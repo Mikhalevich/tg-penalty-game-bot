@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/Mikhalevich/tg-penalty-game-bot/cmd/bot/internal/app/tgbot"
-	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/messageprocessor/button"
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/button"
 )
 
 func (t *TGHandler) DefaultCallbackQuery(ctx context.Context, msg tgbot.BotMessage, sender tgbot.MessageSender) error {

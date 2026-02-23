@@ -7,16 +7,15 @@ import (
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
 
-	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/messageprocessor"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/msginfo"
 )
 
 func (m *messageSender) SendMessage(
 	ctx context.Context,
-	msg messageprocessor.SenderMessage,
+	msg msginfo.SenderMessage,
 ) error {
 	switch msg.Type {
-	case messageprocessor.MessageTypePlain, messageprocessor.MessageTypeMarkdown:
+	case msginfo.MessageTypePlain, msginfo.MessageTypeMarkdown:
 		if _, err := m.bot.SendMessage(ctx, &bot.SendMessageParams{
 			ChatID:          msg.ChatID.Int64(),
 			Text:            msg.Text,
@@ -27,7 +26,7 @@ func (m *messageSender) SendMessage(
 			return fmt.Errorf("send text message: %w", err)
 		}
 
-	case messageprocessor.MessageTypePNG:
+	case msginfo.MessageTypePNG:
 		if err := m.SendPNGMarkdown(ctx, msg.ChatID, msg.Text, msg.Payload, msg.Buttons...); err != nil {
 			return fmt.Errorf("send png: %w", err)
 		}
@@ -39,8 +38,8 @@ func (m *messageSender) SendMessage(
 	return nil
 }
 
-func parseMode(mt messageprocessor.MessageType) models.ParseMode {
-	if mt == messageprocessor.MessageTypeMarkdown {
+func parseMode(mt msginfo.MessageType) models.ParseMode {
+	if mt == msginfo.MessageTypeMarkdown {
 		return models.ParseModeMarkdown
 	}
 

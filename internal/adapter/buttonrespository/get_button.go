@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/messageprocessor/button"
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/button"
 )
 
 func (r *ButtonRepository) GetButton(ctx context.Context, id button.ID) (*button.Button, error) {

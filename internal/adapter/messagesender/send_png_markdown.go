@@ -8,7 +8,7 @@ import (
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
 
-	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/messageprocessor/button"
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/button"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/msginfo"
 )
 

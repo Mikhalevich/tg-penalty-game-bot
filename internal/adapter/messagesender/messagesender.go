@@ -5,7 +5,7 @@ import (
 	"github.com/go-telegram/bot/models"
 
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/messageprocessor"
-	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/messageprocessor/button"
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/button"
 )
 
 var (

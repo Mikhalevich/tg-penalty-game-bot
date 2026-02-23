@@ -3,48 +3,14 @@ package messageprocessor
 import (
 	"context"
 
-	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/messageprocessor/button"
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/button"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/msginfo"
 )
-
-type MessageType int
-
-const (
-	MessageTypePlain MessageType = iota + 1
-	MessageTypeMarkdown
-	MessageTypePNG
-)
-
-func (mt MessageType) Int() int {
-	return int(mt)
-}
-
-func MessageTypeFromInt(t int) MessageType {
-	return MessageType(t)
-}
-
-type Message struct {
-	ChatID     msginfo.ChatID
-	ReplyMsgID msginfo.MessageID
-	Text       string
-	Type       MessageType
-	Payload    []byte
-	Buttons    []button.ButtonRow
-}
-
-type SenderMessage struct {
-	ChatID     msginfo.ChatID
-	ReplyMsgID msginfo.MessageID
-	Text       string
-	Type       MessageType
-	Payload    []byte
-	Buttons    []button.InlineKeyboardButtonRow
-}
 
 type Sender interface {
 	SendMessage(
 		ctx context.Context,
-		msg SenderMessage,
+		msg msginfo.SenderMessage,
 	) error
 	EditText(
 		ctx context.Context,

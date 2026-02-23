@@ -1,5 +1,9 @@
 package msginfo
 
+import (
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/button"
+)
+
 type MessageID int
 
 func (m MessageID) Int() int {
@@ -18,4 +22,38 @@ func (id ChatID) Int64() int64 {
 
 func ChatIDFromInt64(id int64) ChatID {
 	return ChatID(id)
+}
+
+type MessageType int
+
+const (
+	MessageTypePlain MessageType = iota + 1
+	MessageTypeMarkdown
+	MessageTypePNG
+)
+
+func (mt MessageType) Int() int {
+	return int(mt)
+}
+
+func MessageTypeFromInt(t int) MessageType {
+	return MessageType(t)
+}
+
+type Message struct {
+	ChatID     ChatID
+	ReplyMsgID MessageID
+	Text       string
+	Type       MessageType
+	Payload    []byte
+	Buttons    []button.ButtonRow
+}
+
+type SenderMessage struct {
+	ChatID     ChatID
+	ReplyMsgID MessageID
+	Text       string
+	Type       MessageType
+	Payload    []byte
+	Buttons    []button.InlineKeyboardButtonRow
 }

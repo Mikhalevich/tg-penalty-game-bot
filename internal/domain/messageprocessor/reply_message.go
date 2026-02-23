@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/messageprocessor/button"
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/button"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/msginfo"
 )
 
@@ -15,11 +15,11 @@ func (m *MessageProcessor) ReplyTextPlain(
 	text string,
 	rows ...button.ButtonRow,
 ) error {
-	if err := m.SendMessage(ctx, Message{
+	if err := m.SendMessage(ctx, msginfo.Message{
 		ChatID:     chatID,
 		ReplyMsgID: replyMessageID,
 		Text:       text,
-		Type:       MessageTypePlain,
+		Type:       msginfo.MessageTypePlain,
 		Buttons:    rows,
 	}); err != nil {
 		return fmt.Errorf("send message: %w", err)
@@ -35,11 +35,11 @@ func (m *MessageProcessor) ReplyTextMarkdown(
 	text string,
 	rows ...button.ButtonRow,
 ) error {
-	if err := m.SendMessage(ctx, Message{
+	if err := m.SendMessage(ctx, msginfo.Message{
 		ChatID:     chatID,
 		ReplyMsgID: replyMessageID,
 		Text:       text,
-		Type:       MessageTypeMarkdown,
+		Type:       msginfo.MessageTypeMarkdown,
 		Buttons:    rows,
 	}); err != nil {
 		return fmt.Errorf("send message: %w", err)

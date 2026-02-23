@@ -33,6 +33,10 @@ type Repository interface {
 	IsAlreadyExistsError(err error) bool
 }
 
+type Notifier interface {
+	WelcomeNewPlayer(ctx context.Context, plr player.Player) error
+}
+
 type NameGenerator interface {
 	GenerateName() string
 }
