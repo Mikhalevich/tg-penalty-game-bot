@@ -8,9 +8,13 @@ import (
 )
 
 func (p *PlayerController) Welcome(ctx context.Context, chatID msginfo.ChatID) error {
-	_, err := p.GetPlayerByChatID(ctx, chatID)
+	plr, err := p.GetPlayerByChatID(ctx, chatID)
 	if err != nil {
 		return fmt.Errorf("get player by chat id: %w", err)
+	}
+
+	if err := p.notifier.WelcomeNewPlayer(ctx, plr); err != nil {
+		return fmt.Errorf("notification: %w", err)
 	}
 
 	return nil

@@ -35,6 +35,10 @@ type Repository interface {
 
 type Notifier interface {
 	WelcomeNewPlayer(ctx context.Context, plr player.Player) error
+	ChangeNameDelay(ctx context.Context, plr player.Player, waitPeriod time.Duration) error
+	ChangeName(ctx context.Context, plr player.Player, fullName, userName string) error
+	NameAlreadyRegistered(ctx context.Context, plr player.Player, msgID msginfo.MessageID) error
+	NameChanged(ctx context.Context, plr player.Player, msgID msginfo.MessageID) error
 }
 
 type NameGenerator interface {
@@ -47,6 +51,7 @@ type TimeProvider interface {
 
 type PlayerController struct {
 	repo              Repository
+	notifier          Notifier
 	nameGenerator     NameGenerator
 	timeProvider      TimeProvider
 	changeNameTimeout time.Duration
@@ -54,12 +59,14 @@ type PlayerController struct {
 
 func New(
 	repo Repository,
+	notifier Notifier,
 	nameGenerator NameGenerator,
 	timeProvider TimeProvider,
 	changeNameTimeout time.Duration,
 ) *PlayerController {
 	return &PlayerController{
 		repo:              repo,
+		notifier:          notifier,
 		nameGenerator:     nameGenerator,
 		timeProvider:      timeProvider,
 		changeNameTimeout: changeNameTimeout,
