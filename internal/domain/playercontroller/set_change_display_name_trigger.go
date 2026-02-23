@@ -27,6 +27,8 @@ func (p *PlayerController) SetChangeDisplayNameTrigger(
 		if err := p.notifier.ChangeNameDelay(ctx, plr, formatDelta(p.changeNameTimeout-lastNameChangedInterval)); err != nil {
 			return fmt.Errorf("change name delay: %w", err)
 		}
+
+		return nil
 	}
 
 	if err := p.repo.SetChangeDisplayNameTrigger(ctx, plr.ChatID); err != nil {

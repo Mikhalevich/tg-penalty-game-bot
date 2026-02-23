@@ -12,7 +12,7 @@ type PlayerController interface {
 	Welcome(ctx context.Context, chatID msginfo.ChatID) error
 	GetPlayerByChatID(ctx context.Context, chatID msginfo.ChatID) (player.Player, error)
 	SetChangeDisplayNameTrigger(ctx context.Context, chatID msginfo.ChatID, fullName, userName string) error
-	ChangeDisplayName(ctx context.Context, chatID msginfo.ChatID, displayName string, msgID msginfo.MessageID) error
+	ChangeDisplayName(ctx context.Context, chatID msginfo.ChatID, msgID msginfo.MessageID, displayName string) error
 }
 
 type ButtonProvider interface {

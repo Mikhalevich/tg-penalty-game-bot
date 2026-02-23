@@ -10,8 +10,8 @@ import (
 func (p *PlayerController) ChangeDisplayName(
 	ctx context.Context,
 	chatID msginfo.ChatID,
-	displayName string,
 	msgID msginfo.MessageID,
+	displayName string,
 ) error {
 	currentPlayer, err := p.GetPlayerByChatID(ctx, chatID)
 	if err != nil {
