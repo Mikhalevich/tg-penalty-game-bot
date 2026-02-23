@@ -11,7 +11,7 @@ import (
 	"github.com/redis/go-redis/v9"
 
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/messageprocessor"
-	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/messageprocessor/button"
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/button"
 )
 
 var (

@@ -12,6 +12,7 @@ import (
 func (t *TGHandler) DefaultHandler(ctx context.Context, msg tgbot.BotMessage, sender tgbot.MessageSender) error {
 	var (
 		chatID = msginfo.ChatIDFromInt64(msg.ChatID)
+		msgID  = msginfo.MessageIDFromInt(msg.MessageID)
 	)
 
 	currentPlayer, err := t.playerController.GetPlayerByChatID(ctx, chatID)
@@ -20,7 +21,7 @@ func (t *TGHandler) DefaultHandler(ctx context.Context, msg tgbot.BotMessage, se
 	}
 
 	if currentPlayer.IsChangeNameTriggered {
-		if err := t.changeDisplayName(ctx, chatID, msg.Text); err != nil {
+		if err := t.changeDisplayName(ctx, chatID, msgID, msg.Text); err != nil {
 			return fmt.Errorf("change display name: %w", err)
 		}
 
@@ -33,9 +34,10 @@ func (t *TGHandler) DefaultHandler(ctx context.Context, msg tgbot.BotMessage, se
 func (t *TGHandler) changeDisplayName(
 	ctx context.Context,
 	chatID msginfo.ChatID,
+	msgID msginfo.MessageID,
 	displayName string,
 ) error {
-	if err := t.playerController.ChangeDisplayName(ctx, chatID, displayName); err != nil {
+	if err := t.playerController.ChangeDisplayName(ctx, chatID, msgID, displayName); err != nil {
 		if !perror.IsType(err, perror.TypeAlreadyExists) {
 			return fmt.Errorf("change display name: %w", err)
 		}

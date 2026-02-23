@@ -6,8 +6,6 @@ import (
 	"fmt"
 
 	"github.com/google/uuid"
-
-	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/msginfo"
 )
 
 type ID string
@@ -22,7 +20,6 @@ func IDFromString(s string) ID {
 
 type Button struct {
 	ID        ID
-	ChatID    msginfo.ChatID
 	Caption   string
 	Operation Operation
 	Payload   []byte
@@ -63,7 +60,6 @@ func gobDecodePayload[Payload any](b []byte) (Payload, error) {
 }
 
 func createButton[P any](
-	chatID msginfo.ChatID,
 	caption string,
 	operation Operation,
 	payload P,
@@ -75,7 +71,6 @@ func createButton[P any](
 
 	return Button{
 		ID:        IDFromString(generateID()),
-		ChatID:    chatID,
 		Caption:   caption,
 		Operation: operation,
 		Payload:   payloadBytes,
@@ -84,13 +79,11 @@ func createButton[P any](
 
 //nolint:unused
 func createButtonWithoutPayload(
-	chatID msginfo.ChatID,
 	caption string,
 	operation Operation,
 ) Button {
 	return Button{
 		ID:        IDFromString(generateID()),
-		ChatID:    chatID,
 		Caption:   caption,
 		Operation: operation,
 	}

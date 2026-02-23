@@ -20,6 +20,7 @@ import (
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/adapter/repository/postgres/transaction"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/adapter/timeprovider"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/messageprocessor"
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/notifier"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playercontroller"
 )
 
@@ -49,7 +50,8 @@ func StartBot(ctx context.Context, cfg config.Config) error {
 		tp               = timeprovider.New()
 		msgSender        = messagesender.New(botAPI)
 		msgProcessor     = messageprocessor.New(msgSender, msgSender, btnRepo)
-		playerController = playercontroller.New(pgDB, nameGenerator, tp, cfg.ChangeNameInterval)
+		notification     = notifier.New(msgProcessor, msgProcessor)
+		playerController = playercontroller.New(pgDB, notification, nameGenerator, tp, cfg.ChangeNameInterval)
 	)
 
 	if err := app.Start(
