@@ -17,7 +17,7 @@ type Repository interface {
 	ChangePlayerGameStatus(
 		ctx context.Context,
 		playerID player.ID,
-		gameID game.GameID,
+		gameID game.ID,
 		status player.GameStatus,
 		changedTime time.Time,
 		prevoiusStatuses ...player.GameStatus,

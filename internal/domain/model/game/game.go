@@ -4,18 +4,18 @@ import (
 	"time"
 )
 
-type GameID string
+type ID string
 
-func (id GameID) String() string {
+func (id ID) String() string {
 	return string(id)
 }
 
-func GameIDFromString(id string) GameID {
-	return GameID(id)
+func IDFromString(id string) ID {
+	return ID(id)
 }
 
 type Game struct {
-	GameID          GameID
+	GameID          ID
 	CreatedAt       time.Time
 	Status          GameStatus
 	StatusChagnedAt time.Time
