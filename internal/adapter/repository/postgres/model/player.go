@@ -74,7 +74,7 @@ func ToDBPlayers(players []player.Player) []Player {
 func toNullTime(t time.Time) sql.NullTime {
 	return sql.NullTime{
 		Time:  t,
-		Valid: t.IsZero(),
+		Valid: !t.IsZero(),
 	}
 }
 
