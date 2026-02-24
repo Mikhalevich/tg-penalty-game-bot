@@ -11,7 +11,7 @@ import (
 func (p *PlayerController) ChangeGameStatus(
 	ctx context.Context,
 	playerID player.ID,
-	gameID game.GameID,
+	gameID game.ID,
 	status player.GameStatus,
 ) error {
 	if err := p.repo.ChangePlayerGameStatus(

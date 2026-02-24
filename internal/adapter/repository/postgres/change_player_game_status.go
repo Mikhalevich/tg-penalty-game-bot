@@ -15,7 +15,7 @@ import (
 func (p *Postgres) ChangePlayerGameStatus(
 	ctx context.Context,
 	playerID player.ID,
-	gameID game.GameID,
+	gameID game.ID,
 	status player.GameStatus,
 	changedTime time.Time,
 	previousStatuses ...player.GameStatus,
@@ -46,7 +46,7 @@ func (p *Postgres) ChangePlayerGameStatus(
 
 func makeChangeGameStatusQuery(
 	playerID player.ID,
-	gameID game.GameID,
+	gameID game.ID,
 	status player.GameStatus,
 	changedTime time.Time,
 	previousStatuses []player.GameStatus,
@@ -96,7 +96,7 @@ func makeChangeGameStatusQuery(
 func bindChangeGameStatusQuery(
 	query string,
 	playerID player.ID,
-	gameID game.GameID,
+	gameID game.ID,
 	status player.GameStatus,
 	changedTime time.Time,
 ) (string, []any, error) {
