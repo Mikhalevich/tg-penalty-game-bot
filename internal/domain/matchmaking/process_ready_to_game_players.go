@@ -55,6 +55,7 @@ func (m *MatchMaking) transactionReadyToGamePlayers(
 		inGamePlayers = make([]player.Player, 0, len(players))
 		//nolint:mnd
 		games = make([]game.Game, 0, len(players)/2)
+		shots = make([]game.Shot, 0, len(players))
 	)
 
 	for i := 1; i < len(players); i += 2 {
@@ -63,12 +64,13 @@ func (m *MatchMaking) transactionReadyToGamePlayers(
 			player2 = players[i]
 		)
 
-		newGame, _, err := m.gameCreator.CreateGame(ctx, []player.Player{player1, player2})
+		newGame, pendingShots, err := m.gameCreator.CreateGame(ctx, []player.Player{player1, player2})
 		if err != nil {
 			return nil, fmt.Errorf("create game: %w", err)
 		}
 
 		games = append(games, newGame)
+		shots = append(shots, pendingShots...)
 
 		inGamePlayers = appendInGamePlayers(inGamePlayers, player1, newGame.ID, newGame.CreatedAt)
 		inGamePlayers = appendInGamePlayers(inGamePlayers, player2, newGame.ID, newGame.CreatedAt)
@@ -76,6 +78,10 @@ func (m *MatchMaking) transactionReadyToGamePlayers(
 
 	if err := m.insertGames(ctx, games); err != nil {
 		return nil, fmt.Errorf("insert games: %w", err)
+	}
+
+	if err := m.insertShots(ctx, shots); err != nil {
+		return nil, fmt.Errorf("insert shots: %w", err)
 	}
 
 	if err := m.setPlayersInGameStatus(ctx, inGamePlayers); err != nil {
@@ -120,6 +126,18 @@ func (m *MatchMaking) insertGames(ctx context.Context, games []game.Game) error 
 
 	if err := m.repo.InsertGames(ctx, games); err != nil {
 		return fmt.Errorf("repo insert games: %w", err)
+	}
+
+	return nil
+}
+
+func (m *MatchMaking) insertShots(ctx context.Context, shots []game.Shot) error {
+	if len(shots) == 0 {
+		return nil
+	}
+
+	if err := m.repo.InsertShots(ctx, shots); err != nil {
+		return fmt.Errorf("repo insert shots: %w", err)
 	}
 
 	return nil

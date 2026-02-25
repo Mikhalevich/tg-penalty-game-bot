@@ -10,6 +10,7 @@ import (
 type Repository interface {
 	SelectReadyToGamePlayers(ctx context.Context, limit int) ([]player.Player, error)
 	InsertGames(ctx context.Context, games []game.Game) error
+	InsertShots(ctx context.Context, shots []game.Shot) error
 	ChangeOrInsertPlayersGameStatus(
 		ctx context.Context,
 		players []player.Player,
