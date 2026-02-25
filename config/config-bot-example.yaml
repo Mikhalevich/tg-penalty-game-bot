@@ -1,7 +1,7 @@
 log_level: "info"
 tracing:
   endpoint: "jaeger:4318"
-  service_name: "perudo-game-bot"
+  service_name: "penalty-game-bot"
 bot:
   token: "bot_token"
 postgres:
