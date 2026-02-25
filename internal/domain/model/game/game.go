@@ -6,6 +6,10 @@ import (
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/player"
 )
 
+const (
+	ShotsInitial = 5
+)
+
 type ID string
 
 func (id ID) String() string {
