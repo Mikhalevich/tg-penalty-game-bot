@@ -32,6 +32,22 @@ services:
     networks:
       - bot-net
 
+  outboxpoller:
+    build:
+      context: ../../
+      dockerfile: script/docker/outboxpoller.Dockerfile
+    depends_on:
+      jaeger:
+        condition: service_started
+      sql-migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./../../config/config-outboxpoller.yaml:/app/config/config-outboxpoller.yaml
+    networks:
+      - bot-net
+
   jaeger:
     image: jaegertracing/all-in-one:1.57
     ports:

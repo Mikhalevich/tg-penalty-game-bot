@@ -1,0 +1,85 @@
+package app
+
+import (
+	"context"
+	"sync"
+	"time"
+
+	"github.com/Mikhalevich/tg-penalty-game-bot/cmd/outboxpoller/internal/config"
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/infra/logger"
+)
+
+type Processor interface {
+	ProcessMessage(ctx context.Context, batchSize int) error
+}
+
+type App struct {
+	processor Processor
+}
+
+func New(processor Processor) *App {
+	return &App{
+		processor: processor,
+	}
+}
+
+func (a *App) Run(
+	ctx context.Context,
+	messageCfg config.Worker,
+) {
+	var wgr sync.WaitGroup
+
+	runWorkers(ctx, "message", messageCfg, &wgr,
+		func(ctx context.Context) error {
+			return a.processor.ProcessMessage(ctx, messageCfg.BatchSize)
+		},
+	)
+
+	wgr.Wait()
+}
+
+func runWorkers(
+	ctx context.Context,
+	workerName string,
+	cfg config.Worker,
+	wgr *sync.WaitGroup,
+	processFn func(ctx context.Context) error,
+) {
+	for i := range cfg.Count {
+		wgr.Go(func() {
+			log := logger.FromContext(ctx).
+				WithFields(logger.Fields{
+					"worker_name":   workerName,
+					"worker_number": i,
+				})
+			runPoller(
+				logger.WithLogger(ctx, log),
+				cfg.Interval,
+				processFn,
+			)
+		})
+	}
+}
+
+func runPoller(
+	ctx context.Context,
+	interval time.Duration,
+	processFn func(ctx context.Context) error,
+) {
+	ticker := time.NewTicker(interval)
+	defer ticker.Stop()
+
+	for {
+		select {
+		case <-ticker.C:
+			if err := processFn(ctx); err != nil {
+				logger.FromContext(ctx).
+					WithError(err).
+					Error("poller process error")
+			}
+
+		case <-ctx.Done():
+			return
+		}
+	}
+}
