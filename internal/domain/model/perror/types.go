@@ -9,4 +9,6 @@ const (
 	TypeInvalidParam
 	TypeTooManyRequests
 	TypeInvalidPlayer
+	TypeInvalidGameState
+	TypeInvalidRound
 )

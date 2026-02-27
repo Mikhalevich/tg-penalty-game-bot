@@ -76,3 +76,11 @@ func TooManyRequests(msg string, waitDuration time.Duration) Error {
 func InvalidPlayer() Error {
 	return New(TypeInvalidPlayer, "invalid player")
 }
+
+func InvalidGameState() Error {
+	return New(TypeInvalidGameState, "invalid game state")
+}
+
+func InvalidRound() Error {
+	return New(TypeInvalidRound, "invalid round")
+}
