@@ -51,3 +51,10 @@ type State struct {
 	Players []Player
 	Rounds  []Round
 }
+
+func (g *Game) CurrentRound() int {
+	return len(g.State.Rounds)
+}
+
+func (g *Game) CompleteRound(shots []Shot) {
+}

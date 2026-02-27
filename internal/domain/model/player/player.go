@@ -27,3 +27,8 @@ type Player struct {
 	GameStatusChangedAt   time.Time
 	CurrentGameID         string
 }
+
+func (p Player) IsInGame(gameID string) bool {
+	return p.GameStatus == GameStatusInGame &&
+		p.CurrentGameID == gameID
+}
