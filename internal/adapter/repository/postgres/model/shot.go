@@ -30,6 +30,16 @@ func (s Shot) ToShot() game.Shot {
 	}
 }
 
+func ToShots(dbShots []Shot) []game.Shot {
+	domShots := make([]game.Shot, 0, len(dbShots))
+
+	for _, s := range dbShots {
+		domShots = append(domShots, s.ToShot())
+	}
+
+	return domShots
+}
+
 func ToDBShot(domShot game.Shot) Shot {
 	return Shot{
 		GameID:      domShot.GameID.String(),

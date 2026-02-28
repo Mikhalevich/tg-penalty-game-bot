@@ -5,11 +5,13 @@ import (
 
 	"github.com/jmoiron/sqlx"
 
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/gamecontroller"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playercontroller"
 )
 
 var (
 	_ playercontroller.Repository = (*Postgres)(nil)
+	_ gamecontroller.Repository   = (*Postgres)(nil)
 )
 
 type Driver interface {
