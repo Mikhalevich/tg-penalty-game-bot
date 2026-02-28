@@ -13,7 +13,7 @@ import (
 func (p *Postgres) InsertShots(ctx context.Context, shots []game.Shot) error {
 	var (
 		query = `
-			INSERT INTO game(
+			INSERT INTO shot(
 				game_id,
 				player_id,
 				round,

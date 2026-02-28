@@ -39,7 +39,7 @@ func (gc *GameController) Shot(
 		return fmt.Errorf("update shot: %w", err)
 	}
 
-	shots, err := gc.repo.GetRoundShotsByGame(ctx, gameID, round)
+	shots, err := gc.repo.GetRoundShots(ctx, gameID, round)
 	if err != nil {
 		return fmt.Errorf("get round shots by game: %w", err)
 	}
