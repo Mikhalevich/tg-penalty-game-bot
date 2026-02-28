@@ -82,7 +82,13 @@ func (gc *GameController) completeRound(
 		return perror.InvalidRound()
 	}
 
-	currentGame.CompleteRound(shots)
+	if err := currentGame.CompleteRound(shots); err != nil {
+		return fmt.Errorf("complete round: %w", err)
+	}
+
+	if err := gc.repo.UpdateGame(ctx, currentGame); err != nil {
+		return fmt.Errorf("update game: %w", err)
+	}
 
 	return nil
 }

@@ -11,6 +11,7 @@ import (
 
 type Repository interface {
 	GetGame(ctx context.Context, gameID game.ID) (game.Game, error)
+	UpdateGame(ctx context.Context, game game.Game) error
 	UpdateShot(ctx context.Context, shot game.Shot) error
 	GetRoundShotsByGame(ctx context.Context, gameID game.ID, round int) ([]game.Shot, error)
 	IsNoRowsUpdated(err error) bool
