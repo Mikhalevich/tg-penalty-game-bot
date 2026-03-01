@@ -2,6 +2,7 @@ package gamecontroller
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/google/uuid"
 
@@ -18,36 +19,26 @@ const (
 func (gc *GameController) CreateGame(
 	ctx context.Context,
 	players []player.Player,
-) (game.Game, []game.Shot, error) {
+) (game.Game, error) {
 	if len(players) != playersCountForNewGame {
-		return game.Game{}, nil, perror.InvalidParam("invalid players count")
+		return game.Game{}, perror.InvalidParam("invalid players count")
 	}
 
 	var (
-		gameID       = game.IDFromString(uuid.NewString())
-		now          = gc.timeProvider.Now()
-		gamePlayers  = make([]game.Player, 0, len(players))
-		pendingShots = make([]game.Shot, 0, playersCountForNewGame)
+		gameID      = game.IDFromString(uuid.NewString())
+		now         = gc.timeProvider.Now()
+		gamePlayers = make([]game.Player, 0, len(players))
 	)
 
-	for plrIdx, plr := range players {
+	for _, plr := range players {
 		gamePlayers = append(gamePlayers, game.Player{
 			ID:             plr.ID,
 			DisplayName:    plr.DisplayName,
 			ShotsAvailable: game.ShotsInitial,
 		})
-
-		pendingShots = append(pendingShots, game.Shot{
-			GameID:    gameID,
-			PlayerID:  plr.ID,
-			Round:     0,
-			Type:      shotTypeByPlayerPos(plrIdx),
-			CreatedAt: now,
-			Side:      game.ShotSideNoShot,
-		})
 	}
 
-	return game.Game{
+	createdGame := game.Game{
 		ID:              gameID,
 		CreatedAt:       now,
 		Status:          game.GameStatusInProgress,
@@ -55,13 +46,11 @@ func (gc *GameController) CreateGame(
 		State: game.State{
 			Players: gamePlayers,
 		},
-	}, pendingShots, nil
-}
-
-func shotTypeByPlayerPos(pos int) game.ShotType {
-	if pos == 0 {
-		return game.ShotTypeAttack
 	}
 
-	return game.ShotTypeDefend
+	if err := createdGame.StartNextRound(now); err != nil {
+		return game.Game{}, fmt.Errorf("start next round: %w", err)
+	}
+
+	return createdGame, nil
 }
