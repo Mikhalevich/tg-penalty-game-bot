@@ -11,4 +11,5 @@ const (
 	TypeInvalidPlayer
 	TypeInvalidGameState
 	TypeInvalidRound
+	TypeRoundNotCompleted
 )

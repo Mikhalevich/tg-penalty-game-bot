@@ -84,3 +84,7 @@ func InvalidGameState() Error {
 func InvalidRound() Error {
 	return New(TypeInvalidRound, "invalid round")
 }
+
+func RoundNotCompleted() Error {
+	return New(TypeRoundNotCompleted, "round not completed")
+}

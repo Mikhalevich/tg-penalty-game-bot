@@ -10,7 +10,6 @@ import (
 type Repository interface {
 	SelectReadyToGamePlayers(ctx context.Context, limit int) ([]player.Player, error)
 	InsertGames(ctx context.Context, games []game.Game) error
-	InsertShots(ctx context.Context, shots []game.Shot) error
 	ChangeOrInsertPlayersGameStatus(
 		ctx context.Context,
 		players []player.Player,
@@ -22,7 +21,7 @@ type Transactor interface {
 }
 
 type GameCreator interface {
-	CreateGame(ctx context.Context, players []player.Player) (game.Game, []game.Shot, error)
+	CreateGame(ctx context.Context, players []player.Player) (game.Game, error)
 }
 
 type Notifier interface {

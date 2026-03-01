@@ -1,16 +1,15 @@
 package game
 
 import (
-	"errors"
+	"fmt"
 	"time"
 
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/perror"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/player"
 )
 
 const (
 	ShotsInitial = 5
-
-	shotsToCompleteRound = 2
 )
 
 type ID string
@@ -39,15 +38,11 @@ type Player struct {
 	GoalsScored    int
 }
 
-type RoundShot struct {
-	PlayerID player.ID
-	Side     ShotSide
-}
-
 type Round struct {
-	Defend RoundShot
-	Attack RoundShot
-	IsGoal bool
+	Defend      Shot
+	Attack      Shot
+	IsGoal      bool
+	IsCompleted bool
 }
 
 type State struct {
@@ -55,73 +50,136 @@ type State struct {
 	Rounds  []Round
 }
 
-func (g *Game) CurrentRound() int {
+func (g *Game) CurrentRoundNumber() int {
 	return len(g.State.Rounds)
+}
+
+func (g *Game) CurrentRound() *Round {
+	if len(g.State.Rounds) == 0 {
+		return nil
+	}
+
+	return &g.State.Rounds[len(g.State.Rounds)-1]
 }
 
 func (g *Game) IsFinished() bool {
 	return g.Status == GameStatusFinished
 }
 
-func (g *Game) CompleteRound(shots []Shot) error {
-	if len(shots) != shotsToCompleteRound {
-		return errors.New("invalid shot count")
+func (g *Game) PlayerShot(shot Shot) error {
+	var (
+		cRound     = g.CurrentRound()
+		inGameShot *Shot
+	)
+
+	switch shot.Type {
+	case ShotTypeAttack:
+		inGameShot = &cRound.Attack
+
+	case ShotTypeDefend:
+		inGameShot = &cRound.Defend
 	}
 
-	round := makeRoundByShots(shots)
-
-	g.State.Rounds = append(g.State.Rounds, round)
-
-	g.updateAttackerShots(round)
-
-	g.updateGameStatus()
+	if err := updateShot(inGameShot, shot); err != nil {
+		return fmt.Errorf("update shot: %w", err)
+	}
 
 	return nil
 }
 
-func makeRoundByShots(shots []Shot) Round {
-	var round Round
-
-	for _, shot := range shots {
-		roundShot := RoundShot{
-			PlayerID: shot.PlayerID,
-			Side:     shot.Side,
-		}
-
-		switch shot.Type {
-		case ShotTypeAttack:
-			round.Attack = roundShot
-
-		case ShotTypeDefend:
-			round.Defend = roundShot
-		}
+func updateShot(inGameShot *Shot, shot Shot) error {
+	if inGameShot.PlayerID != shot.PlayerID {
+		return perror.InvalidPlayer()
 	}
 
-	round.IsGoal = round.Attack.Side != round.Defend.Side
+	if inGameShot.Round != shot.Round {
+		return perror.InvalidRound()
+	}
 
-	return round
+	inGameShot.Side = shot.Side
+	inGameShot.CompletedAt = shot.CompletedAt
+
+	return nil
 }
 
-func (g *Game) updateAttackerShots(round Round) {
+// TryToCompleteRound complete round if both players make shots
+// and updates attacker shots and scores
+// returns true if round was completed.
+func (g *Game) TryToCompleteRound() bool {
+	cRound := g.CurrentRound()
+
+	if (cRound.Attack.Side == ShotSideNoShot) ||
+		(cRound.Defend.Side == ShotSideNoShot) {
+		return false
+	}
+
+	cRound.IsGoal = cRound.Attack.Side != cRound.Defend.Side
+
+	g.updateAttackerShots(cRound.Attack.PlayerID, cRound.IsGoal)
+
+	cRound.IsCompleted = true
+
+	return true
+}
+
+// StartNextRound starts next round or finish the game.
+func (g *Game) StartNextRound(now time.Time) error {
+	cRound := g.CurrentRound()
+	if cRound != nil && !cRound.IsCompleted {
+		return perror.RoundNotCompleted()
+	}
+
+	var (
+		player1 = g.State.Players[0]
+		player2 = g.State.Players[1]
+	)
+
+	if (player1.ShotsAvailable == 0) && (player2.ShotsAvailable == 0) {
+		g.Status = GameStatusFinished
+
+		return nil
+	}
+
+	attacker, defender := nextAttackerDefenderInOrder(player1, player2)
+
+	g.State.Rounds = append(g.State.Rounds, Round{
+		Attack: g.makePendingShot(attacker.ID, ShotTypeAttack, now),
+		Defend: g.makePendingShot(defender.ID, ShotTypeDefend, now),
+	})
+
+	return nil
+}
+
+func (g *Game) makePendingShot(playerID player.ID, shotType ShotType, now time.Time) Shot {
+	return Shot{
+		GameID:    g.ID,
+		PlayerID:  playerID,
+		Round:     g.CurrentRoundNumber() + 1,
+		Type:      shotType,
+		CreatedAt: now,
+		Side:      ShotSideNoShot,
+	}
+}
+
+// nextAttackerDefenderInOrder returns players in order attacker => defender..
+func nextAttackerDefenderInOrder(player1, player2 Player) (Player, Player) {
+	if player1.ShotsAvailable > player2.ShotsAvailable {
+		return player2, player1
+	}
+
+	return player1, player2
+}
+
+func (g *Game) updateAttackerShots(attackerID player.ID, isGoal bool) {
 	for plrIdx, plr := range g.State.Players {
-		if plr.ID != round.Attack.PlayerID {
+		if plr.ID != attackerID {
 			continue
 		}
 
 		g.State.Players[plrIdx].ShotsAvailable--
 
-		if round.IsGoal {
+		if isGoal {
 			g.State.Players[plrIdx].GoalsScored++
 		}
 	}
-}
-
-func (g *Game) updateGameStatus() {
-	for _, plr := range g.State.Players {
-		if plr.ShotsAvailable > 0 {
-			return
-		}
-	}
-
-	g.Status = GameStatusFinished
 }
