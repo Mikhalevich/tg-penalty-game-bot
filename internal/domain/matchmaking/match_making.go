@@ -21,7 +21,7 @@ type Transactor interface {
 }
 
 type GameCreator interface {
-	CreateGame(ctx context.Context, players []player.Player) (game.Game, error)
+	CreateGame(ctx context.Context, player1 player.Player, player2 player.Player) (game.Game, error)
 }
 
 type Notifier interface {

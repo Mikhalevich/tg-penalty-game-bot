@@ -29,4 +29,6 @@ go.work.sum
 /tools
 
 /config/config-bot.yaml
+/config/config-gamepoller.yaml
+/config/config-outboxpoller.yaml
 /config/dbconfig.yml

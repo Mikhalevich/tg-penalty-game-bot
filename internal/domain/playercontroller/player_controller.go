@@ -39,6 +39,7 @@ type Notifier interface {
 	ChangeName(ctx context.Context, plr player.Player, fullName, userName string) error
 	NameAlreadyRegistered(ctx context.Context, plr player.Player, msgID msginfo.MessageID) error
 	NameChanged(ctx context.Context, plr player.Player, msgID msginfo.MessageID) error
+	PlayerAlreadyInGame(ctx context.Context, plr player.Player) error
 }
 
 type NameGenerator interface {

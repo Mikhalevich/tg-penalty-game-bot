@@ -38,7 +38,7 @@ func StartWorker(ctx context.Context, cfg config.Config) error {
 
 	var (
 		msgSender            = messagesender.New(botAPI)
-		gameNofifier         = notifier.New(nil, msgSender)
+		gameNofifier         = notifier.New(pgDB, msgSender)
 		timeProvider         = timeprovider.New()
 		gameController       = gamecontroller.New(pgDB, nil, timeProvider)
 		matchmakingProcessor = matchmaking.New(

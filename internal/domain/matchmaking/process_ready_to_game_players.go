@@ -63,7 +63,7 @@ func (m *MatchMaking) transactionReadyToGamePlayers(
 			player2 = players[i]
 		)
 
-		newGame, err := m.gameCreator.CreateGame(ctx, []player.Player{player1, player2})
+		newGame, err := m.gameCreator.CreateGame(ctx, player1, player2)
 		if err != nil {
 			return nil, fmt.Errorf("create game: %w", err)
 		}

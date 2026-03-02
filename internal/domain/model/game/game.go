@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/msginfo"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/perror"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/player"
 )
@@ -33,6 +34,7 @@ type Game struct {
 
 type Player struct {
 	ID             player.ID
+	ChatID         msginfo.ChatID
 	DisplayName    string
 	ShotsAvailable int
 	GoalsScored    int
@@ -46,7 +48,8 @@ type Round struct {
 }
 
 type State struct {
-	Players []Player
+	Player1 Player
+	Player2 Player
 	Rounds  []Round
 }
 
@@ -130,8 +133,8 @@ func (g *Game) StartNextRound(now time.Time) error {
 	}
 
 	var (
-		player1 = g.State.Players[0]
-		player2 = g.State.Players[1]
+		player1 = g.State.Player1
+		player2 = g.State.Player2
 	)
 
 	if (player1.ShotsAvailable == 0) && (player2.ShotsAvailable == 0) {
@@ -161,7 +164,7 @@ func (g *Game) makePendingShot(playerID player.ID, shotType ShotType, now time.T
 	}
 }
 
-// nextAttackerDefenderInOrder returns players in order attacker => defender..
+// nextAttackerDefenderInOrder returns players in order attacker => defender.
 func nextAttackerDefenderInOrder(player1, player2 Player) (Player, Player) {
 	if player1.ShotsAvailable > player2.ShotsAvailable {
 		return player2, player1
@@ -171,15 +174,17 @@ func nextAttackerDefenderInOrder(player1, player2 Player) (Player, Player) {
 }
 
 func (g *Game) updateAttackerShots(attackerID player.ID, isGoal bool) {
-	for plrIdx, plr := range g.State.Players {
-		if plr.ID != attackerID {
-			continue
-		}
+	var attackerPlayer *Player
 
-		g.State.Players[plrIdx].ShotsAvailable--
+	if attackerID == g.State.Player1.ID {
+		attackerPlayer = &g.State.Player1
+	} else {
+		attackerPlayer = &g.State.Player2
+	}
 
-		if isGoal {
-			g.State.Players[plrIdx].GoalsScored++
-		}
+	attackerPlayer.ShotsAvailable--
+
+	if isGoal {
+		attackerPlayer.GoalsScored++
 	}
 }
