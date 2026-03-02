@@ -7,36 +7,19 @@ import (
 	"github.com/google/uuid"
 
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/game"
-	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/perror"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/player"
-)
-
-const (
-	playersCountForNewGame = 2
 )
 
 // CreateGame create a new game and return created game and two pending players shots.
 func (gc *GameController) CreateGame(
 	ctx context.Context,
-	players []player.Player,
+	player1 player.Player,
+	player2 player.Player,
 ) (game.Game, error) {
-	if len(players) != playersCountForNewGame {
-		return game.Game{}, perror.InvalidParam("invalid players count")
-	}
-
 	var (
-		gameID      = game.IDFromString(uuid.NewString())
-		now         = gc.timeProvider.Now()
-		gamePlayers = make([]game.Player, 0, len(players))
+		gameID = game.IDFromString(uuid.NewString())
+		now    = gc.timeProvider.Now()
 	)
-
-	for _, plr := range players {
-		gamePlayers = append(gamePlayers, game.Player{
-			ID:             plr.ID,
-			DisplayName:    plr.DisplayName,
-			ShotsAvailable: game.ShotsInitial,
-		})
-	}
 
 	createdGame := game.Game{
 		ID:              gameID,
@@ -44,7 +27,8 @@ func (gc *GameController) CreateGame(
 		Status:          game.GameStatusInProgress,
 		StatusChagnedAt: now,
 		State: game.State{
-			Players: gamePlayers,
+			Player1: createGamePlayerFromPlayer(player1),
+			Player2: createGamePlayerFromPlayer(player2),
 		},
 	}
 
@@ -53,4 +37,13 @@ func (gc *GameController) CreateGame(
 	}
 
 	return createdGame, nil
+}
+
+func createGamePlayerFromPlayer(plr player.Player) game.Player {
+	return game.Player{
+		ID:             plr.ID,
+		ChatID:         plr.ChatID,
+		DisplayName:    plr.DisplayName,
+		ShotsAvailable: game.ShotsInitial,
+	}
 }
