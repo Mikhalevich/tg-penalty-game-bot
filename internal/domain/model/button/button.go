@@ -59,7 +59,7 @@ func gobDecodePayload[Payload any](b []byte) (Payload, error) {
 	return payload, nil
 }
 
-func createButton[P any](
+func CreateButton[P any](
 	caption string,
 	operation Operation,
 	payload P,
@@ -77,8 +77,7 @@ func createButton[P any](
 	}, nil
 }
 
-//nolint:unused
-func createButtonWithoutPayload(
+func CreateButtonWithoutPayload(
 	caption string,
 	operation Operation,
 ) Button {

@@ -6,6 +6,7 @@ import (
 
 	"github.com/Mikhalevich/tg-penalty-game-bot/cmd/bot/internal/app/tgbot"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/button"
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/game"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/msginfo"
 )
 
@@ -19,13 +20,17 @@ func (t *TGHandler) DefaultCallbackQuery(ctx context.Context, msg tgbot.BotMessa
 		msgID  = msginfo.MessageIDFromInt(msg.MessageID)
 	)
 
-	btn, err := t.messageProcessor.GetButton(ctx, button.IDFromString(msg.Data))
+	btn, err := t.buttonProvider.GetButton(ctx, button.IDFromString(msg.Data))
 	if err != nil {
 		return fmt.Errorf("get button: %w", err)
 	}
 
-	if btn.Operation == button.OperationChangeName {
+	switch btn.Operation {
+	case button.OperationChangeName:
 		return t.processChangeNameButton(ctx, chatID, msgID, btn)
+
+	case button.OperationShotSide:
+		return t.processShotSideButton(ctx, chatID, btn)
 	}
 
 	return nil
@@ -44,6 +49,23 @@ func (t *TGHandler) processChangeNameButton(
 
 	if err := t.changeDisplayName(ctx, chatID, msgID, payload.DisplayName); err != nil {
 		return fmt.Errorf("change display name: %w", err)
+	}
+
+	return nil
+}
+
+func (t *TGHandler) processShotSideButton(
+	ctx context.Context,
+	chatID msginfo.ChatID,
+	btn *button.Button,
+) error {
+	payload, err := button.GetPayload[game.ShotSidePayload](*btn)
+	if err != nil {
+		return fmt.Errorf("get payload: %w", err)
+	}
+
+	if err := t.gameController.Shot(ctx, chatID, payload.GameID, payload.Round, payload.Side); err != nil {
+		return fmt.Errorf("shot: %w", err)
 	}
 
 	return nil

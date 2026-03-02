@@ -1,7 +1,6 @@
 package game
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/msginfo"
@@ -70,27 +69,12 @@ func (g *Game) IsFinished() bool {
 }
 
 func (g *Game) PlayerShot(shot Shot) error {
-	var (
-		cRound     = g.CurrentRound()
-		inGameShot *Shot
-	)
+	inGameShot := g.shotByPlayerID(shot.PlayerID)
 
-	switch shot.Type {
-	case ShotTypeAttack:
-		inGameShot = &cRound.Attack
-
-	case ShotTypeDefend:
-		inGameShot = &cRound.Defend
+	if inGameShot.Side != ShotSideNoShot {
+		return perror.AlreadyExists("shot already exist")
 	}
 
-	if err := updateShot(inGameShot, shot); err != nil {
-		return fmt.Errorf("update shot: %w", err)
-	}
-
-	return nil
-}
-
-func updateShot(inGameShot *Shot, shot Shot) error {
 	if inGameShot.PlayerID != shot.PlayerID {
 		return perror.InvalidPlayer()
 	}
@@ -151,6 +135,16 @@ func (g *Game) StartNextRound(now time.Time) error {
 	})
 
 	return nil
+}
+
+func (g *Game) shotByPlayerID(id player.ID) *Shot {
+	cRound := g.CurrentRound()
+
+	if cRound.Attack.PlayerID == id {
+		return &cRound.Attack
+	}
+
+	return &cRound.Defend
 }
 
 func (g *Game) makePendingShot(playerID player.ID, shotType ShotType, now time.Time) Shot {

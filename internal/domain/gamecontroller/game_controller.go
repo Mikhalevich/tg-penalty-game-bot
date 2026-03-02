@@ -23,20 +23,27 @@ type TimeProvider interface {
 	Now() time.Time
 }
 
+type Notifier interface {
+	GameStage(ctx context.Context, currentGame game.Game) error
+}
+
 type GameController struct {
 	repo             Repository
 	playerController PlayerController
 	timeProvider     TimeProvider
+	notifier         Notifier
 }
 
 func New(
 	repo Repository,
 	playerController PlayerController,
 	timeProvier TimeProvider,
+	notifier Notifier,
 ) *GameController {
 	return &GameController{
 		repo:             repo,
 		playerController: playerController,
 		timeProvider:     timeProvier,
+		notifier:         notifier,
 	}
 }
