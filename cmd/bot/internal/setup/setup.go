@@ -53,7 +53,7 @@ func StartBot(ctx context.Context, cfg config.Config) error {
 		msgProcessor     = messageprocessor.New(msgSender, msgSender, btnRepo)
 		notification     = notifier.New(msgProcessor, msgProcessor)
 		playerController = playercontroller.New(pgDB, notification, nameGenerator, tp, cfg.ChangeNameInterval)
-		gameController   = gamecontroller.New(pgDB, playerController, tp, notification)
+		gameController   = gamecontroller.New(pgDB, playerController, tp, notification, msgProcessor)
 	)
 
 	if err := app.Start(

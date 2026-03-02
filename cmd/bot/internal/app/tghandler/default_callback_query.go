@@ -30,7 +30,7 @@ func (t *TGHandler) DefaultCallbackQuery(ctx context.Context, msg tgbot.BotMessa
 		return t.processChangeNameButton(ctx, chatID, msgID, btn)
 
 	case button.OperationShotSide:
-		return t.processShotSideButton(ctx, chatID, btn)
+		return t.processShotSideButton(ctx, chatID, msgID, btn)
 	}
 
 	return nil
@@ -57,6 +57,7 @@ func (t *TGHandler) processChangeNameButton(
 func (t *TGHandler) processShotSideButton(
 	ctx context.Context,
 	chatID msginfo.ChatID,
+	msgID msginfo.MessageID,
 	btn *button.Button,
 ) error {
 	payload, err := button.GetPayload[game.ShotSidePayload](*btn)
@@ -64,7 +65,7 @@ func (t *TGHandler) processShotSideButton(
 		return fmt.Errorf("get payload: %w", err)
 	}
 
-	if err := t.gameController.Shot(ctx, chatID, payload.GameID, payload.Round, payload.Side); err != nil {
+	if err := t.gameController.Shot(ctx, chatID, msgID, payload.GameID, payload.Round, payload.Side); err != nil {
 		return fmt.Errorf("shot: %w", err)
 	}
 

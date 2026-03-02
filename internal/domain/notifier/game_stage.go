@@ -15,12 +15,16 @@ func (n *Notifier) GameStage(ctx context.Context, currentGame game.Game) error {
 		if err := n.finishedGameNotifications(ctx, currentGame); err != nil {
 			return fmt.Errorf("finished game notifications: %w", err)
 		}
+
+		return nil
 	}
 
 	if currentGame.CurrentRound().IsCompleted {
 		if err := n.finishedRoundNotifications(ctx, currentGame); err != nil {
 			return fmt.Errorf("finished round notifications: %w", err)
 		}
+
+		return nil
 	}
 
 	if err := n.inGameNotifications(ctx, currentGame); err != nil {
@@ -86,7 +90,7 @@ func makeFinishedRoundMsg(currentGame game.Game) string {
 func (n *Notifier) inGameNotifications(ctx context.Context, currentGame game.Game) error {
 	cRound := currentGame.CurrentRound()
 
-	buttons, err := makeShotSideButtons(currentGame.ID, currentGame.CurrentRoundNumber())
+	attackerButtons, err := makeShotSideButtons(currentGame.ID, currentGame.CurrentRoundNumber())
 	if err != nil {
 		return fmt.Errorf("make buttons: %w", err)
 	}
@@ -95,16 +99,21 @@ func (n *Notifier) inGameNotifications(ctx context.Context, currentGame game.Gam
 		ChatID:  chatIDByPlayerID(cRound.Attack.PlayerID, currentGame),
 		Text:    "Attack",
 		Type:    msginfo.MessageTypeMarkdown,
-		Buttons: []button.ButtonRow{buttons},
+		Buttons: []button.ButtonRow{attackerButtons},
 	}); err != nil {
 		return fmt.Errorf("send attacker msg: %w", err)
+	}
+
+	defenderButtons, err := makeShotSideButtons(currentGame.ID, currentGame.CurrentRoundNumber())
+	if err != nil {
+		return fmt.Errorf("make buttons: %w", err)
 	}
 
 	if err := n.sender.SendMessage(ctx, msginfo.Message{
 		ChatID:  chatIDByPlayerID(cRound.Defend.PlayerID, currentGame),
 		Text:    "Defend",
 		Type:    msginfo.MessageTypeMarkdown,
-		Buttons: []button.ButtonRow{buttons},
+		Buttons: []button.ButtonRow{defenderButtons},
 	}); err != nil {
 		return fmt.Errorf("send defender msg: %w", err)
 	}

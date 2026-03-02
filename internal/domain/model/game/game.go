@@ -160,11 +160,11 @@ func (g *Game) makePendingShot(playerID player.ID, shotType ShotType, now time.T
 
 // nextAttackerDefenderInOrder returns players in order attacker => defender.
 func nextAttackerDefenderInOrder(player1, player2 Player) (Player, Player) {
-	if player1.ShotsAvailable > player2.ShotsAvailable {
-		return player2, player1
+	if player1.ShotsAvailable >= player2.ShotsAvailable {
+		return player1, player2
 	}
 
-	return player1, player2
+	return player2, player1
 }
 
 func (g *Game) updateAttackerShots(attackerID player.ID, isGoal bool) {

@@ -25,6 +25,7 @@ type GameController interface {
 	Shot(
 		ctx context.Context,
 		chatID msginfo.ChatID,
+		msgID msginfo.MessageID,
 		gameID game.ID,
 		round int,
 		side game.ShotSide,
