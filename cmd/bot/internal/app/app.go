@@ -12,13 +12,15 @@ import (
 func Start(
 	ctx context.Context,
 	token string,
+	buttonProvider tghandler.ButtonProvider,
 	playerController tghandler.PlayerController,
-	messageProcessor tghandler.ButtonProvider,
+	gameController tghandler.GameController,
 ) error {
 	var (
 		botHandler = tghandler.New(
+			buttonProvider,
 			playerController,
-			messageProcessor,
+			gameController,
 		)
 	)
 

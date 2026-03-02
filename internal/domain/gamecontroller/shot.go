@@ -9,9 +9,11 @@ import (
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/perror"
 )
 
+//nolint:cyclop
 func (gc *GameController) Shot(
 	ctx context.Context,
 	chatID msginfo.ChatID,
+	msgID msginfo.MessageID,
 	gameID game.ID,
 	round int,
 	side game.ShotSide,
@@ -47,13 +49,25 @@ func (gc *GameController) Shot(
 	}
 
 	if currentGame.TryToCompleteRound() {
+		if err := gc.notifier.GameStage(ctx, currentGame); err != nil {
+			return fmt.Errorf("complete round game stage: %w", err)
+		}
+
 		if err := currentGame.StartNextRound(now); err != nil {
 			return fmt.Errorf("start next round: %w", err)
+		}
+
+		if err := gc.notifier.GameStage(ctx, currentGame); err != nil {
+			return fmt.Errorf("start next round game stage: %w", err)
 		}
 	}
 
 	if err := gc.repo.UpdateGame(ctx, currentGame); err != nil {
 		return fmt.Errorf("update game: %w", err)
+	}
+
+	if err := gc.messageDeleter.DeleteMessage(ctx, chatID, msgID); err != nil {
+		return fmt.Errorf("delete message: %w", err)
 	}
 
 	return nil

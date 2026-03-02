@@ -23,20 +23,38 @@ type TimeProvider interface {
 	Now() time.Time
 }
 
+type Notifier interface {
+	GameStage(ctx context.Context, currentGame game.Game) error
+}
+
+type MessageDeleteter interface {
+	DeleteMessage(
+		ctx context.Context,
+		chatID msginfo.ChatID,
+		messageID msginfo.MessageID,
+	) error
+}
+
 type GameController struct {
 	repo             Repository
 	playerController PlayerController
 	timeProvider     TimeProvider
+	notifier         Notifier
+	messageDeleter   MessageDeleteter
 }
 
 func New(
 	repo Repository,
 	playerController PlayerController,
 	timeProvier TimeProvider,
+	notifier Notifier,
+	messageDeleter MessageDeleteter,
 ) *GameController {
 	return &GameController{
 		repo:             repo,
 		playerController: playerController,
 		timeProvider:     timeProvier,
+		notifier:         notifier,
+		messageDeleter:   messageDeleter,
 	}
 }

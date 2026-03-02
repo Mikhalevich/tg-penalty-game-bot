@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/button"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/game"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/msginfo"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/player"
@@ -14,12 +15,16 @@ func (n *Notifier) GameStage(ctx context.Context, currentGame game.Game) error {
 		if err := n.finishedGameNotifications(ctx, currentGame); err != nil {
 			return fmt.Errorf("finished game notifications: %w", err)
 		}
+
+		return nil
 	}
 
 	if currentGame.CurrentRound().IsCompleted {
 		if err := n.finishedRoundNotifications(ctx, currentGame); err != nil {
 			return fmt.Errorf("finished round notifications: %w", err)
 		}
+
+		return nil
 	}
 
 	if err := n.inGameNotifications(ctx, currentGame); err != nil {
@@ -85,23 +90,54 @@ func makeFinishedRoundMsg(currentGame game.Game) string {
 func (n *Notifier) inGameNotifications(ctx context.Context, currentGame game.Game) error {
 	cRound := currentGame.CurrentRound()
 
-	if err := n.sendMsgToPlayer(
-		ctx,
-		chatIDByPlayerID(cRound.Attack.PlayerID, currentGame),
-		"Attack",
-	); err != nil {
+	attackerButtons, err := makeShotSideButtons(currentGame.ID, currentGame.CurrentRoundNumber())
+	if err != nil {
+		return fmt.Errorf("make buttons: %w", err)
+	}
+
+	if err := n.sender.SendMessage(ctx, msginfo.Message{
+		ChatID:  chatIDByPlayerID(cRound.Attack.PlayerID, currentGame),
+		Text:    "Attack",
+		Type:    msginfo.MessageTypeMarkdown,
+		Buttons: []button.ButtonRow{attackerButtons},
+	}); err != nil {
 		return fmt.Errorf("send attacker msg: %w", err)
 	}
 
-	if err := n.sendMsgToPlayer(
-		ctx,
-		chatIDByPlayerID(cRound.Defend.PlayerID, currentGame),
-		"Defend",
-	); err != nil {
+	defenderButtons, err := makeShotSideButtons(currentGame.ID, currentGame.CurrentRoundNumber())
+	if err != nil {
+		return fmt.Errorf("make buttons: %w", err)
+	}
+
+	if err := n.sender.SendMessage(ctx, msginfo.Message{
+		ChatID:  chatIDByPlayerID(cRound.Defend.PlayerID, currentGame),
+		Text:    "Defend",
+		Type:    msginfo.MessageTypeMarkdown,
+		Buttons: []button.ButtonRow{defenderButtons},
+	}); err != nil {
 		return fmt.Errorf("send defender msg: %w", err)
 	}
 
 	return nil
+}
+
+func makeShotSideButtons(gameID game.ID, roundNumber int) (button.ButtonRow, error) {
+	left, err := game.ShotSideButton("left", gameID, roundNumber, game.ShotSideLeft)
+	if err != nil {
+		return nil, fmt.Errorf("left button: %w", err)
+	}
+
+	middle, err := game.ShotSideButton("middle", gameID, roundNumber, game.ShotSideMiddle)
+	if err != nil {
+		return nil, fmt.Errorf("right button: %w", err)
+	}
+
+	right, err := game.ShotSideButton("right", gameID, roundNumber, game.ShotSideRight)
+	if err != nil {
+		return nil, fmt.Errorf("right button: %w", err)
+	}
+
+	return button.ButtonRow{left, middle, right}, nil
 }
 
 func chatIDByPlayerID(playerID player.ID, currentGame game.Game) msginfo.ChatID {

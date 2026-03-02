@@ -25,7 +25,7 @@ func (p *Postgres) GetGame(ctx context.Context, gameID game.ID) (game.Game, erro
 			FROM
 				game
 			WHERE
-				game_id = $1
+				id = $1
 		`
 
 		dbGame model.Game

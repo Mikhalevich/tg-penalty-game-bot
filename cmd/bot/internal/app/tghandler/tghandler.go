@@ -4,9 +4,14 @@ import (
 	"context"
 
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/button"
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/game"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/msginfo"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/player"
 )
+
+type ButtonProvider interface {
+	GetButton(ctx context.Context, id button.ID) (*button.Button, error)
+}
 
 type PlayerController interface {
 	Welcome(ctx context.Context, chatID msginfo.ChatID) error
@@ -16,21 +21,31 @@ type PlayerController interface {
 	SetPlayerReadyToGame(ctx context.Context, chatID msginfo.ChatID) error
 }
 
-type ButtonProvider interface {
-	GetButton(ctx context.Context, id button.ID) (*button.Button, error)
+type GameController interface {
+	Shot(
+		ctx context.Context,
+		chatID msginfo.ChatID,
+		msgID msginfo.MessageID,
+		gameID game.ID,
+		round int,
+		side game.ShotSide,
+	) error
 }
 
 type TGHandler struct {
+	buttonProvider   ButtonProvider
 	playerController PlayerController
-	messageProcessor ButtonProvider
+	gameController   GameController
 }
 
 func New(
+	buttonProvider ButtonProvider,
 	playerController PlayerController,
-	messageProcessor ButtonProvider,
+	gameController GameController,
 ) *TGHandler {
 	return &TGHandler{
+		buttonProvider:   buttonProvider,
 		playerController: playerController,
-		messageProcessor: messageProcessor,
+		gameController:   gameController,
 	}
 }

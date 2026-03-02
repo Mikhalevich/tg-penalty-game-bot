@@ -5,7 +5,7 @@ type ChangeNamePayload struct {
 }
 
 func ChangeName(caption, displayName string) (Button, error) {
-	return createButton(caption, OperationChangeName,
+	return CreateButton(caption, OperationChangeName,
 		ChangeNamePayload{
 			DisplayName: displayName,
 		},
