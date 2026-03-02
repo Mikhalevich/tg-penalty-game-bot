@@ -21,7 +21,7 @@ func (p *Postgres) InsertGames(ctx context.Context, games []game.Game) error {
 				payload,
 				payload_version
 			) VALUES (
-				:game_id,
+				:id,
 				:created_at,
 				:game_status,
 				:game_status_changed_at,
