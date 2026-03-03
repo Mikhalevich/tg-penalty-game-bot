@@ -12,11 +12,22 @@ import (
 type Repository interface {
 	GetGame(ctx context.Context, gameID game.ID) (game.Game, error)
 	UpdateGame(ctx context.Context, game game.Game) error
+	InsertGames(ctx context.Context, games []game.Game) error
 	IsNoRowsUpdated(err error) bool
+}
+
+type Transactor interface {
+	Transaction(ctx context.Context, trxFn func(ctx context.Context) error) error
 }
 
 type PlayerController interface {
 	GetPlayerByChatID(ctx context.Context, chatID msginfo.ChatID) (player.Player, error)
+	ChangeGameStatus(
+		ctx context.Context,
+		playerID player.ID,
+		gameID game.ID,
+		status player.GameStatus,
+	) error
 }
 
 type TimeProvider interface {
@@ -25,6 +36,7 @@ type TimeProvider interface {
 
 type Notifier interface {
 	GameStage(ctx context.Context, currentGame game.Game) error
+	PlayerAlreadyInGame(ctx context.Context, plr player.Player) error
 }
 
 type MessageDeleteter interface {
@@ -37,6 +49,7 @@ type MessageDeleteter interface {
 
 type GameController struct {
 	repo             Repository
+	transactor       Transactor
 	playerController PlayerController
 	timeProvider     TimeProvider
 	notifier         Notifier
@@ -45,6 +58,7 @@ type GameController struct {
 
 func New(
 	repo Repository,
+	transactor Transactor,
 	playerController PlayerController,
 	timeProvier TimeProvider,
 	notifier Notifier,
@@ -52,6 +66,7 @@ func New(
 ) *GameController {
 	return &GameController{
 		repo:             repo,
+		transactor:       transactor,
 		playerController: playerController,
 		timeProvider:     timeProvier,
 		notifier:         notifier,

@@ -39,6 +39,10 @@ type Player struct {
 	GoalsScored    int
 }
 
+func (p Player) IsBot() bool {
+	return p.ID == 0
+}
+
 type Round struct {
 	Defend      Shot
 	Attack      Shot
@@ -64,8 +68,12 @@ func (g *Game) CurrentRound() *Round {
 	return &g.State.Rounds[len(g.State.Rounds)-1]
 }
 
+func (g *Game) IsGameWithBot() bool {
+	return g.State.Player1.IsBot() || g.State.Player2.IsBot()
+}
+
 func (g *Game) IsFinished() bool {
-	return g.Status == GameStatusFinished
+	return g.Status == GameStatusCompleted
 }
 
 func (g *Game) PlayerShot(shot Shot) error {
@@ -122,7 +130,7 @@ func (g *Game) StartNextRound(now time.Time) error {
 	)
 
 	if (player1.ShotsAvailable == 0) && (player2.ShotsAvailable == 0) {
-		g.Status = GameStatusFinished
+		g.Status = GameStatusCompleted
 
 		return nil
 	}

@@ -43,6 +43,7 @@ func (p *PlayerController) createPlayer(
 			ChatID:      chatID,
 			DisplayName: p.nameGenerator.GenerateName(),
 			CreatedAt:   creationTime,
+			GameStatus:  player.GameStatusIdle,
 		}
 
 		playerID, err := p.repo.CreatePlayer(ctx, newPlayer)
