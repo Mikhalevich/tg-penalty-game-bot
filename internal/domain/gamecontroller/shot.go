@@ -3,13 +3,14 @@ package gamecontroller
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/game"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/msginfo"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/perror"
 )
 
-//nolint:cyclop
+//nolint:cyclop,funlen
 func (gc *GameController) Shot(
 	ctx context.Context,
 	chatID msginfo.ChatID,
@@ -48,6 +49,12 @@ func (gc *GameController) Shot(
 		return fmt.Errorf("player shot: %w", err)
 	}
 
+	if currentGame.IsGameWithBot() {
+		if err := gc.processBotShot(&currentGame, round, now); err != nil {
+			return fmt.Errorf("bot shot: %w", err)
+		}
+	}
+
 	if currentGame.TryToCompleteRound() {
 		if err := gc.notifier.GameStage(ctx, currentGame); err != nil {
 			return fmt.Errorf("complete round game stage: %w", err)
@@ -68,6 +75,24 @@ func (gc *GameController) Shot(
 
 	if err := gc.messageDeleter.DeleteMessage(ctx, chatID, msgID); err != nil {
 		return fmt.Errorf("delete message: %w", err)
+	}
+
+	return nil
+}
+
+func (gc *GameController) processBotShot(
+	currentGame *game.Game,
+	round int,
+	completedAt time.Time,
+) error {
+	if err := currentGame.PlayerShot(game.Shot{
+		GameID:      currentGame.ID,
+		PlayerID:    0,
+		Round:       round,
+		Side:        game.ShotSideLeft,
+		CompletedAt: completedAt,
+	}); err != nil {
+		return fmt.Errorf("player shot: %w", err)
 	}
 
 	return nil

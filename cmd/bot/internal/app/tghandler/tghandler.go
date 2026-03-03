@@ -30,6 +30,7 @@ type GameController interface {
 		round int,
 		side game.ShotSide,
 	) error
+	StartGameWithBot(ctx context.Context, chatID msginfo.ChatID) error
 }
 
 type TGHandler struct {

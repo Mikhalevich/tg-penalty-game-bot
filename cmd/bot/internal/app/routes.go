@@ -10,6 +10,7 @@ func makeRoutes(tbot *tgbot.TGBot, handler *tghandler.TGHandler) {
 
 	tbot.AddMenuCommand("/change_name", "chanage your name", handler.ChangeName)
 	tbot.AddMenuCommand("/find_online_game", "find online player for game", handler.FindGame)
+	tbot.AddMenuCommand("/play_with_bot", "start game with bot", handler.PlayWithBot)
 
 	tbot.AddDefaultHandler(handler.DefaultHandler)
 	tbot.AddDefaultCallbackQueryHander(handler.DefaultCallbackQuery)

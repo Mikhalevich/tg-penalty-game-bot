@@ -4,7 +4,7 @@ type GameStatus string
 
 const (
 	GameStatusInProgress GameStatus = "in_progress"
-	GameStatusFinished   GameStatus = "finished"
+	GameStatusCompleted  GameStatus = "completed"
 )
 
 func (gs GameStatus) String() string {

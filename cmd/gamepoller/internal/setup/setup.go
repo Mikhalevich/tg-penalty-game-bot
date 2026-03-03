@@ -37,10 +37,12 @@ func StartWorker(ctx context.Context, cfg config.Config) error {
 	defer dbCleanup()
 
 	var (
-		msgSender            = messagesender.New(botAPI)
-		gameNofifier         = notifier.New(pgDB, msgSender)
-		timeProvider         = timeprovider.New()
-		gameController       = gamecontroller.New(pgDB, nil, timeProvider, gameNofifier, nil)
+		msgSender      = messagesender.New(botAPI)
+		gameNofifier   = notifier.New(pgDB, msgSender)
+		timeProvider   = timeprovider.New()
+		gameController = gamecontroller.New(
+			pgDB, pgDB.Transactor(), nil, timeProvider, gameNofifier, nil,
+		)
 		matchmakingProcessor = matchmaking.New(
 			pgDB,
 			pgDB.Transactor(),
