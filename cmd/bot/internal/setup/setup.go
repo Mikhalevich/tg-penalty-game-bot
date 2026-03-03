@@ -51,12 +51,12 @@ func StartBot(ctx context.Context, cfg config.Config) error {
 		timeProvider     = timeprovider.New()
 		msgSender        = messagesender.New(botAPI)
 		msgProcessor     = messageprocessor.New(msgSender, msgSender, btnRepo)
-		notification     = notifier.New(msgProcessor, msgProcessor)
+		notification     = notifier.New(pgDB, msgSender)
 		playerController = playercontroller.New(
 			pgDB, notification, nameGenerator, timeProvider, cfg.ChangeNameInterval,
 		)
 		gameController = gamecontroller.New(
-			pgDB, pgDB.Transactor(), playerController, timeProvider, notification, msgProcessor,
+			pgDB, pgDB.Transactor(), playerController, timeProvider, notification, msgSender,
 		)
 	)
 
