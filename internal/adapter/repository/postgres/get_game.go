@@ -26,6 +26,7 @@ func (p *Postgres) GetGame(ctx context.Context, gameID game.ID) (game.Game, erro
 				game
 			WHERE
 				id = $1
+			FOR UPDATE
 		`
 
 		dbGame model.Game
