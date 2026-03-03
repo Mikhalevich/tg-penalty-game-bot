@@ -10,7 +10,7 @@ import (
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/player"
 )
 
-// CreateGame create a new game and return created game and two pending players shots.
+// CreateGame create a new game, start first round and return created game.
 func (gc *GameController) CreateGame(
 	ctx context.Context,
 	player1 player.Player,
