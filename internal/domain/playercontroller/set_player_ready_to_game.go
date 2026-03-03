@@ -33,6 +33,7 @@ func (pc *PlayerController) SetPlayerReadyToGame(ctx context.Context, chatID msg
 		currentPlayer.ID,
 		"",
 		player.GameStatusReadyForGame,
+		pc.timeProvider.Now(),
 	); err != nil {
 		return fmt.Errorf("change player game status: %w", err)
 	}

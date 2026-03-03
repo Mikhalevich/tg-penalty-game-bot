@@ -42,6 +42,7 @@ func (gc *GameController) StartGameWithBot(ctx context.Context, chatID msginfo.C
 			currentPlayer.ID,
 			currentGame.ID,
 			player.GameStatusInGame,
+			gc.timeProvider.Now(),
 		); err != nil {
 			return fmt.Errorf("change player game status: %w", err)
 		}
