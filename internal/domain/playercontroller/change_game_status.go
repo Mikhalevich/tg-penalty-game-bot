@@ -3,6 +3,7 @@ package playercontroller
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/game"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/player"
@@ -13,13 +14,14 @@ func (p *PlayerController) ChangeGameStatus(
 	playerID player.ID,
 	gameID game.ID,
 	status player.GameStatus,
+	changedAt time.Time,
 ) error {
 	if err := p.repo.ChangePlayerGameStatus(
 		ctx,
 		playerID,
 		gameID,
 		status,
-		p.timeProvider.Now(),
+		changedAt,
 		calculateLegalPreviousStatutses(status)...,
 	); err != nil {
 		return fmt.Errorf("change game status: %w", err)

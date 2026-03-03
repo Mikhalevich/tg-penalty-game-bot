@@ -89,17 +89,30 @@ func (gc *GameController) processGameShot(
 		}
 	}
 
-	if currentGame.TryToCompleteRound() {
-		if err := gc.notifier.GameStage(ctx, *currentGame); err != nil {
-			return fmt.Errorf("complete round game stage: %w", err)
-		}
+	if !currentGame.TryToCompleteRound() {
+		return nil
+	}
 
-		if err := currentGame.StartNextRound(now); err != nil {
-			return fmt.Errorf("start next round: %w", err)
-		}
+	if err := gc.notifier.GameStage(ctx, *currentGame); err != nil {
+		return fmt.Errorf("complete round game stage: %w", err)
+	}
 
-		if err := gc.notifier.GameStage(ctx, *currentGame); err != nil {
-			return fmt.Errorf("start next round game stage: %w", err)
+	if err := currentGame.StartNextRound(now); err != nil {
+		return fmt.Errorf("start next round: %w", err)
+	}
+
+	if err := gc.notifier.GameStage(ctx, *currentGame); err != nil {
+		return fmt.Errorf("start next round game stage: %w", err)
+	}
+
+	if currentGame.IsFinished() {
+		if err := gc.playerController.ChangePlayersGameStatus(
+			ctx,
+			currentGame.PlayerIDs(),
+			player.GameStatusIdle,
+			now,
+		); err != nil {
+			return fmt.Errorf("change players game status: %w", err)
 		}
 	}
 

@@ -76,6 +76,21 @@ func (g *Game) IsFinished() bool {
 	return g.Status == GameStatusCompleted
 }
 
+func (g *Game) PlayerIDs() []player.ID {
+	//nolint:mnd
+	ids := make([]player.ID, 0, 2)
+
+	if !g.State.Player1.IsBot() {
+		ids = append(ids, g.State.Player1.ID)
+	}
+
+	if !g.State.Player2.IsBot() {
+		ids = append(ids, g.State.Player2.ID)
+	}
+
+	return ids
+}
+
 func (g *Game) PlayerShot(shot Shot) error {
 	inGameShot := g.shotByPlayerID(shot.PlayerID)
 

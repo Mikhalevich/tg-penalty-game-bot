@@ -27,6 +27,13 @@ type PlayerController interface {
 		playerID player.ID,
 		gameID game.ID,
 		status player.GameStatus,
+		changedAt time.Time,
+	) error
+	ChangePlayersGameStatus(
+		ctx context.Context,
+		playerIDs []player.ID,
+		status player.GameStatus,
+		changedAt time.Time,
 	) error
 }
 
