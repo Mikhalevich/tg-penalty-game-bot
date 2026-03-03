@@ -3,11 +3,17 @@ package notifier
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/button"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/game"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/msginfo"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/player"
+)
+
+const (
+	ballSymbol  = "⚽"
+	gloveSymbol = "🧤"
 )
 
 func (n *Notifier) GameStage(ctx context.Context, currentGame game.Game) error {
@@ -63,12 +69,11 @@ func (n *Notifier) sendMsgToPlayer(ctx context.Context, plr game.Player, msg str
 }
 
 func (n *Notifier) finishedGameNotifications(ctx context.Context, currentGame game.Game) error {
-	finishedGameMsg := fmt.Sprintf("Game Finished\n%s %d \\: %s %d",
-		n.escaper.EscapeMarkdown(currentGame.State.Player1.DisplayName), currentGame.State.Player1.GoalsScored,
-		n.escaper.EscapeMarkdown(currentGame.State.Player2.DisplayName), currentGame.State.Player2.GoalsScored,
-	)
-
-	if err := n.sendMsgToPlayers(ctx, currentGame, finishedGameMsg); err != nil {
+	if err := n.sendMsgToPlayers(
+		ctx,
+		currentGame,
+		n.makeScoreMsg("Game Finished", currentGame),
+	); err != nil {
 		return fmt.Errorf("send msg to players: %w", err)
 	}
 
@@ -76,19 +81,52 @@ func (n *Notifier) finishedGameNotifications(ctx context.Context, currentGame ga
 }
 
 func (n *Notifier) finishedRoundNotifications(ctx context.Context, currentGame game.Game) error {
-	if err := n.sendMsgToPlayers(ctx, currentGame, makeFinishedRoundMsg(currentGame)); err != nil {
+	if err := n.sendMsgToPlayers(
+		ctx,
+		currentGame,
+		n.makeScoreMsg(goalMsg(currentGame), currentGame),
+	); err != nil {
 		return fmt.Errorf("send msg to players: %w", err)
 	}
 
 	return nil
 }
 
-func makeFinishedRoundMsg(currentGame game.Game) string {
+func (n *Notifier) makeScoreMsg(header string, currentGame game.Game) string {
+	return fmt.Sprintf("*%s*\n %s \\: %s",
+		header,
+		playerGoalsScoredMsg(currentGame.State.Player1.ID, currentGame),
+		playerGoalsScoredMsg(currentGame.State.Player2.ID, currentGame),
+	)
+}
+
+func playerGoalsScoredMsg(playerID player.ID, currentGame game.Game) string {
+	var builder strings.Builder
+	for _, round := range currentGame.State.Rounds {
+		if round.Attack.PlayerID != playerID {
+			continue
+		}
+
+		if !round.IsCompleted {
+			continue
+		}
+
+		if round.IsGoal {
+			builder.WriteString(ballSymbol)
+		} else {
+			builder.WriteString(gloveSymbol)
+		}
+	}
+
+	return builder.String()
+}
+
+func goalMsg(currentGame game.Game) string {
 	if currentGame.CurrentRound().IsGoal {
 		return "Goal"
 	}
 
-	return "Defend"
+	return "Save"
 }
 
 func (n *Notifier) inGameNotifications(ctx context.Context, currentGame game.Game) error {
