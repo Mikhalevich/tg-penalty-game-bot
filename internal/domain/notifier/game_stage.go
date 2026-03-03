@@ -12,8 +12,11 @@ import (
 )
 
 const (
-	ballSymbol  = "⚽"
-	gloveSymbol = "🧤"
+	ballSymbol       = "⚽"
+	gloveSymbol      = "🧤"
+	leftSideSymbol   = "👈"
+	rightSideSymbol  = "👉"
+	middleSideSymbol = "🖐"
 )
 
 func (n *Notifier) GameStage(ctx context.Context, currentGame game.Game) error {
@@ -171,17 +174,17 @@ func (n *Notifier) inGameNotifications(ctx context.Context, currentGame game.Gam
 }
 
 func makeShotSideButtons(gameID game.ID, roundNumber int) (button.ButtonRow, error) {
-	left, err := game.ShotSideButton("left", gameID, roundNumber, game.ShotSideLeft)
+	left, err := game.ShotSideButton(leftSideSymbol, gameID, roundNumber, game.ShotSideLeft)
 	if err != nil {
 		return nil, fmt.Errorf("left button: %w", err)
 	}
 
-	middle, err := game.ShotSideButton("middle", gameID, roundNumber, game.ShotSideMiddle)
+	middle, err := game.ShotSideButton(middleSideSymbol, gameID, roundNumber, game.ShotSideMiddle)
 	if err != nil {
 		return nil, fmt.Errorf("right button: %w", err)
 	}
 
-	right, err := game.ShotSideButton("right", gameID, roundNumber, game.ShotSideRight)
+	right, err := game.ShotSideButton(rightSideSymbol, gameID, roundNumber, game.ShotSideRight)
 	if err != nil {
 		return nil, fmt.Errorf("right button: %w", err)
 	}
