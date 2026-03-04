@@ -9,9 +9,12 @@ import (
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/player"
 )
 
+const (
+	nameButtonsCount = 2
+)
+
 func (n *Notifier) ChangeName(ctx context.Context, plr player.Player, fullName, userName string) error {
-	//nolint:mnd
-	buttons := make([]button.ButtonRow, 0, 2)
+	buttons := make([]button.ButtonRow, 0, nameButtonsCount)
 
 	buttons, err := appendChanageNameButton(buttons, fullName)
 	if err != nil {
