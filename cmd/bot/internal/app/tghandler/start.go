@@ -9,7 +9,7 @@ import (
 )
 
 func (t *TGHandler) Start(ctx context.Context, msg tgbot.BotMessage, sender tgbot.MessageSender) error {
-	if err := t.playerController.Welcome(ctx, msginfo.ChatIDFromInt64(msg.ChatID)); err != nil {
+	if err := t.welcome.Welcome(ctx, msginfo.ChatIDFromInt64(msg.ChatID)); err != nil {
 		return fmt.Errorf("welcome: %w", err)
 	}
 

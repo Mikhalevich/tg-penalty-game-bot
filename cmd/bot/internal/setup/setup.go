@@ -22,7 +22,13 @@ import (
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/gamecontroller"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/messageprocessor"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/notifier"
-	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playercontroller"
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playercontroller/changename"
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playercontroller/changestatus"
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playercontroller/findgame"
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playercontroller/gameshot"
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playercontroller/playerprovider"
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playercontroller/startgame"
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playercontroller/welcome"
 )
 
 func StartBot(ctx context.Context, cfg config.Config) error {
@@ -47,25 +53,34 @@ func StartBot(ctx context.Context, cfg config.Config) error {
 	}
 
 	var (
-		nameGenerator    = randomgenerator.New(cfg.RandomNameGenerator.Prefix, cfg.RandomNameGenerator.Length)
-		timeProvider     = timeprovider.New()
-		msgSender        = messagesender.New(botAPI)
-		msgProcessor     = messageprocessor.New(msgSender, msgSender, btnRepo)
-		notification     = notifier.New(pgDB, msgSender)
-		playerController = playercontroller.New(
-			pgDB, notification, nameGenerator, timeProvider, cfg.ChangeNameInterval,
+		nameGenerator       = randomgenerator.New(cfg.RandomNameGenerator.Prefix, cfg.RandomNameGenerator.Length)
+		timeProvider        = timeprovider.New()
+		msgSender           = messagesender.New(botAPI)
+		msgProcessor        = messageprocessor.New(msgSender, msgSender, btnRepo)
+		notification        = notifier.New(pgDB, msgSender)
+		playerProvider      = playerprovider.New(pgDB, nameGenerator, timeProvider)
+		welcomeService      = welcome.New(playerProvider, notification)
+		changeNameService   = changename.New(pgDB, playerProvider, timeProvider, notification, cfg.ChangeNameInterval)
+		findGameSerivce     = findgame.New(pgDB, playerProvider, timeProvider, notification)
+		changeStatusService = changestatus.New(pgDB)
+		gameController      = gamecontroller.New(
+			pgDB, pgDB.Transactor(), changeStatusService, timeProvider, notification,
 		)
-		gameController = gamecontroller.New(
-			pgDB, pgDB.Transactor(), playerController, timeProvider, notification, msgSender,
-		)
+		startGameService = startgame.New(pgDB, pgDB.Transactor(),
+			playerProvider, gameController, timeProvider, notification)
+		gameShotService = gameshot.New(playerProvider, gameController, timeProvider, msgProcessor)
 	)
 
 	if err := app.Start(
 		ctx,
 		cfg.Bot.Token,
 		msgProcessor,
-		playerController,
-		gameController,
+		playerProvider,
+		welcomeService,
+		changeNameService,
+		findGameSerivce,
+		startGameService,
+		gameShotService,
 	); err != nil {
 		return fmt.Errorf("app start: %w", err)
 	}

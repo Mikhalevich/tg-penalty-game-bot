@@ -13,15 +13,28 @@ type ButtonProvider interface {
 	GetButton(ctx context.Context, id button.ID) (*button.Button, error)
 }
 
-type PlayerController interface {
-	Welcome(ctx context.Context, chatID msginfo.ChatID) error
+type PlayerProvider interface {
 	GetPlayerByChatID(ctx context.Context, chatID msginfo.ChatID) (player.Player, error)
-	SetChangeDisplayNameTrigger(ctx context.Context, chatID msginfo.ChatID, fullName, userName string) error
-	ChangeDisplayName(ctx context.Context, chatID msginfo.ChatID, msgID msginfo.MessageID, displayName string) error
-	SetPlayerReadyToGame(ctx context.Context, chatID msginfo.ChatID) error
 }
 
-type GameController interface {
+type Welcome interface {
+	Welcome(ctx context.Context, chatID msginfo.ChatID) error
+}
+
+type ChangeName interface {
+	SetChangeDisplayNameTrigger(ctx context.Context, chatID msginfo.ChatID, fullName, userName string) error
+	ChangeDisplayName(ctx context.Context, chatID msginfo.ChatID, msgID msginfo.MessageID, displayName string) error
+}
+
+type FindGame interface {
+	FindGame(ctx context.Context, chatID msginfo.ChatID) error
+}
+
+type StartGame interface {
+	StartGameWithBot(ctx context.Context, chatID msginfo.ChatID) error
+}
+
+type GameShot interface {
 	Shot(
 		ctx context.Context,
 		chatID msginfo.ChatID,
@@ -30,23 +43,34 @@ type GameController interface {
 		round int,
 		side game.ShotSide,
 	) error
-	StartGameWithBot(ctx context.Context, chatID msginfo.ChatID) error
 }
 
 type TGHandler struct {
-	buttonProvider   ButtonProvider
-	playerController PlayerController
-	gameController   GameController
+	buttonProvider ButtonProvider
+	playerProvider PlayerProvider
+	welcome        Welcome
+	changeName     ChangeName
+	findGame       FindGame
+	startGame      StartGame
+	gameShot       GameShot
 }
 
 func New(
 	buttonProvider ButtonProvider,
-	playerController PlayerController,
-	gameController GameController,
+	playerProvider PlayerProvider,
+	welcome Welcome,
+	changeName ChangeName,
+	findGame FindGame,
+	startGame StartGame,
+	gameShot GameShot,
 ) *TGHandler {
 	return &TGHandler{
-		buttonProvider:   buttonProvider,
-		playerController: playerController,
-		gameController:   gameController,
+		buttonProvider: buttonProvider,
+		playerProvider: playerProvider,
+		welcome:        welcome,
+		changeName:     changeName,
+		findGame:       findGame,
+		startGame:      startGame,
+		gameShot:       gameShot,
 	}
 }

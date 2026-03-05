@@ -9,7 +9,7 @@ import (
 )
 
 func (t *TGHandler) PlayWithBot(ctx context.Context, msg tgbot.BotMessage, sender tgbot.MessageSender) error {
-	if err := t.gameController.StartGameWithBot(
+	if err := t.startGame.StartGameWithBot(
 		ctx,
 		msginfo.ChatIDFromInt64(msg.ChatID),
 	); err != nil {

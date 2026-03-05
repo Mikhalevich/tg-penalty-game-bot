@@ -9,7 +9,7 @@ import (
 )
 
 func (t *TGHandler) FindGame(ctx context.Context, msg tgbot.BotMessage, sender tgbot.MessageSender) error {
-	if err := t.playerController.SetPlayerReadyToGame(
+	if err := t.findGame.FindGame(
 		ctx,
 		msginfo.ChatIDFromInt64(msg.ChatID),
 	); err != nil {

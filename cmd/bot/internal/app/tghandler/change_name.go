@@ -9,7 +9,7 @@ import (
 )
 
 func (t *TGHandler) ChangeName(ctx context.Context, msg tgbot.BotMessage, sender tgbot.MessageSender) error {
-	if err := t.playerController.SetChangeDisplayNameTrigger(
+	if err := t.changeName.SetChangeDisplayNameTrigger(
 		ctx,
 		msginfo.ChatIDFromInt64(msg.ChatID),
 		msg.User.FullName(),
