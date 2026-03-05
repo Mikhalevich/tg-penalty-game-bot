@@ -6,30 +6,16 @@ import (
 	"time"
 
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/game"
-	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/msginfo"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/perror"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/player"
 )
 
 func (gc *GameController) Shot(
 	ctx context.Context,
-	chatID msginfo.ChatID,
-	msgID msginfo.MessageID,
-	gameID game.ID,
-	round int,
-	side game.ShotSide,
+	shot game.Shot,
 ) error {
-	currentPlayer, err := gc.playerController.GetPlayerByChatID(ctx, chatID)
-	if err != nil {
-		return fmt.Errorf("get player: %w", err)
-	}
-
-	if !currentPlayer.IsInGame(gameID.String()) {
-		return fmt.Errorf("not in game %s", gameID)
-	}
-
 	if err := gc.transactor.Transaction(ctx, func(ctx context.Context) error {
-		currentGame, err := gc.repo.GetGame(ctx, gameID)
+		currentGame, err := gc.repo.GetGame(ctx, shot.GameID)
 		if err != nil {
 			return fmt.Errorf("get game: %w", err)
 		}
@@ -41,10 +27,7 @@ func (gc *GameController) Shot(
 		if err := gc.processGameShot(
 			ctx,
 			&currentGame,
-			currentPlayer,
-			round,
-			side,
-			gc.timeProvider.Now(),
+			shot,
 		); err != nil {
 			return fmt.Errorf("process game shot: %w", err)
 		}
@@ -58,33 +41,20 @@ func (gc *GameController) Shot(
 		return fmt.Errorf("transaction: %w", err)
 	}
 
-	if err := gc.messageDeleter.DeleteMessage(ctx, chatID, msgID); err != nil {
-		return fmt.Errorf("delete message: %w", err)
-	}
-
 	return nil
 }
 
 func (gc *GameController) processGameShot(
 	ctx context.Context,
 	currentGame *game.Game,
-	currentPlayer player.Player,
-	round int,
-	side game.ShotSide,
-	now time.Time,
+	shot game.Shot,
 ) error {
-	if err := currentGame.PlayerShot(game.Shot{
-		GameID:      currentGame.ID,
-		PlayerID:    currentPlayer.ID,
-		Round:       round,
-		Side:        side,
-		CompletedAt: now,
-	}); err != nil {
+	if err := currentGame.PlayerShot(shot); err != nil {
 		return fmt.Errorf("player shot: %w", err)
 	}
 
 	if currentGame.IsGameWithBot() {
-		if err := gc.processBotShot(currentGame, round, now); err != nil {
+		if err := gc.processBotShot(currentGame, shot.Round, shot.CompletedAt); err != nil {
 			return fmt.Errorf("bot shot: %w", err)
 		}
 	}
@@ -97,7 +67,7 @@ func (gc *GameController) processGameShot(
 		return fmt.Errorf("complete round game stage: %w", err)
 	}
 
-	if err := currentGame.StartNextRound(now); err != nil {
+	if err := currentGame.StartNextRound(shot.CompletedAt); err != nil {
 		return fmt.Errorf("start next round: %w", err)
 	}
 
@@ -106,11 +76,11 @@ func (gc *GameController) processGameShot(
 	}
 
 	if currentGame.IsFinished() {
-		if err := gc.playerController.ChangePlayersGameStatus(
+		if err := gc.playerStatusChanger.ChangePlayersGameStatus(
 			ctx,
 			currentGame.PlayerIDs(),
 			player.GameStatusIdle,
-			now,
+			shot.CompletedAt,
 		); err != nil {
 			return fmt.Errorf("change players game status: %w", err)
 		}

@@ -65,7 +65,7 @@ func (t *TGHandler) processShotSideButton(
 		return fmt.Errorf("get payload: %w", err)
 	}
 
-	if err := t.gameController.Shot(ctx, chatID, msgID, payload.GameID, payload.Round, payload.Side); err != nil {
+	if err := t.gameShot.Shot(ctx, chatID, msgID, payload.GameID, payload.Round, payload.Side); err != nil {
 		return fmt.Errorf("shot: %w", err)
 	}
 

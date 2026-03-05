@@ -1,4 +1,4 @@
-package playercontroller
+package changestatus
 
 import (
 	"context"
@@ -8,13 +8,13 @@ import (
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/player"
 )
 
-func (p *PlayerController) ChangePlayersGameStatus(
+func (c *ChangeStatus) ChangePlayersGameStatus(
 	ctx context.Context,
 	playerIDs []player.ID,
 	status player.GameStatus,
 	changedAt time.Time,
 ) error {
-	if err := p.repo.ChangePlayersGameStatus(
+	if err := c.repo.ChangePlayersGameStatus(
 		ctx,
 		playerIDs,
 		status,

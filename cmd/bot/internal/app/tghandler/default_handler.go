@@ -15,7 +15,7 @@ func (t *TGHandler) DefaultHandler(ctx context.Context, msg tgbot.BotMessage, se
 		msgID  = msginfo.MessageIDFromInt(msg.MessageID)
 	)
 
-	currentPlayer, err := t.playerController.GetPlayerByChatID(ctx, chatID)
+	currentPlayer, err := t.playerProvider.GetPlayerByChatID(ctx, chatID)
 	if err != nil {
 		return fmt.Errorf("get player info: %w", err)
 	}
@@ -37,7 +37,7 @@ func (t *TGHandler) changeDisplayName(
 	msgID msginfo.MessageID,
 	displayName string,
 ) error {
-	if err := t.playerController.ChangeDisplayName(ctx, chatID, msgID, displayName); err != nil {
+	if err := t.changeName.ChangeDisplayName(ctx, chatID, msgID, displayName); err != nil {
 		if !perror.IsType(err, perror.TypeAlreadyExists) {
 			return fmt.Errorf("change display name: %w", err)
 		}

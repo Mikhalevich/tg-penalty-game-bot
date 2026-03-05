@@ -4,11 +4,11 @@ import (
 	"crypto/rand"
 	"fmt"
 
-	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playercontroller"
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playercontroller/playerprovider"
 )
 
 var (
-	_ playercontroller.NameGenerator = (*RandomGenerator)(nil)
+	_ playerprovider.NameGenerator = (*RandomGenerator)(nil)
 )
 
 type RandomGenerator struct {

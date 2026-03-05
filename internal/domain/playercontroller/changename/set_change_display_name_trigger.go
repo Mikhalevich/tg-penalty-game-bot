@@ -1,4 +1,4 @@
-package playercontroller
+package changename
 
 import (
 	"context"
@@ -8,13 +8,13 @@ import (
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/msginfo"
 )
 
-func (p *PlayerController) SetChangeDisplayNameTrigger(
+func (c *ChangeName) SetChangeDisplayNameTrigger(
 	ctx context.Context,
 	chatID msginfo.ChatID,
 	fullName string,
 	userName string,
 ) error {
-	plr, err := p.GetPlayerByChatID(ctx, chatID)
+	plr, err := c.playerProvider.GetPlayerByChatID(ctx, chatID)
 	if err != nil {
 		return fmt.Errorf("get player by chat id: %w", err)
 	}
@@ -23,19 +23,19 @@ func (p *PlayerController) SetChangeDisplayNameTrigger(
 		lastNameChangedInterval = time.Since(plr.NameChangedAt)
 	)
 
-	if lastNameChangedInterval < p.changeNameTimeout {
-		if err := p.notifier.ChangeNameDelay(ctx, plr, formatDelta(p.changeNameTimeout-lastNameChangedInterval)); err != nil {
+	if lastNameChangedInterval < c.changeNameTimeout {
+		if err := c.notifier.ChangeNameDelay(ctx, plr, formatDelta(c.changeNameTimeout-lastNameChangedInterval)); err != nil {
 			return fmt.Errorf("change name delay: %w", err)
 		}
 
 		return nil
 	}
 
-	if err := p.repo.SetChangeDisplayNameTrigger(ctx, plr.ChatID); err != nil {
+	if err := c.repo.SetChangeDisplayNameTrigger(ctx, plr.ChatID); err != nil {
 		return fmt.Errorf("repo set change display name trigger: %w", err)
 	}
 
-	if err := p.notifier.ChangeName(ctx, plr, fullName, userName); err != nil {
+	if err := c.notifier.ChangeName(ctx, plr, fullName, userName); err != nil {
 		return fmt.Errorf("change name notificatoin: %w", err)
 	}
 

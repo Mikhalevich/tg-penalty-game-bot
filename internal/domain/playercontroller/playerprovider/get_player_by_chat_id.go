@@ -1,4 +1,4 @@
-package playercontroller
+package playerprovider
 
 import (
 	"context"
@@ -9,7 +9,7 @@ import (
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/infra/logger"
 )
 
-func (p *PlayerController) GetPlayerByChatID(
+func (p *PlayerProvider) GetPlayerByChatID(
 	ctx context.Context,
 	chatID msginfo.ChatID,
 ) (player.Player, error) {
@@ -30,7 +30,7 @@ func (p *PlayerController) GetPlayerByChatID(
 	return plr, nil
 }
 
-func (p *PlayerController) createPlayer(
+func (p *PlayerProvider) createPlayer(
 	ctx context.Context,
 	chatID msginfo.ChatID,
 ) (player.Player, error) {

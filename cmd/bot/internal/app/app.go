@@ -13,14 +13,22 @@ func Start(
 	ctx context.Context,
 	token string,
 	buttonProvider tghandler.ButtonProvider,
-	playerController tghandler.PlayerController,
-	gameController tghandler.GameController,
+	playerProvider tghandler.PlayerProvider,
+	welcome tghandler.Welcome,
+	changeName tghandler.ChangeName,
+	findGame tghandler.FindGame,
+	startGame tghandler.StartGame,
+	gameShot tghandler.GameShot,
 ) error {
 	var (
 		botHandler = tghandler.New(
 			buttonProvider,
-			playerController,
-			gameController,
+			playerProvider,
+			welcome,
+			changeName,
+			findGame,
+			startGame,
+			gameShot,
 		)
 	)
 

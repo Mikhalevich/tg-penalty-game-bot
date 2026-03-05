@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/game"
-	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/msginfo"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/player"
 )
 
@@ -20,15 +19,7 @@ type Transactor interface {
 	Transaction(ctx context.Context, trxFn func(ctx context.Context) error) error
 }
 
-type PlayerController interface {
-	GetPlayerByChatID(ctx context.Context, chatID msginfo.ChatID) (player.Player, error)
-	ChangeGameStatus(
-		ctx context.Context,
-		playerID player.ID,
-		gameID game.ID,
-		status player.GameStatus,
-		changedAt time.Time,
-	) error
+type PlayerStatusChanger interface {
 	ChangePlayersGameStatus(
 		ctx context.Context,
 		playerIDs []player.ID,
@@ -43,40 +34,28 @@ type TimeProvider interface {
 
 type Notifier interface {
 	GameStage(ctx context.Context, currentGame game.Game) error
-	PlayerAlreadyInGame(ctx context.Context, plr player.Player) error
-}
-
-type MessageDeleteter interface {
-	DeleteMessage(
-		ctx context.Context,
-		chatID msginfo.ChatID,
-		messageID msginfo.MessageID,
-	) error
 }
 
 type GameController struct {
-	repo             Repository
-	transactor       Transactor
-	playerController PlayerController
-	timeProvider     TimeProvider
-	notifier         Notifier
-	messageDeleter   MessageDeleteter
+	repo                Repository
+	transactor          Transactor
+	playerStatusChanger PlayerStatusChanger
+	timeProvider        TimeProvider
+	notifier            Notifier
 }
 
 func New(
 	repo Repository,
 	transactor Transactor,
-	playerController PlayerController,
+	playerStatusChanger PlayerStatusChanger,
 	timeProvier TimeProvider,
 	notifier Notifier,
-	messageDeleter MessageDeleteter,
 ) *GameController {
 	return &GameController{
-		repo:             repo,
-		transactor:       transactor,
-		playerController: playerController,
-		timeProvider:     timeProvier,
-		notifier:         notifier,
-		messageDeleter:   messageDeleter,
+		repo:                repo,
+		transactor:          transactor,
+		playerStatusChanger: playerStatusChanger,
+		timeProvider:        timeProvier,
+		notifier:            notifier,
 	}
 }

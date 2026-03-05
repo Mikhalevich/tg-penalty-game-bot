@@ -1,4 +1,4 @@
-package playercontroller
+package changename
 
 import (
 	"context"
@@ -7,13 +7,13 @@ import (
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/msginfo"
 )
 
-func (p *PlayerController) ChangeDisplayName(
+func (c *ChangeName) ChangeDisplayName(
 	ctx context.Context,
 	chatID msginfo.ChatID,
 	msgID msginfo.MessageID,
 	displayName string,
 ) error {
-	currentPlayer, err := p.GetPlayerByChatID(ctx, chatID)
+	currentPlayer, err := c.playerProvider.GetPlayerByChatID(ctx, chatID)
 	if err != nil {
 		return fmt.Errorf("get player info: %w", err)
 	}
@@ -22,9 +22,9 @@ func (p *PlayerController) ChangeDisplayName(
 		return fmt.Errorf("change name not triggered: %w", err)
 	}
 
-	if err := p.repo.ChangeDisplayName(ctx, chatID, displayName, p.timeProvider.Now()); err != nil {
-		if p.repo.IsAlreadyExistsError(err) {
-			if err := p.notifier.NameAlreadyRegistered(ctx, currentPlayer, msgID); err != nil {
+	if err := c.repo.ChangeDisplayName(ctx, chatID, displayName, c.timeProvider.Now()); err != nil {
+		if c.repo.IsAlreadyExistsError(err) {
+			if err := c.notifier.NameAlreadyRegistered(ctx, currentPlayer, msgID); err != nil {
 				return fmt.Errorf("name already redistered notification: %w", err)
 			}
 		}
@@ -34,7 +34,7 @@ func (p *PlayerController) ChangeDisplayName(
 
 	currentPlayer.DisplayName = displayName
 
-	if err := p.notifier.NameChanged(ctx, currentPlayer, msgID); err != nil {
+	if err := c.notifier.NameChanged(ctx, currentPlayer, msgID); err != nil {
 		return fmt.Errorf("name changed notification: %w", err)
 	}
 

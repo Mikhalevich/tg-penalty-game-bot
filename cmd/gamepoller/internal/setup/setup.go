@@ -41,7 +41,7 @@ func StartWorker(ctx context.Context, cfg config.Config) error {
 		gameNofifier   = notifier.New(pgDB, msgSender)
 		timeProvider   = timeprovider.New()
 		gameController = gamecontroller.New(
-			pgDB, pgDB.Transactor(), nil, timeProvider, gameNofifier, msgSender,
+			pgDB, pgDB.Transactor(), nil, timeProvider, gameNofifier,
 		)
 		matchmakingProcessor = matchmaking.New(
 			pgDB,
