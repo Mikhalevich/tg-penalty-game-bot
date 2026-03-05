@@ -4,7 +4,7 @@ import (
 	"crypto/rand"
 	"fmt"
 
-	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playercontroller/playerprovider"
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playerusecase/playerprovider"
 )
 
 var (
