@@ -22,13 +22,13 @@ import (
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/gamecontroller"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/messageprocessor"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/notifier"
-	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playercontroller/changename"
-	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playercontroller/changestatus"
-	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playercontroller/findgame"
-	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playercontroller/gameshot"
-	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playercontroller/playerprovider"
-	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playercontroller/startgame"
-	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playercontroller/welcome"
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playerusecase/changename"
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playerusecase/changestatus"
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playerusecase/findgame"
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playerusecase/gameshot"
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playerusecase/playerprovider"
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playerusecase/startgame"
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playerusecase/welcome"
 )
 
 func StartBot(ctx context.Context, cfg config.Config) error {
