@@ -15,7 +15,6 @@ import (
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/adapter/repository/postgres/driver"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/adapter/repository/postgres/transaction"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/adapter/timeprovider"
-	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/gamecontroller"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/matchmaking"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/notifier"
 )
@@ -37,16 +36,13 @@ func StartWorker(ctx context.Context, cfg config.Config) error {
 	defer dbCleanup()
 
 	var (
-		msgSender      = messagesender.New(botAPI)
-		gameNofifier   = notifier.New(pgDB, msgSender)
-		timeProvider   = timeprovider.New()
-		gameController = gamecontroller.New(
-			pgDB, pgDB.Transactor(), nil, timeProvider, gameNofifier,
-		)
+		msgSender            = messagesender.New(botAPI)
+		gameNofifier         = notifier.New(pgDB, msgSender)
+		timeProvider         = timeprovider.New()
 		matchmakingProcessor = matchmaking.New(
 			pgDB,
 			pgDB.Transactor(),
-			gameController,
+			timeProvider,
 			gameNofifier,
 		)
 	)

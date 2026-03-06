@@ -26,13 +26,17 @@ func (s *StartGame) StartGameWithBot(
 		return nil
 	}
 
-	currentGame, err := s.gameRunner.CreateGame(
+	now := s.timeProvider.Now()
+
+	currentGame, err := game.CreateGame(
 		ctx,
 		currentPlayer,
 		player.Player{
 			ID:          0,
 			DisplayName: "bot",
-		})
+		},
+		now,
+	)
 
 	if err != nil {
 		return fmt.Errorf("create game: %w", err)
@@ -44,7 +48,7 @@ func (s *StartGame) StartGameWithBot(
 			currentPlayer.ID,
 			currentGame.ID,
 			player.GameStatusInGame,
-			s.timeProvider.Now(),
+			now,
 			player.GameStatusIdle,
 		); err != nil {
 			return fmt.Errorf("change player game status: %w", err)

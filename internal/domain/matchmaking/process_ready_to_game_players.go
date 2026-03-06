@@ -55,6 +55,7 @@ func (m *MatchMaking) transactionReadyToGamePlayers(
 		inGamePlayers = make([]player.Player, 0, len(players))
 		//nolint:mnd
 		games = make([]game.Game, 0, len(players)/2)
+		now   = m.timeProvider.Now()
 	)
 
 	for i := 1; i < len(players); i += 2 {
@@ -63,7 +64,7 @@ func (m *MatchMaking) transactionReadyToGamePlayers(
 			player2 = players[i]
 		)
 
-		newGame, err := m.gameCreator.CreateGame(ctx, player1, player2)
+		newGame, err := game.CreateGame(ctx, player1, player2, now)
 		if err != nil {
 			return nil, fmt.Errorf("create game: %w", err)
 		}
