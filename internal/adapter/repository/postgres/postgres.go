@@ -5,19 +5,33 @@ import (
 
 	"github.com/jmoiron/sqlx"
 
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/gameusecase/gameshot"
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/gameusecase/startgame"
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/matchmaking"
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/notifier"
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/outboxprocessor"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playerusecase/changename"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playerusecase/changestatus"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playerusecase/findgame"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playerusecase/playerprovider"
-	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playerusecase/startgame"
+	playerstartgame "github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playerusecase/startgame"
 )
 
 var (
-	_ changename.Repository     = (*Postgres)(nil)
-	_ changestatus.Repository   = (*Postgres)(nil)
-	_ findgame.Repository       = (*Postgres)(nil)
-	_ playerprovider.Repository = (*Postgres)(nil)
-	_ startgame.Repository      = (*Postgres)(nil)
+	_ changename.Repository      = (*Postgres)(nil)
+	_ changestatus.Repository    = (*Postgres)(nil)
+	_ findgame.Repository        = (*Postgres)(nil)
+	_ playerprovider.Repository  = (*Postgres)(nil)
+	_ playerstartgame.Repository = (*Postgres)(nil)
+
+	_ matchmaking.Repository = (*Postgres)(nil)
+
+	_ gameshot.Repository  = (*Postgres)(nil)
+	_ startgame.Repository = (*Postgres)(nil)
+
+	_ outboxprocessor.Repository = (*Postgres)(nil)
+
+	_ notifier.Sender = (*Postgres)(nil)
 )
 
 type Driver interface {
