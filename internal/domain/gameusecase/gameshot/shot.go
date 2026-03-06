@@ -1,4 +1,4 @@
-package gamecontroller
+package gameshot
 
 import (
 	"context"
@@ -10,12 +10,12 @@ import (
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/player"
 )
 
-func (gc *GameController) Shot(
+func (g *GameShot) Shot(
 	ctx context.Context,
 	shot game.Shot,
 ) error {
-	if err := gc.transactor.Transaction(ctx, func(ctx context.Context) error {
-		currentGame, err := gc.repo.GetGame(ctx, shot.GameID)
+	if err := g.transactor.Transaction(ctx, func(ctx context.Context) error {
+		currentGame, err := g.repo.GetGame(ctx, shot.GameID)
 		if err != nil {
 			return fmt.Errorf("get game: %w", err)
 		}
@@ -24,7 +24,7 @@ func (gc *GameController) Shot(
 			return perror.InvalidGameState()
 		}
 
-		if err := gc.processGameShot(
+		if err := g.processGameShot(
 			ctx,
 			&currentGame,
 			shot,
@@ -32,7 +32,7 @@ func (gc *GameController) Shot(
 			return fmt.Errorf("process game shot: %w", err)
 		}
 
-		if err := gc.repo.UpdateGame(ctx, currentGame); err != nil {
+		if err := g.repo.UpdateGame(ctx, currentGame); err != nil {
 			return fmt.Errorf("update game: %w", err)
 		}
 
@@ -44,7 +44,7 @@ func (gc *GameController) Shot(
 	return nil
 }
 
-func (gc *GameController) processGameShot(
+func (g *GameShot) processGameShot(
 	ctx context.Context,
 	currentGame *game.Game,
 	shot game.Shot,
@@ -54,7 +54,7 @@ func (gc *GameController) processGameShot(
 	}
 
 	if currentGame.IsGameWithBot() {
-		if err := gc.processBotShot(currentGame, shot.Round, shot.CompletedAt); err != nil {
+		if err := g.processBotShot(currentGame, shot.Round, shot.CompletedAt); err != nil {
 			return fmt.Errorf("bot shot: %w", err)
 		}
 	}
@@ -63,7 +63,7 @@ func (gc *GameController) processGameShot(
 		return nil
 	}
 
-	if err := gc.notifier.GameStage(ctx, *currentGame); err != nil {
+	if err := g.notifier.GameStage(ctx, *currentGame); err != nil {
 		return fmt.Errorf("complete round game stage: %w", err)
 	}
 
@@ -71,12 +71,12 @@ func (gc *GameController) processGameShot(
 		return fmt.Errorf("start next round: %w", err)
 	}
 
-	if err := gc.notifier.GameStage(ctx, *currentGame); err != nil {
+	if err := g.notifier.GameStage(ctx, *currentGame); err != nil {
 		return fmt.Errorf("start next round game stage: %w", err)
 	}
 
 	if currentGame.IsFinished() {
-		if err := gc.playerStatusChanger.ChangePlayersGameStatus(
+		if err := g.playerStatusChanger.ChangePlayersGameStatus(
 			ctx,
 			currentGame.PlayerIDs(),
 			player.GameStatusIdle,
@@ -89,7 +89,7 @@ func (gc *GameController) processGameShot(
 	return nil
 }
 
-func (gc *GameController) processBotShot(
+func (g *GameShot) processBotShot(
 	currentGame *game.Game,
 	round int,
 	completedAt time.Time,
