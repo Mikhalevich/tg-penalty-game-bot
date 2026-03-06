@@ -10,7 +10,6 @@ import (
 
 type Repository interface {
 	SelectReadyToGamePlayers(ctx context.Context, limit int) ([]player.Player, error)
-	InsertGames(ctx context.Context, games []game.Game) error
 	ChangeOrInsertPlayersGameStatus(
 		ctx context.Context,
 		players []player.Player,
@@ -21,31 +20,31 @@ type Transactor interface {
 	Transaction(ctx context.Context, trxFn func(ctx context.Context) error) error
 }
 
-type TimeProvider interface {
-	Now() time.Time
+type GameRunner interface {
+	StartGames(ctx context.Context, games []game.Game) error
 }
 
-type Notifier interface {
-	GameStage(ctx context.Context, gm game.Game) error
+type TimeProvider interface {
+	Now() time.Time
 }
 
 type MatchMaking struct {
 	repo         Repository
 	transactor   Transactor
+	gameRunner   GameRunner
 	timeProvider TimeProvider
-	notifier     Notifier
 }
 
 func New(
 	repo Repository,
 	transactor Transactor,
+	gameRunner GameRunner,
 	timeProvider TimeProvider,
-	notifier Notifier,
 ) *MatchMaking {
 	return &MatchMaking{
 		repo:         repo,
 		transactor:   transactor,
+		gameRunner:   gameRunner,
 		timeProvider: timeProvider,
-		notifier:     notifier,
 	}
 }
