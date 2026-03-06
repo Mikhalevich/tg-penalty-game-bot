@@ -1,4 +1,4 @@
-package gamecontroller
+package gameshot
 
 import (
 	"context"
@@ -11,7 +11,6 @@ import (
 type Repository interface {
 	GetGame(ctx context.Context, gameID game.ID) (game.Game, error)
 	UpdateGame(ctx context.Context, game game.Game) error
-	InsertGames(ctx context.Context, games []game.Game) error
 	IsNoRowsUpdated(err error) bool
 }
 
@@ -28,19 +27,14 @@ type PlayerStatusChanger interface {
 	) error
 }
 
-type TimeProvider interface {
-	Now() time.Time
-}
-
 type Notifier interface {
 	GameStage(ctx context.Context, currentGame game.Game) error
 }
 
-type GameController struct {
+type GameShot struct {
 	repo                Repository
 	transactor          Transactor
 	playerStatusChanger PlayerStatusChanger
-	timeProvider        TimeProvider
 	notifier            Notifier
 }
 
@@ -48,14 +42,12 @@ func New(
 	repo Repository,
 	transactor Transactor,
 	playerStatusChanger PlayerStatusChanger,
-	timeProvier TimeProvider,
 	notifier Notifier,
-) *GameController {
-	return &GameController{
+) *GameShot {
+	return &GameShot{
 		repo:                repo,
 		transactor:          transactor,
 		playerStatusChanger: playerStatusChanger,
-		timeProvider:        timeProvier,
 		notifier:            notifier,
 	}
 }

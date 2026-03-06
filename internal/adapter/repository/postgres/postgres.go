@@ -5,7 +5,6 @@ import (
 
 	"github.com/jmoiron/sqlx"
 
-	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/gamecontroller"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playerusecase/changename"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playerusecase/changestatus"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playerusecase/findgame"
@@ -19,7 +18,6 @@ var (
 	_ findgame.Repository       = (*Postgres)(nil)
 	_ playerprovider.Repository = (*Postgres)(nil)
 	_ startgame.Repository      = (*Postgres)(nil)
-	_ gamecontroller.Repository = (*Postgres)(nil)
 )
 
 type Driver interface {
