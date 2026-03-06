@@ -2,6 +2,7 @@ package matchmaking
 
 import (
 	"context"
+	"time"
 
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/game"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/player"
@@ -20,8 +21,8 @@ type Transactor interface {
 	Transaction(ctx context.Context, trxFn func(ctx context.Context) error) error
 }
 
-type GameCreator interface {
-	CreateGame(ctx context.Context, player1 player.Player, player2 player.Player) (game.Game, error)
+type TimeProvider interface {
+	Now() time.Time
 }
 
 type Notifier interface {
@@ -29,22 +30,22 @@ type Notifier interface {
 }
 
 type MatchMaking struct {
-	repo        Repository
-	transactor  Transactor
-	gameCreator GameCreator
-	notifier    Notifier
+	repo         Repository
+	transactor   Transactor
+	timeProvider TimeProvider
+	notifier     Notifier
 }
 
 func New(
 	repo Repository,
 	transactor Transactor,
-	gameCreator GameCreator,
+	timeProvider TimeProvider,
 	notifier Notifier,
 ) *MatchMaking {
 	return &MatchMaking{
-		repo:        repo,
-		transactor:  transactor,
-		gameCreator: gameCreator,
-		notifier:    notifier,
+		repo:         repo,
+		transactor:   transactor,
+		timeProvider: timeProvider,
+		notifier:     notifier,
 	}
 }

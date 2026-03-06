@@ -32,11 +32,6 @@ type PlayerProvider interface {
 }
 
 type GameRunner interface {
-	CreateGame(
-		ctx context.Context,
-		player1 player.Player,
-		player2 player.Player,
-	) (game.Game, error)
 	StartGames(ctx context.Context, games []game.Game) error
 }
 
