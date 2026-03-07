@@ -17,6 +17,7 @@ import (
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/adapter/repository/postgres"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/adapter/repository/postgres/driver"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/adapter/repository/postgres/transaction"
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/adapter/shotimageprovider"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/adapter/timeprovider"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/messageprocessor"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/outboxprocessor"
@@ -45,7 +46,8 @@ func StartPoller(
 
 	var (
 		sender          = messagesender.New(botAPI)
-		msgProcessor    = messageprocessor.New(sender, sender, buttonRepository)
+		imageProvider   = shotimageprovider.New()
+		msgProcessor    = messageprocessor.New(sender, sender, buttonRepository, imageProvider)
 		timeProvider    = timeprovider.New()
 		outboxProcessor = outboxprocessor.New(
 			pgDB,

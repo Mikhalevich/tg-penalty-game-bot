@@ -57,7 +57,7 @@ func StartBot(ctx context.Context, cfg config.Config) error {
 		nameGenerator          = randomgenerator.New(cfg.RandomNameGenerator.Prefix, cfg.RandomNameGenerator.Length)
 		timeProvider           = timeprovider.New()
 		msgSender              = messagesender.New(botAPI)
-		msgProcessor           = messageprocessor.New(msgSender, msgSender, btnRepo)
+		msgProcessor           = messageprocessor.New(msgSender, msgSender, btnRepo, nil)
 		notification           = notifier.New(pgDB, msgSender)
 		playerProvider         = playerprovider.New(pgDB, nameGenerator, timeProvider)
 		welcomeService         = welcome.New(playerProvider, notification)
