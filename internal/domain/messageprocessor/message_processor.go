@@ -5,6 +5,7 @@ import (
 
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/button"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/msginfo"
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/shotimage"
 )
 
 type Sender interface {
@@ -38,20 +39,27 @@ type ButtonRepository interface {
 	IsNotFoundError(err error) bool
 }
 
+type ShotImageProvider interface {
+	Image(ctx context.Context, shot shotimage.ShotImage) ([]byte, error)
+}
+
 type MessageProcessor struct {
-	sender           Sender
-	escaper          MarkdownEscaper
-	buttonRepository ButtonRepository
+	sender            Sender
+	escaper           MarkdownEscaper
+	buttonRepository  ButtonRepository
+	shotImageProvider ShotImageProvider
 }
 
 func New(
 	sender Sender,
 	escaper MarkdownEscaper,
 	buttonRepository ButtonRepository,
+	shotImageProvider ShotImageProvider,
 ) *MessageProcessor {
 	return &MessageProcessor{
-		sender:           sender,
-		escaper:          escaper,
-		buttonRepository: buttonRepository,
+		sender:            sender,
+		escaper:           escaper,
+		buttonRepository:  buttonRepository,
+		shotImageProvider: shotImageProvider,
 	}
 }

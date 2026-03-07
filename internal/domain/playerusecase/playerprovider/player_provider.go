@@ -36,6 +36,8 @@ func New(
 	timeProvider TimeProvider,
 ) *PlayerProvider {
 	return &PlayerProvider{
-		repo: repo,
+		repo:          repo,
+		nameGenerator: nameGenerator,
+		timeProvider:  timeProvider,
 	}
 }

@@ -9,6 +9,7 @@ import (
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/game"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/msginfo"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/player"
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/shotimage"
 )
 
 const (
@@ -36,7 +37,7 @@ func (n *Notifier) GameStage(ctx context.Context, currentGame game.Game) error {
 		return nil
 	}
 
-	if err := n.inGameNotifications(ctx, currentGame); err != nil {
+	if err := n.newRoundNotifications(ctx, currentGame); err != nil {
 		return fmt.Errorf("in game notifications: %w", err)
 	}
 
@@ -132,7 +133,7 @@ func goalMsg(currentGame game.Game) string {
 	return "Save"
 }
 
-func (n *Notifier) inGameNotifications(ctx context.Context, currentGame game.Game) error {
+func (n *Notifier) newRoundNotifications(ctx context.Context, currentGame game.Game) error {
 	cRound := currentGame.CurrentRound()
 
 	attackerPlayer := playerByPlayerID(cRound.Attack.PlayerID, currentGame)
@@ -142,10 +143,19 @@ func (n *Notifier) inGameNotifications(ctx context.Context, currentGame game.Gam
 			return fmt.Errorf("make buttons: %w", err)
 		}
 
+		payload, err := shotimage.ShotImage{
+			Type: shotimage.ImageTypeAttackerPrepare,
+		}.GOBEncode()
+
+		if err != nil {
+			return fmt.Errorf("make shot attacker payload: %w", err)
+		}
+
 		if err := n.sender.SendMessage(ctx, msginfo.Message{
 			ChatID:  attackerPlayer.ChatID,
 			Text:    "Attack",
-			Type:    msginfo.MessageTypeMarkdown,
+			Type:    msginfo.MessageTypeShotImage,
+			Payload: payload,
 			Buttons: []button.ButtonRow{attackerButtons},
 		}); err != nil {
 			return fmt.Errorf("send attacker msg: %w", err)
@@ -160,10 +170,19 @@ func (n *Notifier) inGameNotifications(ctx context.Context, currentGame game.Gam
 			return fmt.Errorf("make buttons: %w", err)
 		}
 
+		payload, err := shotimage.ShotImage{
+			Type: shotimage.ImageTypeDefenderPrepare,
+		}.GOBEncode()
+
+		if err != nil {
+			return fmt.Errorf("make shot defender payload: %w", err)
+		}
+
 		if err := n.sender.SendMessage(ctx, msginfo.Message{
 			ChatID:  defenderPlayer.ChatID,
 			Text:    "Defend",
-			Type:    msginfo.MessageTypeMarkdown,
+			Type:    msginfo.MessageTypeShotImage,
+			Payload: payload,
 			Buttons: []button.ButtonRow{defenderButtons},
 		}); err != nil {
 			return fmt.Errorf("send defender msg: %w", err)

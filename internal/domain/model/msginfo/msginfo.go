@@ -30,6 +30,7 @@ const (
 	MessageTypePlain MessageType = iota + 1
 	MessageTypeMarkdown
 	MessageTypePNG
+	MessageTypeShotImage
 )
 
 func (mt MessageType) Int() int {
