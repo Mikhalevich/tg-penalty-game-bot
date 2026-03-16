@@ -63,27 +63,45 @@ func (g *GameShot) processGameShot(
 		return nil
 	}
 
-	if err := g.notifier.GameStage(ctx, *currentGame); err != nil {
-		return fmt.Errorf("complete round game stage: %w", err)
+	if err := g.notifier.GameRoundFinish(ctx, *currentGame); err != nil {
+		return fmt.Errorf("round finish: %w", err)
 	}
 
-	if err := currentGame.StartNextRound(shot.CompletedAt); err != nil {
+	if err := g.startNextRound(ctx, currentGame, shot.CompletedAt); err != nil {
 		return fmt.Errorf("start next round: %w", err)
 	}
 
-	if err := g.notifier.GameStage(ctx, *currentGame); err != nil {
-		return fmt.Errorf("start next round game stage: %w", err)
+	return nil
+}
+
+func (g *GameShot) startNextRound(
+	ctx context.Context,
+	currentGame *game.Game,
+	startedAt time.Time,
+) error {
+	if err := currentGame.StartNextRound(startedAt); err != nil {
+		return fmt.Errorf("start next round: %w", err)
 	}
 
-	if currentGame.IsFinished() {
-		if err := g.playerStatusChanger.ChangePlayersGameStatus(
-			ctx,
-			currentGame.PlayerIDs(),
-			player.GameStatusIdle,
-			shot.CompletedAt,
-		); err != nil {
-			return fmt.Errorf("change players game status: %w", err)
+	if !currentGame.IsFinished() {
+		if err := g.notifier.GameNewRound(ctx, *currentGame); err != nil {
+			return fmt.Errorf("start next round: %w", err)
 		}
+
+		return nil
+	}
+
+	if err := g.playerStatusChanger.ChangePlayersGameStatus(
+		ctx,
+		currentGame.PlayerIDs(),
+		player.GameStatusIdle,
+		startedAt,
+	); err != nil {
+		return fmt.Errorf("change players game status: %w", err)
+	}
+
+	if err := g.notifier.GameFinish(ctx, *currentGame); err != nil {
+		return fmt.Errorf("game finish: %w", err)
 	}
 
 	return nil
