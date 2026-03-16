@@ -16,7 +16,7 @@ type Transactor interface {
 }
 
 type Notifier interface {
-	GameStage(ctx context.Context, currentGame game.Game) error
+	GameNewRound(ctx context.Context, currentGame game.Game) error
 }
 
 type StartGame struct {
@@ -44,8 +44,8 @@ func (s *StartGame) StartGames(ctx context.Context, games []game.Game) error {
 		}
 
 		for _, currentGame := range games {
-			if err := s.notifier.GameStage(ctx, currentGame); err != nil {
-				return fmt.Errorf("game stage notification: %w", err)
+			if err := s.notifier.GameNewRound(ctx, currentGame); err != nil {
+				return fmt.Errorf("new round notification: %w", err)
 			}
 		}
 
