@@ -68,6 +68,22 @@ func (g *Game) CurrentRound() *Round {
 	return &g.State.Rounds[len(g.State.Rounds)-1]
 }
 
+func (g *Game) LivePlayers() []Player {
+	if g.State.Player1.IsBot() && g.State.Player2.IsBot() {
+		return nil
+	}
+
+	if g.State.Player1.IsBot() {
+		return []Player{g.State.Player2}
+	}
+
+	if g.State.Player2.IsBot() {
+		return []Player{g.State.Player1}
+	}
+
+	return []Player{g.State.Player1, g.State.Player2}
+}
+
 func (g *Game) IsGameWithBot() bool {
 	return g.State.Player1.IsBot() || g.State.Player2.IsBot()
 }
