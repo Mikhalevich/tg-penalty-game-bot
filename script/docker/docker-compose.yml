@@ -45,6 +45,7 @@ services:
         condition: service_healthy
     volumes:
       - ./../../config/config-outboxpoller.yaml:/app/config/config-outboxpoller.yaml
+      - ./../../assets/shot_images/:/app/images/
     networks:
       - bot-net
 

@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	imagePathTemplate = "/app/images/%s.jpg"
+	imagePathTemplate = "/app/images/%s.png"
 )
 
 func (sip *ShotImageProvider) Image(
