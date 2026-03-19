@@ -7,7 +7,6 @@ import (
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/button"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/game"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/msginfo"
-	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/player"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/shotimage"
 )
 
@@ -19,12 +18,15 @@ const (
 	middleSideSymbol = "🖐"
 )
 
-func (n *Notifier) GameNewRound(ctx context.Context, currentGame game.Game) error {
-	cRound := currentGame.CurrentRound()
+func (n *Notifier) GameNewRound(ctx context.Context, gameID game.ID, state game.State) error {
+	var (
+		cRound      = state.Rounds.Last()
+		roundNumber = state.Rounds.Len()
+	)
 
-	attackerPlayer := playerByPlayerID(cRound.Attack.PlayerID, currentGame)
+	attackerPlayer := state.PlayerByID(cRound.Attack.PlayerID)
 	if !attackerPlayer.IsBot() {
-		attackerButtons, err := makeShotSideButtons(currentGame.ID, currentGame.CurrentRoundNumber())
+		attackerButtons, err := makeShotSideButtons(gameID, roundNumber)
 		if err != nil {
 			return fmt.Errorf("make buttons: %w", err)
 		}
@@ -48,10 +50,10 @@ func (n *Notifier) GameNewRound(ctx context.Context, currentGame game.Game) erro
 		}
 	}
 
-	defenderPlayer := playerByPlayerID(cRound.Defend.PlayerID, currentGame)
+	defenderPlayer := state.PlayerByID(cRound.Defend.PlayerID)
 
 	if !defenderPlayer.IsBot() {
-		defenderButtons, err := makeShotSideButtons(currentGame.ID, currentGame.CurrentRoundNumber())
+		defenderButtons, err := makeShotSideButtons(gameID, roundNumber)
 		if err != nil {
 			return fmt.Errorf("make buttons: %w", err)
 		}
@@ -95,12 +97,4 @@ func makeShotSideButtons(gameID game.ID, roundNumber int) (button.ButtonRow, err
 	}
 
 	return button.ButtonRow{left, middle, right}, nil
-}
-
-func playerByPlayerID(playerID player.ID, currentGame game.Game) game.Player {
-	if currentGame.State.Player1.ID == playerID {
-		return currentGame.State.Player1
-	}
-
-	return currentGame.State.Player2
 }

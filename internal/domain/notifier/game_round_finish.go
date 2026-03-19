@@ -9,14 +9,14 @@ import (
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/shotimage"
 )
 
-func (n *Notifier) GameRoundFinish(ctx context.Context, currentGame game.Game) error {
+func (n *Notifier) GameRoundFinish(ctx context.Context, state game.State) error {
 	var (
-		cRound = currentGame.CurrentRound()
-		msg    = n.makeScoreMsg(goalMsg(currentGame), currentGame)
+		lastRound = state.Rounds.Last()
+		msg       = n.makeScoreMsg(goalMsg(lastRound), state)
 	)
 
-	for _, plr := range currentGame.LivePlayers() {
-		if err := n.sendShotImage(ctx, plr, msg, cRound.Attack.Side, cRound.Defend.Side); err != nil {
+	for _, plr := range state.LivePlayers() {
+		if err := n.sendShotImage(ctx, plr, msg, lastRound.Attack.Side, lastRound.Defend.Side); err != nil {
 			return fmt.Errorf("send shot image: %w", err)
 		}
 	}
@@ -24,8 +24,8 @@ func (n *Notifier) GameRoundFinish(ctx context.Context, currentGame game.Game) e
 	return nil
 }
 
-func goalMsg(currentGame game.Game) string {
-	if currentGame.CurrentRound().IsGoal {
+func goalMsg(round game.Round) string {
+	if round.IsGoal {
 		return "Goal"
 	}
 
