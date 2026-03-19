@@ -43,18 +43,6 @@ func (p Player) IsBot() bool {
 	return p.ID == 0
 }
 
-func (g *Game) CurrentRoundNumber() int {
-	return len(g.State.Rounds)
-}
-
-func (g *Game) CurrentRound() *Round {
-	if len(g.State.Rounds) == 0 {
-		return nil
-	}
-
-	return &g.State.Rounds[len(g.State.Rounds)-1]
-}
-
 func (g *Game) IsGameWithBot() bool {
 	return g.State.Player1.IsBot() || g.State.Player2.IsBot()
 }
@@ -103,7 +91,7 @@ func (g *Game) PlayerShot(shot Shot) error {
 // and updates attacker shots and scores
 // returns true if round was completed.
 func (g *Game) TryToCompleteRound() bool {
-	cRound := g.CurrentRound()
+	cRound := g.mustLastRoundPtr()
 
 	if (cRound.Attack.Side == ShotSideNoShot) ||
 		(cRound.Defend.Side == ShotSideNoShot) {
@@ -121,8 +109,8 @@ func (g *Game) TryToCompleteRound() bool {
 
 // StartNextRound starts next round or finish the game.
 func (g *Game) StartNextRound(now time.Time) error {
-	cRound := g.CurrentRound()
-	if cRound != nil && !cRound.IsCompleted {
+	cRound := g.State.Rounds.Last()
+	if !cRound.IsCompleted {
 		return perror.RoundNotCompleted()
 	}
 
@@ -147,8 +135,17 @@ func (g *Game) StartNextRound(now time.Time) error {
 	return nil
 }
 
+// mustLastRoundPtr returns pointer for last round or fake round if no rounds.
+func (g *Game) mustLastRoundPtr() *Round {
+	if len(g.State.Rounds) == 0 {
+		return &Round{}
+	}
+
+	return &g.State.Rounds[len(g.State.Rounds)-1]
+}
+
 func (g *Game) shotByPlayerID(id player.ID) *Shot {
-	cRound := g.CurrentRound()
+	cRound := g.State.Rounds.Last()
 
 	if cRound.Attack.PlayerID == id {
 		return &cRound.Attack
@@ -161,7 +158,7 @@ func (g *Game) makePendingShot(playerID player.ID, shotType ShotType, now time.T
 	return Shot{
 		GameID:    g.ID,
 		PlayerID:  playerID,
-		Round:     g.CurrentRoundNumber() + 1,
+		Round:     g.State.Rounds.Len() + 1,
 		Type:      shotType,
 		CreatedAt: now,
 		Side:      ShotSideNoShot,
