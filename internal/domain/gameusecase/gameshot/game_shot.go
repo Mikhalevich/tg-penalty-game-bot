@@ -28,9 +28,9 @@ type PlayerStatusChanger interface {
 }
 
 type Notifier interface {
-	GameNewRound(ctx context.Context, currentGame game.Game) error
-	GameRoundFinish(ctx context.Context, currentGame game.Game) error
-	GameFinish(ctx context.Context, currentGame game.Game) error
+	GameNewRound(ctx context.Context, gameID game.ID, state game.State) error
+	GameRoundFinish(ctx context.Context, state game.State) error
+	GameFinish(ctx context.Context, state game.State) error
 }
 
 type GameShot struct {

@@ -10,25 +10,13 @@ import (
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/player"
 )
 
-func (n *Notifier) GameFinish(ctx context.Context, currentGame game.Game) error {
-	if err := n.sendMsgToPlayers(
-		ctx,
-		currentGame,
-		n.makeScoreMsg("Game Finished", currentGame),
-	); err != nil {
-		return fmt.Errorf("send msg to players: %w", err)
-	}
+func (n *Notifier) GameFinish(ctx context.Context, state game.State) error {
+	msg := n.makeScoreMsg("Game Finished", state)
 
-	return nil
-}
-
-func (n *Notifier) sendMsgToPlayers(ctx context.Context, currentGame game.Game, msg string) error {
-	if err := n.sendMsgToPlayer(ctx, currentGame.State.Player1, msg); err != nil {
-		return fmt.Errorf("send msg to first player: %w", err)
-	}
-
-	if err := n.sendMsgToPlayer(ctx, currentGame.State.Player2, msg); err != nil {
-		return fmt.Errorf("send msg to second player: %w", err)
+	for _, plr := range state.LivePlayers() {
+		if err := n.sendMsgToPlayer(ctx, plr, msg); err != nil {
+			return fmt.Errorf("send msg to player: %w", err)
+		}
 	}
 
 	return nil
@@ -50,17 +38,17 @@ func (n *Notifier) sendMsgToPlayer(ctx context.Context, plr game.Player, msg str
 	return nil
 }
 
-func (n *Notifier) makeScoreMsg(header string, currentGame game.Game) string {
+func (n *Notifier) makeScoreMsg(header string, state game.State) string {
 	return fmt.Sprintf("*%s*\n %s \\: %s",
 		header,
-		playerGoalsScoredMsg(currentGame.State.Player1.ID, currentGame),
-		playerGoalsScoredMsg(currentGame.State.Player2.ID, currentGame),
+		playerGoalsScoredMsg(state.Player1.ID, state.Rounds),
+		playerGoalsScoredMsg(state.Player2.ID, state.Rounds),
 	)
 }
 
-func playerGoalsScoredMsg(playerID player.ID, currentGame game.Game) string {
+func playerGoalsScoredMsg(playerID player.ID, rounds []game.Round) string {
 	var builder strings.Builder
-	for _, round := range currentGame.State.Rounds {
+	for _, round := range rounds {
 		if round.Attack.PlayerID != playerID {
 			continue
 		}

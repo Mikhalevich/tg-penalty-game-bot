@@ -16,7 +16,7 @@ type Transactor interface {
 }
 
 type Notifier interface {
-	GameNewRound(ctx context.Context, currentGame game.Game) error
+	GameNewRound(ctx context.Context, gameID game.ID, state game.State) error
 	GameStart(ctx context.Context, player1, player2 game.Player) error
 }
 
@@ -49,7 +49,7 @@ func (s *StartGame) StartGames(ctx context.Context, games []game.Game) error {
 				return fmt.Errorf("start game notification: %w", err)
 			}
 
-			if err := s.notifier.GameNewRound(ctx, currentGame); err != nil {
+			if err := s.notifier.GameNewRound(ctx, currentGame.ID, currentGame.State); err != nil {
 				return fmt.Errorf("new round notification: %w", err)
 			}
 		}
