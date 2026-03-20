@@ -11,9 +11,10 @@ import (
 type ImageType string
 
 const (
-	ImageTypeAttackerPrepare = "attacker_prepare"
-	ImageTypeDefenderPrepare = "defender_prepare"
-	ImageTypeShot            = "shot"
+	ImageTypePrepareAttack = "prepare_attack"
+	ImageTypePrepareDefend = "prepare_defend"
+	ImageTypeAttack        = "attack"
+	ImageTypeDefend        = "defend"
 )
 
 func (it ImageType) String() string {

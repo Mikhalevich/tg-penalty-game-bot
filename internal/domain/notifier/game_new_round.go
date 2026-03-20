@@ -32,7 +32,7 @@ func (n *Notifier) GameNewRound(ctx context.Context, gameID game.ID, state game.
 		}
 
 		payload, err := shotimage.ShotImage{
-			Type: shotimage.ImageTypeAttackerPrepare,
+			Type: shotimage.ImageTypePrepareAttack,
 		}.GOBEncode()
 
 		if err != nil {
@@ -59,7 +59,7 @@ func (n *Notifier) GameNewRound(ctx context.Context, gameID game.ID, state game.
 		}
 
 		payload, err := shotimage.ShotImage{
-			Type: shotimage.ImageTypeDefenderPrepare,
+			Type: shotimage.ImageTypePrepareDefend,
 		}.GOBEncode()
 
 		if err != nil {

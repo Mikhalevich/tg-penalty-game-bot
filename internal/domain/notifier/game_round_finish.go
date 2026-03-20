@@ -6,6 +6,7 @@ import (
 
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/game"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/msginfo"
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/player"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/shotimage"
 )
 
@@ -16,7 +17,14 @@ func (n *Notifier) GameRoundFinish(ctx context.Context, state game.State) error 
 	)
 
 	for _, plr := range state.LivePlayers() {
-		if err := n.sendShotImage(ctx, plr, msg, lastRound.Attack.Side, lastRound.Defend.Side); err != nil {
+		if err := n.sendShotImage(
+			ctx,
+			plr,
+			msg,
+			shotImageTypeByPlayerID(plr.ID, lastRound.Attack.PlayerID),
+			lastRound.Attack.Side,
+			lastRound.Defend.Side,
+		); err != nil {
 			return fmt.Errorf("send shot image: %w", err)
 		}
 	}
@@ -32,10 +40,19 @@ func goalMsg(round game.Round) string {
 	return "Save"
 }
 
+func shotImageTypeByPlayerID(playerID, attackerID player.ID) shotimage.ImageType {
+	if playerID == attackerID {
+		return shotimage.ImageTypeAttack
+	}
+
+	return shotimage.ImageTypeDefend
+}
+
 func (n *Notifier) sendShotImage(
 	ctx context.Context,
 	plr game.Player,
 	msg string,
+	imageType shotimage.ImageType,
 	attackerSide game.ShotSide,
 	defenderSide game.ShotSide,
 ) error {
@@ -44,7 +61,7 @@ func (n *Notifier) sendShotImage(
 	}
 
 	payload, err := shotimage.ShotImage{
-		Type:         shotimage.ImageTypeShot,
+		Type:         imageType,
 		AttackerSide: attackerSide,
 		DefenderSide: defenderSide,
 	}.GOBEncode()

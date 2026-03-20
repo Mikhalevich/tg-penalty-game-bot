@@ -109,8 +109,7 @@ func (g *Game) TryToCompleteRound() bool {
 
 // StartNextRound starts next round or finish the game.
 func (g *Game) StartNextRound(now time.Time) error {
-	cRound := g.State.Rounds.Last()
-	if !cRound.IsCompleted {
+	if g.State.Rounds.Len() > 0 && !g.State.Rounds.Last().IsCompleted {
 		return perror.RoundNotCompleted()
 	}
 
@@ -145,7 +144,7 @@ func (g *Game) mustLastRoundPtr() *Round {
 }
 
 func (g *Game) shotByPlayerID(id player.ID) *Shot {
-	cRound := g.State.Rounds.Last()
+	cRound := g.mustLastRoundPtr()
 
 	if cRound.Attack.PlayerID == id {
 		return &cRound.Attack
