@@ -8,7 +8,13 @@ import (
 )
 
 const (
-	imagePathTemplate = "assets/%s.png"
+	imagePathTemplate = "assets/%s/%s.png"
+
+	prepareFolder = "prepare"
+	attackFolder  = "attack"
+	defendFolder  = "defend"
+	attackFile    = "attack"
+	defendFile    = "defend"
 )
 
 func (sip *ShotImageProvider) Image(
@@ -24,17 +30,26 @@ func (sip *ShotImageProvider) Image(
 }
 
 func imagePath(shot shotimage.ShotImage) string {
-	return fmt.Sprintf(imagePathTemplate, imageName(shot))
+	folder, fileName := imageFolderAndName(shot)
+
+	return fmt.Sprintf(imagePathTemplate, folder, fileName)
 }
 
-func imageName(shot shotimage.ShotImage) string {
+// imageFodlerAndName returns image folder and filename withoud suffix.
+func imageFolderAndName(shot shotimage.ShotImage) (string, string) {
 	switch shot.Type {
-	case shotimage.ImageTypeAttackerPrepare, shotimage.ImageTypeDefenderPrepare:
-		return shot.Type.String()
+	case shotimage.ImageTypePrepareAttack:
+		return prepareFolder, attackFile
 
-	case shotimage.ImageTypeShot:
-		return fmt.Sprintf("%s_%s", shot.AttackerSide, shot.DefenderSide)
+	case shotimage.ImageTypePrepareDefend:
+		return prepareFolder, defendFile
+
+	case shotimage.ImageTypeAttack:
+		return attackFolder, fmt.Sprintf("%s_%s", shot.AttackerSide, shot.DefenderSide)
+
+	case shotimage.ImageTypeDefend:
+		return defendFolder, fmt.Sprintf("%s_%s", shot.AttackerSide, shot.DefenderSide)
 	}
 
-	return ""
+	return "", ""
 }
