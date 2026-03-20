@@ -2,8 +2,10 @@
 -- SQL in section 'Up' is executed when this migration is applied
 
 CREATE TYPE game_status AS ENUM (
+    'pending',
     'in_progress',
-    'completed'
+    'completed',
+    'canceled'
 );
 
 CREATE TABLE game(
