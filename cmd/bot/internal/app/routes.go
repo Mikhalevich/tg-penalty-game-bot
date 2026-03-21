@@ -6,12 +6,12 @@ import (
 )
 
 func makeRoutes(tbot *tgbot.TGBot, handler *tghandler.TGHandler) {
-	tbot.AddTextCommand("/start", handler.Start)
+	tbot.AddTextCommand("start", handler.Start)
 
-	tbot.AddMenuCommand("/change_name", "chanage your name", handler.ChangeName)
-	tbot.AddMenuCommand("/find_online_game", "find online player for game", handler.FindGame)
-	tbot.AddMenuCommand("/play_with_bot", "start game with bot", handler.PlayWithBot)
-	tbot.AddMenuCommand("/create_game_link", "start game by share link", handler.CreateGameLink)
+	tbot.AddMenuCommand("change_name", "chanage your name", handler.ChangeName)
+	tbot.AddMenuCommand("find_online_game", "find online player for game", handler.FindGame)
+	tbot.AddMenuCommand("play_with_bot", "start game with bot", handler.PlayWithBot)
+	tbot.AddMenuCommand("create_game_link", "start game by share link", handler.CreateGameLink)
 
 	tbot.AddDefaultHandler(handler.DefaultHandler)
 	tbot.AddDefaultCallbackQueryHander(handler.DefaultCallbackQuery)
