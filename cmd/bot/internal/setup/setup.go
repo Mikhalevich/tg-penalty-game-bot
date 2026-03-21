@@ -20,6 +20,7 @@ import (
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/adapter/repository/postgres/transaction"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/adapter/timeprovider"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/gameusecase/gameshot"
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/gameusecase/joingame"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/gameusecase/startgame"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/messageprocessor"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/notifier"
@@ -65,8 +66,9 @@ func StartBot(ctx context.Context, cfg config.Config) error {
 		findGameSerivce        = findgame.New(pgDB, playerProvider, timeProvider, notification)
 		changeStatusService    = changestatus.New(pgDB)
 		startGameService       = startgame.New(pgDB, pgDB.Transactor(), notification)
+		joinGameService        = joingame.New(pgDB, pgDB.Transactor(), notification)
 		playerStartGameService = playerstartgame.New(pgDB, pgDB.Transactor(),
-			playerProvider, startGameService, timeProvider, notification)
+			playerProvider, startGameService, joinGameService, timeProvider, notification)
 		gameShotService       = gameshot.New(pgDB, pgDB.Transactor(), changeStatusService, notification)
 		playerGameShotService = playergameshot.New(playerProvider, gameShotService, timeProvider, msgProcessor)
 	)
