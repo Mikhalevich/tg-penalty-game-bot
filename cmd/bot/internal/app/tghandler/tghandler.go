@@ -32,6 +32,7 @@ type FindGame interface {
 
 type StartGame interface {
 	StartGameWithBot(ctx context.Context, chatID msginfo.ChatID) error
+	StartGameByLink(ctx context.Context, chatID msginfo.ChatID) error
 }
 
 type GameShot interface {

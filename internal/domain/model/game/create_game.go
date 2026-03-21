@@ -10,7 +10,7 @@ import (
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/player"
 )
 
-// CreateGame create a new game, start first round and return created game.
+// CreateGame create a new game(in progress status), start first round and return created game.
 func CreateGame(
 	ctx context.Context,
 	player1 player.Player,
@@ -33,6 +33,23 @@ func CreateGame(
 	}
 
 	return createdGame, nil
+}
+
+// CreatePendingGame create a new game in pending status, no round is starting and return created game.
+func CreatePendingGame(
+	ctx context.Context,
+	plr player.Player,
+	createdAt time.Time,
+) Game {
+	return Game{
+		ID:              IDFromString(uuid.NewString()),
+		CreatedAt:       createdAt,
+		Status:          GameStatusPending,
+		StatusChagnedAt: createdAt,
+		State: State{
+			Player1: createGamePlayerFromPlayer(plr),
+		},
+	}
 }
 
 func createGamePlayerFromPlayer(plr player.Player) Player {
