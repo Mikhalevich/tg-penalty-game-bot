@@ -3,6 +3,7 @@ package tgbot
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
@@ -47,6 +48,7 @@ type BotMessage struct {
 	// for callback query
 	Data    string
 	Payment Payment
+	Args    string
 }
 
 type MessageSender interface {
@@ -74,7 +76,7 @@ func (t *TGBot) addCommand(command string, description string, handler Handler) 
 	t.bot.RegisterHandler(
 		bot.HandlerTypeMessageText,
 		command,
-		bot.MatchTypeExact,
+		bot.MatchTypeCommandStartOnly,
 		t.wrapHandler(command, handler),
 	)
 }
@@ -110,8 +112,10 @@ func (t *TGBot) wrapHandler(pattern string, handler Handler) bot.HandlerFunc {
 		defer span.End()
 
 		var (
-			msg    = makeMsgFromUpdate(update)
-			log    = t.logger.WithContext(ctx).WithField("endpoint", pattern)
+			msg = makeMsgFromUpdate(update)
+			log = t.logger.WithContext(ctx).
+				WithField("endpoint", pattern).
+				WithField("bot_message", msg)
 			ctxLog = logger.WithLogger(ctx, log)
 		)
 
@@ -134,6 +138,7 @@ func (t *TGBot) wrapHandler(pattern string, handler Handler) bot.HandlerFunc {
 func makeMsgFromUpdate(update *models.Update) BotMessage {
 	if update.Message != nil {
 		msg := fillBaseMessage(update.Message)
+		msg.Args = commandArgs(update.Message)
 
 		if update.Message.SuccessfulPayment != nil {
 			msg.Payment = Payment{
@@ -195,4 +200,16 @@ func fillBaseMessage(msg *models.Message) BotMessage {
 	}
 
 	return botMsg
+}
+
+func commandArgs(msg *models.Message) string {
+	for _, e := range msg.Entities {
+		if e.Type == models.MessageEntityTypeBotCommand {
+			if e.Offset == 0 {
+				return strings.TrimLeft(msg.Text[e.Offset+e.Length:], " ")
+			}
+		}
+	}
+
+	return ""
 }
