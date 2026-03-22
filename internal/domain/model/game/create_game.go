@@ -23,8 +23,8 @@ func CreateGame(
 		Status:          GameStatusInProgress,
 		StatusChagnedAt: createdAt,
 		State: State{
-			Player1: createGamePlayerFromPlayer(player1),
-			Player2: createGamePlayerFromPlayer(player2),
+			Player1: CreateGamePlayerFromPlayer(player1),
+			Player2: CreateGamePlayerFromPlayer(player2),
 		},
 	}
 
@@ -47,12 +47,12 @@ func CreatePendingGame(
 		Status:          GameStatusPending,
 		StatusChagnedAt: createdAt,
 		State: State{
-			Player1: createGamePlayerFromPlayer(plr),
+			Player1: CreateGamePlayerFromPlayer(plr),
 		},
 	}
 }
 
-func createGamePlayerFromPlayer(plr player.Player) Player {
+func CreateGamePlayerFromPlayer(plr player.Player) Player {
 	return Player{
 		ID:             plr.ID,
 		ChatID:         plr.ChatID,

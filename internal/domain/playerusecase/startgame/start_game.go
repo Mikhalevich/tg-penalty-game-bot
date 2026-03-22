@@ -35,6 +35,10 @@ type GameRunner interface {
 	StartGames(ctx context.Context, games []game.Game) error
 }
 
+type GameJoiner interface {
+	JoinGame(ctx context.Context, gameID game.ID, plr game.Player, joineddAt time.Time) error
+}
+
 type TimeProvider interface {
 	Now() time.Time
 }
@@ -48,6 +52,7 @@ type StartGame struct {
 	transactor     Transactor
 	playerProvider PlayerProvider
 	gameRunner     GameRunner
+	gameJoiner     GameJoiner
 	timeProvider   TimeProvider
 	notifier       Notifier
 }
@@ -57,6 +62,7 @@ func New(
 	transactor Transactor,
 	playerProvider PlayerProvider,
 	gameRunner GameRunner,
+	gameJoiner GameJoiner,
 	timeProvider TimeProvider,
 	notifier Notifier,
 ) *StartGame {
@@ -65,6 +71,7 @@ func New(
 		transactor:     transactor,
 		playerProvider: playerProvider,
 		gameRunner:     gameRunner,
+		gameJoiner:     gameJoiner,
 		timeProvider:   timeProvider,
 		notifier:       notifier,
 	}

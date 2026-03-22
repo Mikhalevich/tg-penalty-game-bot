@@ -1,6 +1,7 @@
 package game
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/msginfo"
@@ -64,6 +65,22 @@ func (g *Game) PlayerIDs() []player.ID {
 	}
 
 	return ids
+}
+
+func (g *Game) JoinPlayerAndStartGame(plr Player, joinedAt time.Time) error {
+	if g.Status != GameStatusPending {
+		return perror.InvalidGameState()
+	}
+
+	g.State.Player2 = plr
+
+	g.Status = GameStatusInProgress
+
+	if err := g.StartNextRound(joinedAt); err != nil {
+		return fmt.Errorf("start next round: %w", err)
+	}
+
+	return nil
 }
 
 func (g *Game) PlayerShot(shot Shot) error {

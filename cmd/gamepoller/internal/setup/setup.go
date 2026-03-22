@@ -18,6 +18,7 @@ import (
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/gameusecase/startgame"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/matchmaking"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/notifier"
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playerusecase/changestatus"
 )
 
 func StartWorker(ctx context.Context, cfg config.Config) error {
@@ -39,8 +40,9 @@ func StartWorker(ctx context.Context, cfg config.Config) error {
 	var (
 		msgSender            = messagesender.New(botAPI)
 		gameNofifier         = notifier.New(pgDB, msgSender)
+		changeStatusService  = changestatus.New(pgDB)
 		timeProvider         = timeprovider.New()
-		startGameService     = startgame.New(pgDB, pgDB.Transactor(), gameNofifier)
+		startGameService     = startgame.New(pgDB, pgDB.Transactor(), changeStatusService, gameNofifier)
 		matchmakingProcessor = matchmaking.New(
 			pgDB,
 			pgDB.Transactor(),
