@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/game"
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/player"
 )
 
 type Repository interface {
@@ -17,30 +18,69 @@ type Transactor interface {
 	Transaction(ctx context.Context, trxFn func(ctx context.Context) error) error
 }
 
+type PlayerStatusChanger interface {
+	ChangePlayersGameStatus(
+		ctx context.Context,
+		playerIDs []player.ID,
+		status player.GameStatus,
+		changedAt time.Time,
+	) error
+}
+
 type Notifier interface {
 	GameStart(ctx context.Context, player1, player2 game.Player) error
 	GameNewRound(ctx context.Context, gameID game.ID, state game.State) error
 }
 
 type JoinGame struct {
-	repo       Repository
-	transactor Transactor
-	notifier   Notifier
+	repo                Repository
+	transactor          Transactor
+	playerStatusChanger PlayerStatusChanger
+	notifier            Notifier
 }
 
 func New(
 	repo Repository,
 	transactor Transactor,
+	playerStatusChanger PlayerStatusChanger,
 	notifier Notifier,
 ) *JoinGame {
 	return &JoinGame{
-		repo:       repo,
-		transactor: transactor,
-		notifier:   notifier,
+		repo:                repo,
+		transactor:          transactor,
+		playerStatusChanger: playerStatusChanger,
+		notifier:            notifier,
 	}
 }
 
-func (j *JoinGame) JoinGame(ctx context.Context, gameID game.ID, plr game.Player, joinedAt time.Time) error {
+func (j *JoinGame) JoinGame(
+	ctx context.Context,
+	gameID game.ID,
+	plr game.Player,
+	joinedAt time.Time,
+) error {
+	if err := j.processJoin(ctx, gameID, plr, joinedAt); err != nil {
+		if err := j.playerStatusChanger.ChangePlayersGameStatus(
+			ctx,
+			[]player.ID{plr.ID},
+			player.GameStatusIdle,
+			joinedAt,
+		); err != nil {
+			return fmt.Errorf("change player status to idle: %w", err)
+		}
+
+		return fmt.Errorf("process join game: %w", err)
+	}
+
+	return nil
+}
+
+func (j *JoinGame) processJoin(
+	ctx context.Context,
+	gameID game.ID,
+	plr game.Player,
+	joinedAt time.Time,
+) error {
 	if err := j.transactor.Transaction(ctx, func(ctx context.Context) error {
 		currentGame, err := j.repo.GetGame(ctx, gameID)
 		if err != nil {
