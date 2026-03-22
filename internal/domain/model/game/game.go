@@ -72,6 +72,10 @@ func (g *Game) JoinPlayerAndStartGame(plr Player, joinedAt time.Time) error {
 		return perror.InvalidGameState()
 	}
 
+	if g.State.Player1.ID == plr.ID {
+		return perror.InvalidPlayer()
+	}
+
 	g.State.Player2 = plr
 
 	g.Status = GameStatusInProgress
