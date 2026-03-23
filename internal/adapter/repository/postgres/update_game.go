@@ -15,9 +15,9 @@ func (p *Postgres) UpdateGame(ctx context.Context, game game.Game) error {
 		query = `
 			UPDATE game SET
 				game_status = :game_status,
-				game_status_changed_at = :game_status_changed_at,
 				payload = :payload,
-				payload_version = payload_version + 1
+				payload_version = payload_version + 1,
+				payload_updated_at = :payload_updated_at
 			WHERE
 				payload_version = :payload_version
 		`

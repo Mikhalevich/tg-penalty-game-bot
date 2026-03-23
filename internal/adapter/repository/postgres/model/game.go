@@ -9,12 +9,13 @@ import (
 )
 
 type Game struct {
-	ID              string      `db:"id"`
-	CreatedAt       time.Time   `db:"created_at"`
-	Status          string      `db:"game_status"`
-	StatusChagnedAt time.Time   `db:"game_status_changed_at"`
-	Payload         jsonb.JSONB `db:"payload"`
-	PayloadVersion  int         `db:"payload_version"`
+	ID               string      `db:"id"`
+	CreatedAt        time.Time   `db:"created_at"`
+	Type             string      `db:"game_type"`
+	Status           string      `db:"game_status"`
+	Payload          jsonb.JSONB `db:"payload"`
+	PayloadVersion   int         `db:"payload_version"`
+	PayloadUpdatedAt time.Time   `db:"payload_updated_at"`
 }
 
 func (g Game) ToGame() (game.Game, error) {
@@ -25,12 +26,13 @@ func (g Game) ToGame() (game.Game, error) {
 	}
 
 	return game.Game{
-		ID:              game.IDFromString(g.ID),
-		CreatedAt:       g.CreatedAt,
-		Status:          game.GameStatus(g.Status),
-		StatusChagnedAt: g.StatusChagnedAt,
-		State:           gameState,
-		StateVersion:    g.PayloadVersion,
+		ID:             game.IDFromString(g.ID),
+		CreatedAt:      g.CreatedAt,
+		Type:           game.GameType(g.Type),
+		Status:         game.GameStatus(g.Status),
+		State:          gameState,
+		StateVersion:   g.PayloadVersion,
+		StateUpdatedAt: g.PayloadUpdatedAt,
 	}, nil
 }
 
@@ -41,12 +43,13 @@ func ToDBGame(domGame game.Game) (Game, error) {
 	}
 
 	return Game{
-		ID:              domGame.ID.String(),
-		CreatedAt:       domGame.CreatedAt,
-		Status:          domGame.Status.String(),
-		StatusChagnedAt: domGame.StatusChagnedAt,
-		Payload:         payload,
-		PayloadVersion:  domGame.StateVersion,
+		ID:               domGame.ID.String(),
+		CreatedAt:        domGame.CreatedAt,
+		Type:             domGame.Type.String(),
+		Status:           domGame.Status.String(),
+		Payload:          payload,
+		PayloadVersion:   domGame.StateVersion,
+		PayloadUpdatedAt: domGame.StateUpdatedAt,
 	}, nil
 }
 

@@ -16,17 +16,19 @@ func (p *Postgres) InsertGames(ctx context.Context, games []game.Game) error {
 			INSERT INTO game(
 				id,
 				created_at,
+				game_type,
 				game_status,
-				game_status_changed_at,
 				payload,
-				payload_version
+				payload_version,
+				payload_updated_at
 			) VALUES (
 				:id,
 				:created_at,
+				:game_type,
 				:game_status,
-				:game_status_changed_at,
 				:payload,
-				:payload_version
+				:payload_version,
+				:payload_updated_at
 			)
 		`
 	)

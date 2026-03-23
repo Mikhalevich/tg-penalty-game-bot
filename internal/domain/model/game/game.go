@@ -24,12 +24,13 @@ func IDFromString(id string) ID {
 }
 
 type Game struct {
-	ID              ID
-	CreatedAt       time.Time
-	Status          GameStatus
-	StatusChagnedAt time.Time
-	State           State
-	StateVersion    int
+	ID             ID
+	CreatedAt      time.Time
+	Type           GameType
+	Status         GameStatus
+	State          State
+	StateVersion   int
+	StateUpdatedAt time.Time
 }
 
 type Player struct {
@@ -84,6 +85,8 @@ func (g *Game) JoinPlayerAndStartGame(plr Player, joinedAt time.Time) error {
 		return fmt.Errorf("start next round: %w", err)
 	}
 
+	g.StateUpdatedAt = joinedAt
+
 	return nil
 }
 
@@ -104,6 +107,8 @@ func (g *Game) PlayerShot(shot Shot) error {
 
 	inGameShot.Side = shot.Side
 	inGameShot.CompletedAt = shot.CompletedAt
+
+	g.StateUpdatedAt = shot.CompletedAt
 
 	return nil
 }

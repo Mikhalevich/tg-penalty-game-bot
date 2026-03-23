@@ -18,14 +18,14 @@ func CreateGame(
 	createdAt time.Time,
 ) (Game, error) {
 	createdGame := Game{
-		ID:              IDFromString(uuid.NewString()),
-		CreatedAt:       createdAt,
-		Status:          GameStatusInProgress,
-		StatusChagnedAt: createdAt,
+		ID:        IDFromString(uuid.NewString()),
+		CreatedAt: createdAt,
+		Status:    GameStatusInProgress,
 		State: State{
 			Player1: CreateGamePlayerFromPlayer(player1),
 			Player2: CreateGamePlayerFromPlayer(player2),
 		},
+		StateUpdatedAt: createdAt,
 	}
 
 	if err := createdGame.StartNextRound(createdAt); err != nil {
@@ -42,13 +42,13 @@ func CreatePendingGame(
 	createdAt time.Time,
 ) Game {
 	return Game{
-		ID:              IDFromString(uuid.NewString()),
-		CreatedAt:       createdAt,
-		Status:          GameStatusPending,
-		StatusChagnedAt: createdAt,
+		ID:        IDFromString(uuid.NewString()),
+		CreatedAt: createdAt,
+		Status:    GameStatusPending,
 		State: State{
 			Player1: CreateGamePlayerFromPlayer(plr),
 		},
+		StateUpdatedAt: createdAt,
 	}
 }
 
