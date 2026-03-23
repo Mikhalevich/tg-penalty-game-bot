@@ -13,6 +13,7 @@ import (
 // CreateGame create a new game(in progress status), start first round and return created game.
 func CreateGame(
 	ctx context.Context,
+	gameType GameType,
 	player1 player.Player,
 	player2 player.Player,
 	createdAt time.Time,
@@ -20,6 +21,7 @@ func CreateGame(
 	createdGame := Game{
 		ID:        IDFromString(uuid.NewString()),
 		CreatedAt: createdAt,
+		Type:      gameType,
 		Status:    GameStatusInProgress,
 		State: State{
 			Player1: CreateGamePlayerFromPlayer(player1),
@@ -44,6 +46,7 @@ func CreatePendingGame(
 	return Game{
 		ID:        IDFromString(uuid.NewString()),
 		CreatedAt: createdAt,
+		Type:      GameTypeFriendly,
 		Status:    GameStatusPending,
 		State: State{
 			Player1: CreateGamePlayerFromPlayer(plr),
