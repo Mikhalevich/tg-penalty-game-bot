@@ -1,6 +1,11 @@
 -- +migrate Up
 -- SQL in section 'Up' is executed when this migration is applied
 
+CREATE TYPE game_type AS ENUM (
+    'rating',
+    'friendly'
+);
+
 CREATE TYPE game_status AS ENUM (
     'pending',
     'in_progress',
@@ -11,11 +16,14 @@ CREATE TYPE game_status AS ENUM (
 CREATE TABLE game(
     id UUID NOT NULL PRIMARY KEY,
     created_at TIMESTAMPTZ NOT NULL,
+    game_type game_type NOT NULL,
     game_status game_status NOT NULL,
-    game_status_changed_at TIMESTAMPTZ NOT NULL,
     payload JSONB NOT NULL,
-    payload_version INTEGER NOT NULL DEFAULT 0
+    payload_version INTEGER NOT NULL DEFAULT 0,
+    payload_updated_at TIMESTAMPTZ NOT NULL
 );
+
+CREATE INDEX game_raring_in_progress_idx ON game(game_type, game_status, payload_updated_at) WHERE game_type = 'rating' AND game_status = 'in_progress';
 
 CREATE TYPE shot_type AS ENUM (
     'defend',
@@ -51,3 +59,4 @@ DROP TYPE shot_side;
 DROP TYPE shot_type;
 DROP TABLE game;
 DROP TYPE game_status;
+DROP TYPE game_type;

@@ -30,6 +30,7 @@ func (s *StartGame) StartGameWithBot(
 
 	currentGame, err := game.CreateGame(
 		ctx,
+		game.GameTypeFriendly,
 		currentPlayer,
 		player.Player{
 			ID:          0,

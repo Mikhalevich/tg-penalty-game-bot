@@ -18,10 +18,11 @@ func (p *Postgres) GetGame(ctx context.Context, gameID game.ID) (game.Game, erro
 			SELECT
 				id,
 				created_at,
+				game_type,
 				game_status,
-				game_status_changed_at,
 				payload,
-				payload_version
+				payload_version,
+				payload_updated_at
 			FROM
 				game
 			WHERE
