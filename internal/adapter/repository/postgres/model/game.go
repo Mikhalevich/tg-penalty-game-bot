@@ -36,6 +36,24 @@ func (g Game) ToGame() (game.Game, error) {
 	}, nil
 }
 
+func ToDomainGames(dbGames []Game) ([]game.Game, error) {
+	if len(dbGames) == 0 {
+		return nil, nil
+	}
+
+	domGames := make([]game.Game, 0, len(dbGames))
+	for _, dbGame := range dbGames {
+		domGame, err := dbGame.ToGame()
+		if err != nil {
+			return nil, fmt.Errorf("convert to game: %w", err)
+		}
+
+		domGames = append(domGames, domGame)
+	}
+
+	return domGames, nil
+}
+
 func ToDBGame(domGame game.Game) (Game, error) {
 	payload, err := jsonb.NewFromMarshaler(domGame.State)
 	if err != nil {

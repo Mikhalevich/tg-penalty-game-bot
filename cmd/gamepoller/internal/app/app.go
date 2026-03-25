@@ -9,29 +9,52 @@ import (
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/infra/logger"
 )
 
-type Processor interface {
+type MatchmakingProcessor interface {
 	ProcessReadyToGamePlayers(ctx context.Context, playersLimit int) error
 }
 
-type App struct {
-	processor Processor
+type ExpiredShotsProcessor interface {
+	ForceShotForGames(ctx context.Context, expirationDuration time.Duration, limit int) error
 }
 
-func New(processor Processor) *App {
+type App struct {
+	matchmakingProcessor  MatchmakingProcessor
+	expiredShotsProcessor ExpiredShotsProcessor
+}
+
+func New(
+	matchmakingProcessor MatchmakingProcessor,
+	expiredShotsProcessor ExpiredShotsProcessor,
+) *App {
 	return &App{
-		processor: processor,
+		matchmakingProcessor:  matchmakingProcessor,
+		expiredShotsProcessor: expiredShotsProcessor,
 	}
 }
 
 func (a *App) Run(
 	ctx context.Context,
-	cfg config.Worker,
+	matchmakingCfg config.Worker,
+	expiredShotsCfg config.ExpiredShotsWorker,
 ) {
 	var wgr sync.WaitGroup
 
-	runWorkers(ctx, "players ready to game", cfg.Count, cfg.Interval, &wgr,
+	runWorkers(ctx, "players ready to game", matchmakingCfg.Count, matchmakingCfg.Interval, &wgr,
 		func(ctx context.Context) error {
-			return a.processor.ProcessReadyToGamePlayers(ctx, cfg.BatchSize)
+			return a.matchmakingProcessor.ProcessReadyToGamePlayers(
+				ctx,
+				matchmakingCfg.BatchSize,
+			)
+		},
+	)
+
+	runWorkers(ctx, "expires shots", expiredShotsCfg.Count, expiredShotsCfg.Interval, &wgr,
+		func(ctx context.Context) error {
+			return a.expiredShotsProcessor.ForceShotForGames(
+				ctx,
+				expiredShotsCfg.ShotExpireDuration,
+				expiredShotsCfg.BatchSize,
+			)
 		},
 	)
 

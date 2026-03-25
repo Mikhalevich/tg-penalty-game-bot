@@ -10,3 +10,8 @@ matchmaking_worker:
   count: 2
   interval: 1s
   batch_size: 10
+expired_shots_worker:
+  count: 2
+  interval: 5s
+  batch_size: 100
+  shot_expire_duration: 5m

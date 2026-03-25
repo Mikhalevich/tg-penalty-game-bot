@@ -160,6 +160,24 @@ func (g *Game) StartNextRound(now time.Time) error {
 	return nil
 }
 
+func (g *Game) MakeForceShots(side ShotSide, shotAt time.Time) {
+	round := g.mustLastRoundPtr()
+
+	updateIfNoShot(&round.Attack, side, shotAt)
+	updateIfNoShot(&round.Defend, side, shotAt)
+
+	g.StateUpdatedAt = shotAt
+}
+
+func updateIfNoShot(shot *Shot, side ShotSide, shotAt time.Time) {
+	if shot.Side != ShotSideNoShot || shot.PlayerID == 0 {
+		return
+	}
+
+	shot.Side = side
+	shot.CompletedAt = shotAt
+}
+
 // mustLastRoundPtr returns pointer for last round or fake round if no rounds.
 func (g *Game) mustLastRoundPtr() *Round {
 	if len(g.State.Rounds) == 0 {
