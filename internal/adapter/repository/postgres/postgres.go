@@ -5,6 +5,7 @@ import (
 
 	"github.com/jmoiron/sqlx"
 
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/gameusecase/forceshot"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/gameusecase/gameshot"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/gameusecase/startgame"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/matchmaking"
@@ -27,6 +28,7 @@ var (
 	_ matchmaking.Repository = (*Postgres)(nil)
 
 	_ gameshot.Repository  = (*Postgres)(nil)
+	_ forceshot.Repository = (*Postgres)(nil)
 	_ startgame.Repository = (*Postgres)(nil)
 
 	_ outboxprocessor.Repository = (*Postgres)(nil)

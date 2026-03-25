@@ -15,6 +15,7 @@ import (
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/adapter/repository/postgres/driver"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/adapter/repository/postgres/transaction"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/adapter/timeprovider"
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/gameusecase/forceshot"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/gameusecase/startgame"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/matchmaking"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/notifier"
@@ -39,19 +40,27 @@ func StartWorker(ctx context.Context, cfg config.Config) error {
 
 	var (
 		msgSender            = messagesender.New(botAPI)
-		gameNofifier         = notifier.New(pgDB, msgSender)
+		gameNotifier         = notifier.New(pgDB, msgSender)
 		changeStatusService  = changestatus.New(pgDB)
 		timeProvider         = timeprovider.New()
-		startGameService     = startgame.New(pgDB, pgDB.Transactor(), changeStatusService, gameNofifier)
+		startGameService     = startgame.New(pgDB, pgDB.Transactor(), changeStatusService, gameNotifier)
 		matchmakingProcessor = matchmaking.New(
 			pgDB,
 			pgDB.Transactor(),
 			startGameService,
 			timeProvider,
 		)
+		expiredShotsProcessor = forceshot.New(pgDB, timeProvider, changeStatusService, gameNotifier)
 	)
 
-	app.New(matchmakingProcessor).Run(ctx, cfg.Worker)
+	app.New(
+		matchmakingProcessor,
+		expiredShotsProcessor,
+	).Run(
+		ctx,
+		cfg.MatchmakingWorker,
+		cfg.ExpiredShotsWorker,
+	)
 
 	return nil
 }
