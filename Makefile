@@ -9,7 +9,7 @@ BIN_PATH ?= $(ROOT)/bin
 GOPRIVATE = GOPRIVATE=github.com/Mikhalevich/
 
 LINTER_NAME := golangci-lint
-LINTER_VERSION := v2.11.3
+LINTER_VERSION := v2.11.4
 
 .PHONY: all build test compose-up compose-down load-test-data vendor install-linter lint fmt tools-update generate
 
