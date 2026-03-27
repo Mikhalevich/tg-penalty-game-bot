@@ -3,6 +3,7 @@ package startgame
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/game"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/msginfo"
@@ -18,16 +19,36 @@ func (s *StartGame) StartGameWithBot(
 		return fmt.Errorf("get player by chat_id: %w", err)
 	}
 
-	if currentPlayer.GameStatus != player.GameStatusIdle {
+	switch currentPlayer.GameStatus {
+	case player.GameStatusInGame:
+		if err := s.shotStater.ShotState(ctx, currentPlayer); err != nil {
+			return fmt.Errorf("shot state: %w", err)
+		}
+
+		return nil
+
+	case player.GameStatusReadyForGame:
 		if err := s.notifier.PlayerAlreadyInGame(ctx, currentPlayer); err != nil {
 			return fmt.Errorf("already in game notitication: %w", err)
 		}
 
 		return nil
+
+	case player.GameStatusIdle:
 	}
 
-	now := s.timeProvider.Now()
+	if err := s.startGameWithBot(ctx, currentPlayer, s.timeProvider.Now()); err != nil {
+		return fmt.Errorf("start game with bot: %w", err)
+	}
 
+	return nil
+}
+
+func (s *StartGame) startGameWithBot(
+	ctx context.Context,
+	currentPlayer player.Player,
+	createdAt time.Time,
+) error {
 	currentGame, err := game.CreateGame(
 		ctx,
 		game.GameTypeFriendly,
@@ -36,7 +57,7 @@ func (s *StartGame) StartGameWithBot(
 			ID:          0,
 			DisplayName: "bot",
 		},
-		now,
+		createdAt,
 	)
 
 	if err != nil {
@@ -49,7 +70,7 @@ func (s *StartGame) StartGameWithBot(
 			currentPlayer.ID,
 			currentGame.ID,
 			player.GameStatusInGame,
-			now,
+			createdAt,
 			player.GameStatusIdle,
 		); err != nil {
 			return fmt.Errorf("change player game status: %w", err)

@@ -29,28 +29,28 @@ type TimeProvider interface {
 	Now() time.Time
 }
 
-type Notifier interface {
-	PlayerAlreadyInGame(ctx context.Context, plr player.Player) error
+type ShotStater interface {
+	ShotState(ctx context.Context, currentPlayer player.Player) error
 }
 
 type FindGame struct {
 	repo           Repository
 	playerProvider PlayerProvider
 	timeProvider   TimeProvider
-	notifier       Notifier
+	shotStater     ShotStater
 }
 
 func New(
 	repo Repository,
 	playerProvider PlayerProvider,
 	timeProvider TimeProvider,
-	notifier Notifier,
+	shotStater ShotStater,
 ) *FindGame {
 	return &FindGame{
 		repo:           repo,
 		playerProvider: playerProvider,
 		timeProvider:   timeProvider,
-		notifier:       notifier,
+		shotStater:     shotStater,
 	}
 }
 
@@ -62,8 +62,8 @@ func (fg *FindGame) FindGame(ctx context.Context, chatID msginfo.ChatID) error {
 
 	switch currentPlayer.GameStatus {
 	case player.GameStatusInGame:
-		if err := fg.notifier.PlayerAlreadyInGame(ctx, currentPlayer); err != nil {
-			return fmt.Errorf("send player already in game notification: %w", err)
+		if err := fg.shotStater.ShotState(ctx, currentPlayer); err != nil {
+			return fmt.Errorf("shot state: %w", err)
 		}
 
 		return nil
