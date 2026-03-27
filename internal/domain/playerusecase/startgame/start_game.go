@@ -43,6 +43,10 @@ type TimeProvider interface {
 	Now() time.Time
 }
 
+type ShotStater interface {
+	ShotState(ctx context.Context, currentPlayer player.Player) error
+}
+
 type Notifier interface {
 	PlayerAlreadyInGame(ctx context.Context, plr player.Player) error
 }
@@ -54,6 +58,7 @@ type StartGame struct {
 	gameRunner     GameRunner
 	gameJoiner     GameJoiner
 	timeProvider   TimeProvider
+	shotStater     ShotStater
 	notifier       Notifier
 }
 
@@ -64,6 +69,7 @@ func New(
 	gameRunner GameRunner,
 	gameJoiner GameJoiner,
 	timeProvider TimeProvider,
+	shotStater ShotStater,
 	notifier Notifier,
 ) *StartGame {
 	return &StartGame{
@@ -73,6 +79,7 @@ func New(
 		gameRunner:     gameRunner,
 		gameJoiner:     gameJoiner,
 		timeProvider:   timeProvider,
+		shotStater:     shotStater,
 		notifier:       notifier,
 	}
 }

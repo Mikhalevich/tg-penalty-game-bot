@@ -53,6 +53,10 @@ func (g *Game) IsFinished() bool {
 	return g.Status == GameStatusCompleted
 }
 
+func (g *Game) IsInProgress() bool {
+	return g.Status == GameStatusInProgress
+}
+
 func (g *Game) PlayerIDs() []player.ID {
 	//nolint:mnd
 	ids := make([]player.ID, 0, 2)
