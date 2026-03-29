@@ -173,13 +173,46 @@ func (g *Game) MakeForceShots(side ShotSide, shotAt time.Time) {
 	g.StateUpdatedAt = shotAt
 }
 
+func (g *Game) MissForRestShotsAndCompleteGame(playerID player.ID, completedAt time.Time) {
+	for _, round := range g.State.Rounds {
+		if round.IsCompleted {
+			continue
+		}
+
+		missShotForPlayerOrMiddleOtherwise(&round.Attack, playerID, completedAt)
+		missShotForPlayerOrMiddleOtherwise(&round.Defend, playerID, completedAt)
+
+	}
+
+	g.Status = GameStatusCompleted
+	g.StateUpdatedAt = completedAt
+}
+
+func updateShot(shot *Shot, side ShotSide, shotAt time.Time) {
+	shot.Side = side
+	shot.CompletedAt = shotAt
+}
+
 func updateIfNoShot(shot *Shot, side ShotSide, shotAt time.Time) {
 	if shot.Side != ShotSideNoShot || shot.PlayerID == 0 {
 		return
 	}
 
-	shot.Side = side
-	shot.CompletedAt = shotAt
+	updateShot(shot, side, shotAt)
+}
+
+func missShotForPlayerOrMiddleOtherwise(
+	shot *Shot,
+	missShotPlayerID player.ID,
+	completedAt time.Time,
+) {
+	if shot.PlayerID == missShotPlayerID {
+		updateShot(shot, ShotSideMiss, completedAt)
+
+		return
+	}
+
+	updateIfNoShot(shot, ShotSideMiddle, completedAt)
 }
 
 // mustLastRoundPtr returns pointer for last round or fake round if no rounds.
