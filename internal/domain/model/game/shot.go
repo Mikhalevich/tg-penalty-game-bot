@@ -24,6 +24,7 @@ const (
 	ShotSideLeft   ShotSide = "left"
 	ShotSideRight  ShotSide = "right"
 	ShotSideMiddle ShotSide = "middle"
+	ShotSideMiss   ShotSide = "miss"
 )
 
 func (ss ShotSide) String() string {

@@ -22,6 +22,7 @@ import (
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/gameusecase/gameshot"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/gameusecase/getgame"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/gameusecase/joingame"
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/gameusecase/leavegame"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/gameusecase/startgame"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/messageprocessor"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/notifier"
@@ -30,6 +31,7 @@ import (
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playerusecase/findgame"
 	playergameshot "github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playerusecase/gameshot"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playerusecase/gameshotstate"
+	playerleavegame "github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playerusecase/leavegame"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playerusecase/playerprovider"
 	playerstartgame "github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playerusecase/startgame"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playerusecase/welcome"
@@ -74,8 +76,10 @@ func StartBot(ctx context.Context, cfg config.Config) error {
 		joinGameService        = joingame.New(pgDB, pgDB.Transactor(), changeStatusService, notificationService)
 		playerStartGameService = playerstartgame.New(pgDB, pgDB.Transactor(),
 			playerProvider, startGameService, joinGameService, timeProvider, gameShotStateService, notificationService)
-		gameShotService       = gameshot.New(pgDB, pgDB.Transactor(), changeStatusService, notificationService)
-		playerGameShotService = playergameshot.New(playerProvider, gameShotService, timeProvider, msgProcessor)
+		gameShotService        = gameshot.New(pgDB, pgDB.Transactor(), changeStatusService, notificationService)
+		playerGameShotService  = playergameshot.New(playerProvider, gameShotService, timeProvider, msgProcessor)
+		leaveGameService       = leavegame.New(pgDB, pgDB.Transactor(), changeStatusService, notificationService)
+		leavePlayerGameService = playerleavegame.New(playerProvider, leaveGameService, timeProvider)
 	)
 
 	if err := app.Start(
@@ -88,6 +92,7 @@ func StartBot(ctx context.Context, cfg config.Config) error {
 		findGameSerivce,
 		playerStartGameService,
 		playerGameShotService,
+		leavePlayerGameService,
 	); err != nil {
 		return fmt.Errorf("app start: %w", err)
 	}

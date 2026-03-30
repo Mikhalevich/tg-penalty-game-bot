@@ -4,31 +4,42 @@ import (
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/player"
 )
 
+type RoundResult int
+
+const (
+	RoundResultNotCompleted RoundResult = iota
+	RoundResultGoal
+	RoundResultSave
+	RoundResultMiss
+)
+
 type Round struct {
-	Defend      Shot
-	Attack      Shot
-	IsGoal      bool
-	IsCompleted bool
+	Defend Shot
+	Attack Shot
+	Result RoundResult
 }
 
-type Rounds []Round
-
-func (r Rounds) Last() Round {
-	if len(r) == 0 {
-		return Round{}
-	}
-
-	return r[len(r)-1]
+func (r Round) IsCompleted() bool {
+	return r.Result != RoundResultNotCompleted
 }
 
-func (r Rounds) Len() int {
-	return len(r)
+func (r Round) IsGoal() bool {
+	return r.Result == RoundResultGoal
 }
 
 type State struct {
-	Player1 Player
-	Player2 Player
-	Rounds  Rounds
+	Player1         Player
+	Player2         Player
+	Rounds          []Round
+	CurrentRoundIdx int
+}
+
+func (s State) CurrentRound() Round {
+	return s.Rounds[s.CurrentRoundIdx]
+}
+
+func (s State) CurrentRoundNumber() int {
+	return s.CurrentRoundIdx
 }
 
 func (s State) LivePlayers() []Player {

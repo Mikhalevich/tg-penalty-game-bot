@@ -49,7 +49,7 @@ func (s *StartGame) startGameWithBot(
 	currentPlayer player.Player,
 	createdAt time.Time,
 ) error {
-	currentGame, err := game.CreateGame(
+	currentGame := game.CreateGame(
 		ctx,
 		game.GameTypeFriendly,
 		currentPlayer,
@@ -59,10 +59,6 @@ func (s *StartGame) startGameWithBot(
 		},
 		createdAt,
 	)
-
-	if err != nil {
-		return fmt.Errorf("create game: %w", err)
-	}
 
 	if err := s.transactor.Transaction(ctx, func(ctx context.Context) error {
 		if err := s.repo.ChangePlayerGameStatus(

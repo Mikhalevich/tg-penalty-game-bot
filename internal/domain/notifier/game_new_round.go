@@ -13,6 +13,7 @@ import (
 const (
 	ballSymbol       = "⚽"
 	gloveSymbol      = "🧤"
+	missSymbol       = "❌"
 	leftSideSymbol   = "👈"
 	rightSideSymbol  = "👉"
 	middleSideSymbol = "🖐"
@@ -20,8 +21,8 @@ const (
 
 func (n *Notifier) GameNewRound(ctx context.Context, gameID game.ID, state game.State) error {
 	var (
-		cRound      = state.Rounds.Last()
-		roundNumber = state.Rounds.Len()
+		cRound      = state.CurrentRound()
+		roundNumber = state.CurrentRoundNumber()
 	)
 
 	attackerPlayer := state.PlayerByID(cRound.Attack.PlayerID)
