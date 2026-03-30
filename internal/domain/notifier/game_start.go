@@ -4,15 +4,18 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/button"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/game"
 )
 
 func (n *Notifier) GameStart(ctx context.Context, player1, player2 game.Player) error {
-	if err := n.sendMsgToPlayer(ctx, player1, n.startGameAgainstMsg(player2)); err != nil {
+	leaveBtn := button.ButtonRow{game.LeaveGameButton("Leave")}
+
+	if err := n.sendMsgToPlayer(ctx, player1, n.startGameAgainstMsg(player2), leaveBtn); err != nil {
 		return fmt.Errorf("send msg to first player: %w", err)
 	}
 
-	if err := n.sendMsgToPlayer(ctx, player2, n.startGameAgainstMsg(player1)); err != nil {
+	if err := n.sendMsgToPlayer(ctx, player2, n.startGameAgainstMsg(player1), leaveBtn); err != nil {
 		return fmt.Errorf("send msg to second player: %w", err)
 	}
 

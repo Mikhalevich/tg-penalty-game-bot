@@ -31,6 +31,9 @@ func (t *TGHandler) DefaultCallbackQuery(ctx context.Context, msg tgbot.BotMessa
 
 	case button.OperationShotSide:
 		return t.processShotSideButton(ctx, chatID, msgID, btn)
+
+	case button.OperationLeaveGame:
+		return t.processLeaveGameButton(ctx, chatID)
 	}
 
 	return nil
@@ -67,6 +70,17 @@ func (t *TGHandler) processShotSideButton(
 
 	if err := t.gameShot.Shot(ctx, chatID, msgID, payload.GameID, payload.Round, payload.Side); err != nil {
 		return fmt.Errorf("shot: %w", err)
+	}
+
+	return nil
+}
+
+func (t *TGHandler) processLeaveGameButton(
+	ctx context.Context,
+	chatID msginfo.ChatID,
+) error {
+	if err := t.leaveGame.LeaveGame(ctx, chatID); err != nil {
+		return fmt.Errorf("leave game: %w", err)
 	}
 
 	return nil
