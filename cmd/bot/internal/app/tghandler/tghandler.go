@@ -36,6 +36,10 @@ type StartGame interface {
 	JoinGameByLink(ctx context.Context, chatID msginfo.ChatID, gameID game.ID) error
 }
 
+type LeaveGame interface {
+	LeaveGame(ctx context.Context, chatID msginfo.ChatID) error
+}
+
 type GameShot interface {
 	Shot(
 		ctx context.Context,
@@ -55,6 +59,7 @@ type TGHandler struct {
 	findGame       FindGame
 	startGame      StartGame
 	gameShot       GameShot
+	leaveGame      LeaveGame
 }
 
 func New(
@@ -65,6 +70,7 @@ func New(
 	findGame FindGame,
 	startGame StartGame,
 	gameShot GameShot,
+	leaveGame LeaveGame,
 ) *TGHandler {
 	return &TGHandler{
 		buttonProvider: buttonProvider,
@@ -74,5 +80,6 @@ func New(
 		findGame:       findGame,
 		startGame:      startGame,
 		gameShot:       gameShot,
+		leaveGame:      leaveGame,
 	}
 }

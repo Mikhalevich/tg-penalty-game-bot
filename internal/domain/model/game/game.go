@@ -173,6 +173,8 @@ func (g *Game) MissForRestShotsAndCompleteGame(playerID player.ID, completedAt t
 		round := &g.State.Rounds[i]
 		missShotForPlayerOrMiddleOtherwise(&round.Attack, playerID, completedAt)
 		missShotForPlayerOrMiddleOtherwise(&round.Defend, playerID, completedAt)
+
+		updateRoundResults(round)
 	}
 
 	g.Status = GameStatusCompleted

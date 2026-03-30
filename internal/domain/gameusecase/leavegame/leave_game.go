@@ -71,6 +71,15 @@ func (s *LeaveGame) LeaveGame(
 
 		currentGame.MissForRestShotsAndCompleteGame(playerID, completedAt)
 
+		if err := s.playerStatusChanger.ChangePlayersGameStatus(
+			ctx,
+			currentGame.PlayerIDs(),
+			player.GameStatusIdle,
+			completedAt,
+		); err != nil {
+			return fmt.Errorf("change players game status: %w", err)
+		}
+
 		if err := s.notifier.GameFinish(ctx, currentGame.State); err != nil {
 			return fmt.Errorf("game finish notification: %w", err)
 		}

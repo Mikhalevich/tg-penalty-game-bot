@@ -54,7 +54,7 @@ func playerGoalsScoredMsg(playerID player.ID, rounds []game.Round) string {
 		}
 
 		if !round.IsCompleted() {
-			continue
+			break
 		}
 
 		switch round.Result {
