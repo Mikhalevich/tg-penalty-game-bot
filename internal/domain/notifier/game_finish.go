@@ -53,14 +53,22 @@ func playerGoalsScoredMsg(playerID player.ID, rounds []game.Round) string {
 			continue
 		}
 
-		if !round.IsCompleted {
+		if !round.IsCompleted() {
 			continue
 		}
 
-		if round.IsGoal {
+		switch round.Result {
+		case game.RoundResultNotCompleted:
+			// impossible
+
+		case game.RoundResultGoal:
 			builder.WriteString(ballSymbol)
-		} else {
+
+		case game.RoundResultSave:
 			builder.WriteString(gloveSymbol)
+
+		case game.RoundResultMiss:
+			builder.WriteString(missSymbol)
 		}
 	}
 

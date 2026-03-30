@@ -55,21 +55,21 @@ func (s *GameShotState) ShotState(ctx context.Context, currentPlayer player.Play
 	}
 
 	var (
-		lastRound   = currentGame.State.Rounds.Last()
-		roundNumber = currentGame.State.Rounds.Len()
+		currentRound = currentGame.State.CurrentRound()
+		roundNumber  = currentGame.State.CurrentRoundNumber()
 	)
 
-	if lastRound.IsCompleted {
+	if currentRound.IsCompleted() {
 		return fmt.Errorf("last raund is completed, game_id: %q round: %d",
 			currentGame.ID.String(), roundNumber)
 	}
 
 	var shotType game.ShotType
 	switch currentPlayer.ID {
-	case lastRound.Attack.PlayerID:
+	case currentRound.Attack.PlayerID:
 		shotType = game.ShotTypeAttack
 
-	case lastRound.Defend.PlayerID:
+	case currentRound.Defend.PlayerID:
 		shotType = game.ShotTypeDefend
 
 	default:

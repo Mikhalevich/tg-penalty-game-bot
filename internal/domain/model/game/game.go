@@ -1,7 +1,6 @@
 package game
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/msginfo"
@@ -34,11 +33,10 @@ type Game struct {
 }
 
 type Player struct {
-	ID             player.ID
-	ChatID         msginfo.ChatID
-	DisplayName    string
-	ShotsAvailable int
-	GoalsScored    int
+	ID          player.ID
+	ChatID      msginfo.ChatID
+	DisplayName string
+	GoalsScored int
 }
 
 func (p Player) IsBot() bool {
@@ -82,13 +80,11 @@ func (g *Game) JoinPlayerAndStartGame(plr Player, joinedAt time.Time) error {
 	}
 
 	g.State.Player2 = plr
+	g.State.Rounds = makeRounds(g.ID, ShotsInitial, g.State.Player1.ID, g.State.Player2.ID)
+
+	g.StartFirstRound(joinedAt)
 
 	g.Status = GameStatusInProgress
-
-	if err := g.StartNextRound(joinedAt); err != nil {
-		return fmt.Errorf("start next round: %w", err)
-	}
-
 	g.StateUpdatedAt = joinedAt
 
 	return nil
@@ -121,51 +117,50 @@ func (g *Game) PlayerShot(shot Shot) error {
 // and updates attacker shots and scores
 // returns true if round was completed.
 func (g *Game) TryToCompleteRound() bool {
-	cRound := g.mustLastRoundPtr()
+	cRound := g.currentRoundPtr()
 
 	if (cRound.Attack.Side == ShotSideNoShot) ||
 		(cRound.Defend.Side == ShotSideNoShot) {
 		return false
 	}
 
-	cRound.IsGoal = cRound.Attack.Side != cRound.Defend.Side
+	updateRoundResults(cRound)
 
-	g.updateAttackerShots(cRound.Attack.PlayerID, cRound.IsGoal)
-
-	cRound.IsCompleted = true
+	g.updateAttackerGoals(cRound.Attack.PlayerID, cRound.Result == RoundResultGoal)
 
 	return true
 }
 
+// StartFirstRound just update created_at shot times.
+func (g *Game) StartFirstRound(startedAt time.Time) {
+	cRound := g.currentRoundPtr()
+	cRound.Attack.CreatedAt = startedAt
+	cRound.Defend.CreatedAt = startedAt
+}
+
 // StartNextRound starts next round or finish the game.
-func (g *Game) StartNextRound(now time.Time) error {
-	if g.State.Rounds.Len() > 0 && !g.State.Rounds.Last().IsCompleted {
+func (g *Game) StartNextRound(startedAt time.Time) error {
+	if !g.State.CurrentRound().IsCompleted() {
 		return perror.RoundNotCompleted()
 	}
 
-	var (
-		player1 = g.State.Player1
-		player2 = g.State.Player2
-	)
+	g.State.CurrentRoundIdx++
 
-	if (player1.ShotsAvailable == 0) && (player2.ShotsAvailable == 0) {
+	if g.State.CurrentRoundIdx >= len(g.State.Rounds) {
 		g.Status = GameStatusCompleted
 
 		return nil
 	}
 
-	attacker, defender := nextAttackerDefenderInOrder(player1, player2)
-
-	g.State.Rounds = append(g.State.Rounds, Round{
-		Attack: g.makePendingShot(attacker.ID, ShotTypeAttack, now),
-		Defend: g.makePendingShot(defender.ID, ShotTypeDefend, now),
-	})
+	cRound := g.currentRoundPtr()
+	cRound.Attack.CreatedAt = startedAt
+	cRound.Defend.CreatedAt = startedAt
 
 	return nil
 }
 
 func (g *Game) MakeForceShots(side ShotSide, shotAt time.Time) {
-	round := g.mustLastRoundPtr()
+	round := g.currentRoundPtr()
 
 	updateIfNoShot(&round.Attack, side, shotAt)
 	updateIfNoShot(&round.Defend, side, shotAt)
@@ -174,18 +169,18 @@ func (g *Game) MakeForceShots(side ShotSide, shotAt time.Time) {
 }
 
 func (g *Game) MissForRestShotsAndCompleteGame(playerID player.ID, completedAt time.Time) {
-	for _, round := range g.State.Rounds {
-		if round.IsCompleted {
-			continue
-		}
-
+	for i := g.State.CurrentRoundIdx; i < len(g.State.Rounds); i++ {
+		round := &g.State.Rounds[i]
 		missShotForPlayerOrMiddleOtherwise(&round.Attack, playerID, completedAt)
 		missShotForPlayerOrMiddleOtherwise(&round.Defend, playerID, completedAt)
-
 	}
 
 	g.Status = GameStatusCompleted
 	g.StateUpdatedAt = completedAt
+}
+
+func (g *Game) currentRoundPtr() *Round {
+	return &g.State.Rounds[g.State.CurrentRoundIdx]
 }
 
 func updateShot(shot *Shot, side ShotSide, shotAt time.Time) {
@@ -215,17 +210,8 @@ func missShotForPlayerOrMiddleOtherwise(
 	updateIfNoShot(shot, ShotSideMiddle, completedAt)
 }
 
-// mustLastRoundPtr returns pointer for last round or fake round if no rounds.
-func (g *Game) mustLastRoundPtr() *Round {
-	if len(g.State.Rounds) == 0 {
-		return &Round{}
-	}
-
-	return &g.State.Rounds[len(g.State.Rounds)-1]
-}
-
 func (g *Game) shotByPlayerID(id player.ID) *Shot {
-	cRound := g.mustLastRoundPtr()
+	cRound := g.currentRoundPtr()
 
 	if cRound.Attack.PlayerID == id {
 		return &cRound.Attack
@@ -234,27 +220,7 @@ func (g *Game) shotByPlayerID(id player.ID) *Shot {
 	return &cRound.Defend
 }
 
-func (g *Game) makePendingShot(playerID player.ID, shotType ShotType, now time.Time) Shot {
-	return Shot{
-		GameID:    g.ID,
-		PlayerID:  playerID,
-		Round:     g.State.Rounds.Len() + 1,
-		Type:      shotType,
-		CreatedAt: now,
-		Side:      ShotSideNoShot,
-	}
-}
-
-// nextAttackerDefenderInOrder returns players in order attacker => defender.
-func nextAttackerDefenderInOrder(player1, player2 Player) (Player, Player) {
-	if player1.ShotsAvailable >= player2.ShotsAvailable {
-		return player1, player2
-	}
-
-	return player2, player1
-}
-
-func (g *Game) updateAttackerShots(attackerID player.ID, isGoal bool) {
+func (g *Game) updateAttackerGoals(attackerID player.ID, isGoal bool) {
 	var attackerPlayer *Player
 
 	if attackerID == g.State.Player1.ID {
@@ -263,9 +229,20 @@ func (g *Game) updateAttackerShots(attackerID player.ID, isGoal bool) {
 		attackerPlayer = &g.State.Player2
 	}
 
-	attackerPlayer.ShotsAvailable--
-
 	if isGoal {
 		attackerPlayer.GoalsScored++
+	}
+}
+
+func updateRoundResults(round *Round) {
+	switch {
+	case round.Attack.Side == ShotSideMiss:
+		round.Result = RoundResultMiss
+
+	case round.Attack.Side != round.Defend.Side:
+		round.Result = RoundResultGoal
+
+	default:
+		round.Result = RoundResultSave
 	}
 }

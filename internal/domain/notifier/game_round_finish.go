@@ -12,8 +12,8 @@ import (
 
 func (n *Notifier) GameRoundFinish(ctx context.Context, state game.State) error {
 	var (
-		lastRound = state.Rounds.Last()
-		msg       = n.makeScoreMsg(goalMsg(lastRound), state)
+		cRound = state.CurrentRound()
+		msg    = n.makeScoreMsg(goalMsg(cRound), state)
 	)
 
 	for _, plr := range state.LivePlayers() {
@@ -21,9 +21,9 @@ func (n *Notifier) GameRoundFinish(ctx context.Context, state game.State) error 
 			ctx,
 			plr,
 			msg,
-			shotImageTypeByPlayerID(plr.ID, lastRound.Attack.PlayerID),
-			lastRound.Attack.Side,
-			lastRound.Defend.Side,
+			shotImageTypeByPlayerID(plr.ID, cRound.Attack.PlayerID),
+			cRound.Attack.Side,
+			cRound.Defend.Side,
 		); err != nil {
 			return fmt.Errorf("send shot image: %w", err)
 		}
@@ -33,7 +33,7 @@ func (n *Notifier) GameRoundFinish(ctx context.Context, state game.State) error 
 }
 
 func goalMsg(round game.Round) string {
-	if round.IsGoal {
+	if round.IsGoal() {
 		return "Goal"
 	}
 
