@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/button"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/game"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/msginfo"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/player"
@@ -22,15 +23,21 @@ func (n *Notifier) GameFinish(ctx context.Context, state game.State) error {
 	return nil
 }
 
-func (n *Notifier) sendMsgToPlayer(ctx context.Context, plr game.Player, msg string) error {
+func (n *Notifier) sendMsgToPlayer(
+	ctx context.Context,
+	plr game.Player,
+	msg string,
+	buttons ...button.ButtonRow,
+) error {
 	if plr.IsBot() {
 		return nil
 	}
 
 	if err := n.sender.SendMessage(ctx, msginfo.Message{
-		ChatID: plr.ChatID,
-		Text:   msg,
-		Type:   msginfo.MessageTypeMarkdown,
+		ChatID:  plr.ChatID,
+		Text:    msg,
+		Type:    msginfo.MessageTypeMarkdown,
+		Buttons: buttons,
 	}); err != nil {
 		return fmt.Errorf("send message: %w", err)
 	}
