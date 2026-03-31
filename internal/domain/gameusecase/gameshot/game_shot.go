@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/game"
-	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/player"
 )
 
 type Repository interface {
@@ -19,11 +18,10 @@ type Transactor interface {
 }
 
 type PlayerStatusChanger interface {
-	ChangePlayersGameStatus(
+	ChangeStatusForFinishedGame(
 		ctx context.Context,
-		playerIDs []player.ID,
-		status player.GameStatus,
-		changedAt time.Time,
+		finishedGame game.Game,
+		finishedAt time.Time,
 	) error
 }
 

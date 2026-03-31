@@ -16,7 +16,8 @@ CREATE TABLE player(
     name_changed_at TIMESTAMPTZ,
     game_status player_game_status NOT NULL DEFAULT 'idle',
     game_status_changed_at TIMESTAMPTZ,
-    current_game_id TEXT
+    current_game_id TEXT,
+    score INTEGER NOT NULL
 );
 
 CREATE UNIQUE INDEX player_chat_id_u_idx ON player(chat_id);

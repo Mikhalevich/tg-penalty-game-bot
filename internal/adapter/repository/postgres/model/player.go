@@ -18,6 +18,7 @@ type Player struct {
 	GameStatus            string         `db:"game_status"`
 	GameStatusChangedAt   sql.NullTime   `db:"game_status_changed_at"`
 	CurrentGameID         sql.NullString `db:"current_game_id"`
+	Score                 int            `db:"score"`
 }
 
 func (p Player) ToDomainPlayer() player.Player {
@@ -31,6 +32,7 @@ func (p Player) ToDomainPlayer() player.Player {
 		GameStatus:            player.GameStatus(p.GameStatus),
 		GameStatusChangedAt:   p.GameStatusChangedAt.Time,
 		CurrentGameID:         p.CurrentGameID.String,
+		Score:                 p.Score,
 	}
 }
 
@@ -58,6 +60,7 @@ func ToDBPlayer(plr player.Player) Player {
 		GameStatus:            plr.GameStatus.String(),
 		GameStatusChangedAt:   toNullTime(plr.GameStatusChangedAt),
 		CurrentGameID:         toNullString(plr.CurrentGameID),
+		Score:                 plr.Score,
 	}
 }
 

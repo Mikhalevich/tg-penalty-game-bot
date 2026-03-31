@@ -23,14 +23,16 @@ func (p *Postgres) ChangeOrInsertPlayersGameStatus(
 				created_at,
 				game_status,
 				game_status_changed_at,
-				current_game_id
+				current_game_id,
+				score
 			) VALUES (
 				:chat_id,
 				:display_name,
 				:created_at,
 				:game_status,
 				:game_status_changed_at,
-				:current_game_id
+				:current_game_id,
+				:score
 			) ON CONFLICT(chat_id)
 				DO UPDATE SET
 					game_status = EXCLUDED.game_status,

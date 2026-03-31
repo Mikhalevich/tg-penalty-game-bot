@@ -20,11 +20,10 @@ type Transactor interface {
 }
 
 type PlayerStatusChanger interface {
-	ChangePlayersGameStatus(
+	ChangeStatusForFinishedGame(
 		ctx context.Context,
-		playerIDs []player.ID,
-		status player.GameStatus,
-		changedAt time.Time,
+		finishedGame game.Game,
+		finishedAt time.Time,
 	) error
 }
 
@@ -71,10 +70,9 @@ func (s *LeaveGame) LeaveGame(
 
 		currentGame.MissForRestShotsAndCompleteGame(playerID, completedAt)
 
-		if err := s.playerStatusChanger.ChangePlayersGameStatus(
+		if err := s.playerStatusChanger.ChangeStatusForFinishedGame(
 			ctx,
-			currentGame.PlayerIDs(),
-			player.GameStatusIdle,
+			currentGame,
 			completedAt,
 		); err != nil {
 			return fmt.Errorf("change players game status: %w", err)
