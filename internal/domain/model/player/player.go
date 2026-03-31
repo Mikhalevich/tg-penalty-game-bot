@@ -26,6 +26,7 @@ type Player struct {
 	GameStatus            GameStatus
 	GameStatusChangedAt   time.Time
 	CurrentGameID         string
+	Score                 int
 }
 
 func (p Player) IsInGame(gameID string) bool {

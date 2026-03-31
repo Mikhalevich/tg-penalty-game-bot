@@ -18,11 +18,13 @@ func (p *Postgres) CreatePlayer(ctx context.Context, plr player.Player) (player.
 			INSERT INTO player(
 				chat_id,
 				display_name,
-				created_at
+				created_at,
+				score
 			) VALUES (
 				:chat_id,
 				:display_name,
-				:created_at
+				:created_at,
+				:score
 			)
 			RETURNING id
 		`

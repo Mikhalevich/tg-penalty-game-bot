@@ -175,6 +175,8 @@ func (g *Game) MissForRestShotsAndCompleteGame(playerID player.ID, completedAt t
 		missShotForPlayerOrMiddleOtherwise(&round.Defend, playerID, completedAt)
 
 		updateRoundResults(round)
+
+		g.updateAttackerGoals(round.Attack.PlayerID, round.Result == RoundResultGoal)
 	}
 
 	g.Status = GameStatusCompleted

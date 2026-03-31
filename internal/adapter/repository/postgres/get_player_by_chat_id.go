@@ -28,7 +28,8 @@ func (p *Postgres) GetPlayerByChatID(
 				name_changed_at,
 				game_status,
 				game_status_changed_at,
-				current_game_id
+				current_game_id,
+				score
 			FROM
 				player
 			WHERE

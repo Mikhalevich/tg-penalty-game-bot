@@ -14,6 +14,12 @@ type Repository interface {
 		status player.GameStatus,
 		changedAt time.Time,
 	) error
+	SetPlayerIdleStatusWithScore(
+		ctx context.Context,
+		playerID player.ID,
+		scoreDelta int,
+		changedAt time.Time,
+	) error
 }
 
 type ChangeStatus struct {

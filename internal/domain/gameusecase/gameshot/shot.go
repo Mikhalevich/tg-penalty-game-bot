@@ -7,7 +7,6 @@ import (
 
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/game"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/perror"
-	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/player"
 )
 
 func (g *GameShot) Shot(
@@ -91,10 +90,9 @@ func (g *GameShot) startNextRound(
 		return nil
 	}
 
-	if err := g.playerStatusChanger.ChangePlayersGameStatus(
+	if err := g.playerStatusChanger.ChangeStatusForFinishedGame(
 		ctx,
-		currentGame.PlayerIDs(),
-		player.GameStatusIdle,
+		*currentGame,
 		startedAt,
 	); err != nil {
 		return fmt.Errorf("change players game status: %w", err)

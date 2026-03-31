@@ -9,6 +9,10 @@ import (
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/infra/logger"
 )
 
+const (
+	initialPlayerScore = 1000
+)
+
 func (p *PlayerProvider) GetPlayerByChatID(
 	ctx context.Context,
 	chatID msginfo.ChatID,
@@ -44,6 +48,7 @@ func (p *PlayerProvider) createPlayer(
 			DisplayName: p.nameGenerator.GenerateName(),
 			CreatedAt:   creationTime,
 			GameStatus:  player.GameStatusIdle,
+			Score:       initialPlayerScore,
 		}
 
 		playerID, err := p.repo.CreatePlayer(ctx, newPlayer)
