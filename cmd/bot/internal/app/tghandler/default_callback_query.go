@@ -34,6 +34,9 @@ func (t *TGHandler) DefaultCallbackQuery(ctx context.Context, msg tgbot.BotMessa
 
 	case button.OperationLeaveGame:
 		return t.processLeaveGameButton(ctx, chatID)
+
+	case button.OperationStopSearchGame:
+		return t.processStopFindButton(ctx, chatID)
 	}
 
 	return nil
@@ -81,6 +84,17 @@ func (t *TGHandler) processLeaveGameButton(
 ) error {
 	if err := t.leaveGame.LeaveGame(ctx, chatID); err != nil {
 		return fmt.Errorf("leave game: %w", err)
+	}
+
+	return nil
+}
+
+func (t *TGHandler) processStopFindButton(
+	ctx context.Context,
+	chatID msginfo.ChatID,
+) error {
+	if err := t.findGame.StopFind(ctx, chatID); err != nil {
+		return fmt.Errorf("stop find: %w", err)
 	}
 
 	return nil
