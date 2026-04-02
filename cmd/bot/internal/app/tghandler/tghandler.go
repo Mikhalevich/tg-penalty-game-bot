@@ -28,6 +28,7 @@ type ChangeName interface {
 
 type FindGame interface {
 	FindGame(ctx context.Context, chatID msginfo.ChatID) error
+	StopFind(ctx context.Context, chatID msginfo.ChatID) error
 }
 
 type StartGame interface {

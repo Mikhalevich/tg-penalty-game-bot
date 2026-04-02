@@ -33,11 +33,17 @@ type ShotStater interface {
 	ShotState(ctx context.Context, currentPlayer player.Player) error
 }
 
+type Notifier interface {
+	SearchGame(ctx context.Context, chatID msginfo.ChatID) error
+	StopSearchGame(ctx context.Context, chatID msginfo.ChatID) error
+}
+
 type FindGame struct {
 	repo           Repository
 	playerProvider PlayerProvider
 	timeProvider   TimeProvider
 	shotStater     ShotStater
+	notifier       Notifier
 }
 
 func New(
@@ -45,12 +51,14 @@ func New(
 	playerProvider PlayerProvider,
 	timeProvider TimeProvider,
 	shotStater ShotStater,
+	notifier Notifier,
 ) *FindGame {
 	return &FindGame{
 		repo:           repo,
 		playerProvider: playerProvider,
 		timeProvider:   timeProvider,
 		shotStater:     shotStater,
+		notifier:       notifier,
 	}
 }
 
@@ -83,6 +91,10 @@ func (fg *FindGame) FindGame(ctx context.Context, chatID msginfo.ChatID) error {
 		player.GameStatusIdle,
 	); err != nil {
 		return fmt.Errorf("change player game status: %w", err)
+	}
+
+	if err := fg.notifier.SearchGame(ctx, chatID); err != nil {
+		return fmt.Errorf("search notification: %w", err)
 	}
 
 	return nil

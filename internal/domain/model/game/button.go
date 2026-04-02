@@ -31,3 +31,7 @@ func ShotSideButton(caption string, gameID ID, round int, side ShotSide) (button
 func LeaveGameButton(caption string) button.Button {
 	return button.CreateButtonWithoutPayload(caption, button.OperationLeaveGame)
 }
+
+func StopSearchGame(caption string) button.Button {
+	return button.CreateButtonWithoutPayload(caption, button.OperationStopSearchGame)
+}
