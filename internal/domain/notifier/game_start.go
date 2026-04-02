@@ -9,14 +9,29 @@ import (
 )
 
 func (n *Notifier) GameStart(ctx context.Context, player1, player2 game.Player) error {
-	leaveBtn := button.ButtonRow{game.LeaveGameButton("Leave")}
-
-	if err := n.sendMsgToPlayer(ctx, player1, n.startGameAgainstMsg(player2), leaveBtn); err != nil {
-		return fmt.Errorf("send msg to first player: %w", err)
+	if err := n.sendStartGameNotification(ctx, player1, n.startGameAgainstMsg(player2)); err != nil {
+		return fmt.Errorf("send start game to first player: %w", err)
 	}
 
-	if err := n.sendMsgToPlayer(ctx, player2, n.startGameAgainstMsg(player1), leaveBtn); err != nil {
-		return fmt.Errorf("send msg to second player: %w", err)
+	if err := n.sendStartGameNotification(ctx, player2, n.startGameAgainstMsg(player1)); err != nil {
+		return fmt.Errorf("send start game to second player: %w", err)
+	}
+
+	return nil
+}
+
+func (n *Notifier) sendStartGameNotification(
+	ctx context.Context,
+	plr game.Player,
+	msg string,
+) error {
+	if err := n.sendMsgToPlayer(
+		ctx,
+		plr,
+		msg,
+		button.ButtonRow{game.LeaveGameButton("Leave")},
+	); err != nil {
+		return fmt.Errorf("send msg to player: %w", err)
 	}
 
 	return nil
