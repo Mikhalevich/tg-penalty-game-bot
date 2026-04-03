@@ -55,6 +55,11 @@ func (g *Game) IsInProgress() bool {
 	return g.Status == GameStatusInProgress
 }
 
+func (g *Game) Cancel(canceledAt time.Time) {
+	g.Status = GameStatusCanceled
+	g.StateUpdatedAt = canceledAt
+}
+
 func (g *Game) PlayerIDs() []player.ID {
 	//nolint:mnd
 	ids := make([]player.ID, 0, 2)
