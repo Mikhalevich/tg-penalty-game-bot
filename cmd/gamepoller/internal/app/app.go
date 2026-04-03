@@ -17,18 +17,25 @@ type ExpiredShotsProcessor interface {
 	ForceShotForGames(ctx context.Context, expirationDuration time.Duration, limit int) error
 }
 
+type LeaderboradRefresher interface {
+	RefreshScoreLeaderboard(ctx context.Context) error
+}
+
 type App struct {
 	matchmakingProcessor  MatchmakingProcessor
 	expiredShotsProcessor ExpiredShotsProcessor
+	leaderboradRefresher  LeaderboradRefresher
 }
 
 func New(
 	matchmakingProcessor MatchmakingProcessor,
 	expiredShotsProcessor ExpiredShotsProcessor,
+	leaderboradRefresher LeaderboradRefresher,
 ) *App {
 	return &App{
 		matchmakingProcessor:  matchmakingProcessor,
 		expiredShotsProcessor: expiredShotsProcessor,
+		leaderboradRefresher:  leaderboradRefresher,
 	}
 }
 
@@ -36,6 +43,7 @@ func (a *App) Run(
 	ctx context.Context,
 	matchmakingCfg config.Worker,
 	expiredShotsCfg config.ExpiredShotsWorker,
+	leaderboardCfg config.Worker,
 ) {
 	var wgr sync.WaitGroup
 
@@ -55,6 +63,12 @@ func (a *App) Run(
 				expiredShotsCfg.ShotExpireDuration,
 				expiredShotsCfg.BatchSize,
 			)
+		},
+	)
+
+	runWorkers(ctx, "leaderboard refresher", leaderboardCfg.Count, leaderboardCfg.Interval, &wgr,
+		func(ctx context.Context) error {
+			return a.leaderboradRefresher.RefreshScoreLeaderboard(ctx)
 		},
 	)
 

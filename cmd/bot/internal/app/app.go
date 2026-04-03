@@ -20,6 +20,7 @@ func Start(
 	startGame tghandler.StartGame,
 	gameShot tghandler.GameShot,
 	leaveGame tghandler.LeaveGame,
+	leaderboard tghandler.Leaderboard,
 ) error {
 	var (
 		botHandler = tghandler.New(
@@ -31,6 +32,7 @@ func Start(
 			startGame,
 			gameShot,
 			leaveGame,
+			leaderboard,
 		)
 	)
 

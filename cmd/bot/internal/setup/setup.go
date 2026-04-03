@@ -31,6 +31,7 @@ import (
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playerusecase/findgame"
 	playergameshot "github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playerusecase/gameshot"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playerusecase/gameshotstate"
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playerusecase/leaderboard"
 	playerleavegame "github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playerusecase/leavegame"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playerusecase/playerprovider"
 	playerstartgame "github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playerusecase/startgame"
@@ -38,10 +39,7 @@ import (
 )
 
 func StartBot(ctx context.Context, cfg config.Config) error {
-	botAPI, err := bot.New(
-		cfg.Bot.Token,
-		bot.WithSkipGetMe(),
-	)
+	botAPI, err := bot.New(cfg.Bot.Token, bot.WithSkipGetMe())
 	if err != nil {
 		return fmt.Errorf("creating bot api: %w", err)
 	}
@@ -50,7 +48,6 @@ func StartBot(ctx context.Context, cfg config.Config) error {
 	if err != nil {
 		return fmt.Errorf("make postgres: %w", err)
 	}
-
 	defer dbCleanup()
 
 	btnRepo, err := MakeRedisButtonRepository(ctx, cfg.ButtonRedis)
@@ -80,6 +77,7 @@ func StartBot(ctx context.Context, cfg config.Config) error {
 		playerGameShotService  = playergameshot.New(playerProvider, gameShotService, timeProvider, msgProcessor)
 		leaveGameService       = leavegame.New(pgDB, pgDB.Transactor(), changeStatusService, notificationService)
 		leavePlayerGameService = playerleavegame.New(playerProvider, leaveGameService, timeProvider)
+		leaderboardService     = leaderboard.New(pgDB, playerProvider, notificationService)
 	)
 
 	if err := app.Start(
@@ -93,6 +91,7 @@ func StartBot(ctx context.Context, cfg config.Config) error {
 		playerStartGameService,
 		playerGameShotService,
 		leavePlayerGameService,
+		leaderboardService,
 	); err != nil {
 		return fmt.Errorf("app start: %w", err)
 	}

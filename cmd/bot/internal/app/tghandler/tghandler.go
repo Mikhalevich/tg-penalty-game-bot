@@ -41,6 +41,10 @@ type LeaveGame interface {
 	LeaveGame(ctx context.Context, chatID msginfo.ChatID) error
 }
 
+type Leaderboard interface {
+	MyPosition(ctx context.Context, chatID msginfo.ChatID) error
+}
+
 type GameShot interface {
 	Shot(
 		ctx context.Context,
@@ -61,6 +65,7 @@ type TGHandler struct {
 	startGame      StartGame
 	gameShot       GameShot
 	leaveGame      LeaveGame
+	leaderboard    Leaderboard
 }
 
 func New(
@@ -72,6 +77,7 @@ func New(
 	startGame StartGame,
 	gameShot GameShot,
 	leaveGame LeaveGame,
+	leaderboard Leaderboard,
 ) *TGHandler {
 	return &TGHandler{
 		buttonProvider: buttonProvider,
@@ -82,5 +88,6 @@ func New(
 		startGame:      startGame,
 		gameShot:       gameShot,
 		leaveGame:      leaveGame,
+		leaderboard:    leaderboard,
 	}
 }

@@ -56,10 +56,12 @@ func StartWorker(ctx context.Context, cfg config.Config) error {
 	app.New(
 		matchmakingProcessor,
 		expiredShotsProcessor,
+		pgDB,
 	).Run(
 		ctx,
 		cfg.MatchmakingWorker,
 		cfg.ExpiredShotsWorker,
+		cfg.LeaderboardRecalculatorWorker,
 	)
 
 	return nil
