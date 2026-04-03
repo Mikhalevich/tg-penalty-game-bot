@@ -15,3 +15,7 @@ expired_shots_worker:
   interval: 5s
   batch_size: 100
   shot_expire_duration: 5m
+leaderboard_recalculator_worker:
+  count: 1
+  interval: 1m
+  batch_size: 1
