@@ -29,6 +29,7 @@ type PlayerStatusChanger interface {
 
 type Notifier interface {
 	GameFinish(ctx context.Context, state game.State) error
+	GameCanceled(ctx context.Context, players []game.Player) error
 }
 
 type LeaveGame struct {
@@ -64,11 +65,19 @@ func (s *LeaveGame) LeaveGame(
 			return fmt.Errorf("get game: %w", err)
 		}
 
-		if currentGame.Status != game.GameStatusInProgress {
+		switch currentGame.Status {
+		case game.GameStatusInProgress:
+			currentGame.MissForRestShotsAndCompleteGame(playerID, completedAt)
+
+		case game.GameStatusPending:
+			currentGame.Cancel(completedAt)
+
+		case game.GameStatusCompleted, game.GameStatusCanceled:
+			fallthrough
+
+		default:
 			return perror.InvalidGameState()
 		}
-
-		currentGame.MissForRestShotsAndCompleteGame(playerID, completedAt)
 
 		if err := s.playerStatusChanger.ChangeStatusForFinishedGame(
 			ctx,
@@ -78,8 +87,8 @@ func (s *LeaveGame) LeaveGame(
 			return fmt.Errorf("change players game status: %w", err)
 		}
 
-		if err := s.notifier.GameFinish(ctx, currentGame.State); err != nil {
-			return fmt.Errorf("game finish notification: %w", err)
+		if err := s.sendNotifications(ctx, currentGame); err != nil {
+			return fmt.Errorf("send notifications: %w", err)
 		}
 
 		if err := s.repo.UpdateGame(ctx, currentGame); err != nil {
@@ -89,6 +98,28 @@ func (s *LeaveGame) LeaveGame(
 		return nil
 	}); err != nil {
 		return fmt.Errorf("transaction: %w", err)
+	}
+
+	return nil
+}
+
+func (s *LeaveGame) sendNotifications(ctx context.Context, currentGame game.Game) error {
+	switch currentGame.Status {
+	case game.GameStatusCompleted:
+		if err := s.notifier.GameFinish(ctx, currentGame.State); err != nil {
+			return fmt.Errorf("game finish notification: %w", err)
+		}
+
+	case game.GameStatusCanceled:
+		if err := s.notifier.GameCanceled(ctx, currentGame.State.LivePlayers()); err != nil {
+			return fmt.Errorf("game canceled notification: %w", err)
+		}
+
+	case game.GameStatusInProgress, game.GameStatusPending:
+		fallthrough
+
+	default:
+		return perror.InvalidGameState()
 	}
 
 	return nil
