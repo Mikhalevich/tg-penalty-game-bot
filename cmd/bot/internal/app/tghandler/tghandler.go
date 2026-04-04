@@ -42,7 +42,7 @@ type LeaveGame interface {
 }
 
 type Leaderboard interface {
-	MyPosition(ctx context.Context, chatID msginfo.ChatID) error
+	PlayerPosition(ctx context.Context, chatID msginfo.ChatID) error
 }
 
 type GameShot interface {

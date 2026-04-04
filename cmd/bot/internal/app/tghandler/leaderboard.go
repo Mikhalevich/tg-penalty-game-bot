@@ -9,7 +9,7 @@ import (
 )
 
 func (t *TGHandler) Leaderboard(ctx context.Context, msg tgbot.BotMessage, sender tgbot.MessageSender) error {
-	if err := t.leaderboard.MyPosition(
+	if err := t.leaderboard.PlayerPosition(
 		ctx,
 		msginfo.ChatIDFromInt64(msg.ChatID),
 	); err != nil {

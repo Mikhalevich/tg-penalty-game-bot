@@ -2,14 +2,17 @@ package leaderboard
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/msginfo"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/player"
 )
 
+const (
+	positionsLimit = 10
+)
+
 type Repository interface {
-	PlayerScorePosition(ctx context.Context, playerID player.ID) (player.Position, error)
+	PlayerScorePosition(ctx context.Context, playerID player.ID, limit int) ([]player.Position, error)
 }
 
 type PlayerProvider interface {
@@ -20,7 +23,13 @@ type PlayerProvider interface {
 }
 
 type Notifier interface {
-	ShowLeaderbord(ctx context.Context, chatID msginfo.ChatID, positions []player.Position) error
+	ShowLeaderbord(
+		ctx context.Context,
+		chatID msginfo.ChatID,
+		playerID player.ID,
+		positions []player.Position,
+	) error
+	ShowLeaderboardRestrict(ctx context.Context, chatID msginfo.ChatID) error
 }
 
 type Leaderboard struct {
@@ -39,22 +48,4 @@ func New(
 		playerProvider: playerProvider,
 		notifier:       notifier,
 	}
-}
-
-func (l *Leaderboard) MyPosition(ctx context.Context, chatID msginfo.ChatID) error {
-	currentPlayer, err := l.playerProvider.GetPlayerByChatID(ctx, chatID)
-	if err != nil {
-		return fmt.Errorf("get player by id: %w", err)
-	}
-
-	position, err := l.repo.PlayerScorePosition(ctx, currentPlayer.ID)
-	if err != nil {
-		return fmt.Errorf("player score position: %w", err)
-	}
-
-	if err := l.notifier.ShowLeaderbord(ctx, chatID, []player.Position{position}); err != nil {
-		return fmt.Errorf("show leaderboard: %w", err)
-	}
-
-	return nil
 }

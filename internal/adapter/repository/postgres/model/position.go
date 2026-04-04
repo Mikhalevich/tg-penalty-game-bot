@@ -23,3 +23,13 @@ func (p Position) ToDomPosition() player.Position {
 		Position:    p.Position,
 	}
 }
+
+func ToDomPositions(dbPos []Position) []player.Position {
+	domPos := make([]player.Position, 0, len(dbPos))
+
+	for _, pos := range dbPos {
+		domPos = append(domPos, pos.ToDomPosition())
+	}
+
+	return domPos
+}
