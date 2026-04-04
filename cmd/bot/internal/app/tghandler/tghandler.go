@@ -43,6 +43,7 @@ type LeaveGame interface {
 
 type Leaderboard interface {
 	PlayerPosition(ctx context.Context, chatID msginfo.ChatID) error
+	Top(ctx context.Context, chatID msginfo.ChatID) error
 }
 
 type GameShot interface {

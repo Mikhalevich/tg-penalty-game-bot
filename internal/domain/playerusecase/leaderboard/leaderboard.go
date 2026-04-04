@@ -13,6 +13,7 @@ const (
 
 type Repository interface {
 	PlayerScorePosition(ctx context.Context, playerID player.ID, limit int) ([]player.Position, error)
+	PlayerScoreTop(ctx context.Context, limit int) ([]player.Position, error)
 }
 
 type PlayerProvider interface {
@@ -23,13 +24,19 @@ type PlayerProvider interface {
 }
 
 type Notifier interface {
-	ShowLeaderbord(
+	ShowPlayerLeaderbord(
 		ctx context.Context,
 		chatID msginfo.ChatID,
 		playerID player.ID,
 		positions []player.Position,
 	) error
-	ShowLeaderboardRestrict(ctx context.Context, chatID msginfo.ChatID) error
+	ShowTopLeaderbord(
+		ctx context.Context,
+		chatID msginfo.ChatID,
+		playerID player.ID,
+		positions []player.Position,
+	) error
+	LeaderboardRestrict(ctx context.Context, chatID msginfo.ChatID) error
 }
 
 type Leaderboard struct {

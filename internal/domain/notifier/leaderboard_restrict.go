@@ -7,7 +7,7 @@ import (
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/msginfo"
 )
 
-func (n *Notifier) ShowLeaderboardRestrict(ctx context.Context, chatID msginfo.ChatID) error {
+func (n *Notifier) LeaderboardRestrict(ctx context.Context, chatID msginfo.ChatID) error {
 	if err := n.sender.SendMessage(ctx, msginfo.Message{
 		ChatID: chatID,
 		Text:   "You need to play rating game to show leaderboard",
