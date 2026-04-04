@@ -5,11 +5,12 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/button"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/msginfo"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/player"
 )
 
-func (n *Notifier) ShowLeaderbord(
+func (n *Notifier) ShowPlayerLeaderbord(
 	ctx context.Context,
 	chatID msginfo.ChatID,
 	playerID player.ID,
@@ -19,6 +20,11 @@ func (n *Notifier) ShowLeaderbord(
 		ChatID: chatID,
 		Text:   n.makeLeaderboardMsg(playerID, positions),
 		Type:   msginfo.MessageTypeMarkdown,
+		Buttons: []button.ButtonRow{
+			{
+				button.LeaderboardTop("Top"),
+			},
+		},
 	}); err != nil {
 		return fmt.Errorf("send message: %w", err)
 	}

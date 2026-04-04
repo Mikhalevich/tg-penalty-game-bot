@@ -10,13 +10,8 @@ import (
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/player"
 )
 
-const (
-	halfLimit = 2
-)
-
-func (p *Postgres) PlayerScorePosition(
+func (p *Postgres) PlayerScoreTop(
 	ctx context.Context,
-	playerID player.ID,
 	limit int,
 ) ([]player.Position, error) {
 	var (
@@ -29,25 +24,18 @@ func (p *Postgres) PlayerScorePosition(
 				position
 			FROM
 				score_leaderboard
-			WHERE
-				position >= (
-					SELECT
-						position - $1
-					FROM
-						score_leaderboard
-					WHERE
-						player_id = $2
-				)
 			LIMIT
-				$3
+				$1
 		`
 
 		positions []model.Position
 	)
 
-	if err := sqlx.SelectContext(ctx, p.transactor.ExtContext(ctx), &positions, query,
-		limit/halfLimit,
-		playerID,
+	if err := sqlx.SelectContext(
+		ctx,
+		p.transactor.ExtContext(ctx),
+		&positions,
+		query,
 		limit,
 	); err != nil {
 		return nil, fmt.Errorf("select player position: %w", err)

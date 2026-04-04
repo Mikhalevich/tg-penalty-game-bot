@@ -9,7 +9,7 @@ SELECT
     'player_' || i,
     NOW(),
     NOW(),
-    1000 + i
-FROM generate_series(1, 1000) AS i;
+    500 + i
+FROM generate_series(1, 10000) AS i;
 
 COMMIT;

@@ -37,6 +37,12 @@ func (t *TGHandler) DefaultCallbackQuery(ctx context.Context, msg tgbot.BotMessa
 
 	case button.OperationStopSearchGame:
 		return t.processStopFindButton(ctx, chatID)
+
+	case button.OperationLeaderboardPlayer:
+		return t.processPlayerLeaderboard(ctx, chatID)
+
+	case button.OperationLeaderboardTop:
+		return t.processTopLeaderboard(ctx, chatID)
 	}
 
 	return nil
@@ -95,6 +101,28 @@ func (t *TGHandler) processStopFindButton(
 ) error {
 	if err := t.findGame.StopFind(ctx, chatID); err != nil {
 		return fmt.Errorf("stop find: %w", err)
+	}
+
+	return nil
+}
+
+func (t *TGHandler) processPlayerLeaderboard(
+	ctx context.Context,
+	chatID msginfo.ChatID,
+) error {
+	if err := t.leaderboard.PlayerPosition(ctx, chatID); err != nil {
+		return fmt.Errorf("leaderboard player: %w", err)
+	}
+
+	return nil
+}
+
+func (t *TGHandler) processTopLeaderboard(
+	ctx context.Context,
+	chatID msginfo.ChatID,
+) error {
+	if err := t.leaderboard.Top(ctx, chatID); err != nil {
+		return fmt.Errorf("leaderboard top: %w", err)
 	}
 
 	return nil
