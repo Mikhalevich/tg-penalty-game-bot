@@ -2,8 +2,6 @@ package postgres
 
 import (
 	"context"
-	"database/sql"
-	"errors"
 	"fmt"
 
 	"github.com/jmoiron/sqlx"
@@ -12,7 +10,15 @@ import (
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/player"
 )
 
-func (p *Postgres) PlayerScorePosition(ctx context.Context, playerID player.ID) (player.Position, error) {
+const (
+	halfLimit = 2
+)
+
+func (p *Postgres) PlayerScorePosition(
+	ctx context.Context,
+	playerID player.ID,
+	limit int,
+) ([]player.Position, error) {
 	var (
 		query = `
 			SELECT
@@ -24,19 +30,27 @@ func (p *Postgres) PlayerScorePosition(ctx context.Context, playerID player.ID) 
 			FROM
 				score_leaderboard
 			WHERE
-				player_id = $1
+				position >= (
+					SELECT
+						position - $1
+					FROM
+						score_leaderboard
+					WHERE
+						player_id = $2
+				)
+			LIMIT $3
 		`
 
-		position model.Position
+		positions []model.Position
 	)
 
-	if err := sqlx.GetContext(ctx, p.transactor.ExtContext(ctx), &position, query, playerID); err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return player.Position{}, ErrNotFound
-		}
-
-		return player.Position{}, fmt.Errorf("select player position: %w", err)
+	if err := sqlx.SelectContext(ctx, p.transactor.ExtContext(ctx), &positions, query,
+		limit/halfLimit,
+		playerID,
+		limit,
+	); err != nil {
+		return nil, fmt.Errorf("select player position: %w", err)
 	}
 
-	return position.ToDomPosition(), nil
+	return model.ToDomPositions(positions), nil
 }

@@ -15,7 +15,7 @@ CREATE MATERIALIZED VIEW score_leaderboard AS
     ORDER BY
         position;
 
-CREATE INDEX score_leaderboard_user_id_idx ON score_leaderboard(player_id);
+CREATE INDEX score_leaderboard_player_id_idx ON score_leaderboard(player_id);
 
 -- +migrate Down
 -- SQL section 'Down' is executed when this migration is rolled back
