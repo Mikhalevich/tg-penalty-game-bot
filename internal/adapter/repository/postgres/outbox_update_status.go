@@ -5,8 +5,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/outboxmsg"
 	"github.com/jmoiron/sqlx"
+
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/outboxmsg"
 )
 
 func (p *Postgres) OutboxUpdateStatus(
