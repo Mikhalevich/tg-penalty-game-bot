@@ -1,6 +1,7 @@
 package messagesender
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 
@@ -38,8 +39,16 @@ func (m *messageSender) SendMessage(
 		}
 
 	case msginfo.MessageTypePNG:
-		if err := m.SendPNGMarkdown(ctx, msg.ChatID, msg.Text, msg.Payload, msg.Buttons...); err != nil {
-			return fmt.Errorf("send png: %w", err)
+		if _, err := m.bot.SendPhoto(ctx, &bot.SendPhotoParams{
+			ChatID: msg.ChatID.Int64(),
+			Photo: &models.InputFileUpload{
+				Data: bytes.NewReader(msg.Payload),
+			},
+			Caption:     msg.Text,
+			ParseMode:   models.ParseModeMarkdown,
+			ReplyMarkup: makeButtonsMarkup(msg.Buttons...),
+		}); err != nil {
+			return fmt.Errorf("send photo: %w", err)
 		}
 
 	case msginfo.MessageTypeShotImage:
