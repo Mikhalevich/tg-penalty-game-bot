@@ -13,13 +13,6 @@ type Sender interface {
 		ctx context.Context,
 		msg msginfo.SenderMessage,
 	) error
-	EditText(
-		ctx context.Context,
-		chatID msginfo.ChatID,
-		messageID msginfo.MessageID,
-		text string,
-		rows ...button.InlineKeyboardButtonRow,
-	) error
 	DeleteMessage(
 		ctx context.Context,
 		chatID msginfo.ChatID,
