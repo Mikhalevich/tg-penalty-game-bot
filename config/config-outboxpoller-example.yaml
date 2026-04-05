@@ -15,3 +15,4 @@ message_worker:
   count: 2
   interval: 1s
   batch_size: 10
+  max_retry_count: 10

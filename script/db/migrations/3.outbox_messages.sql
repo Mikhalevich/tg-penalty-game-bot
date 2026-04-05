@@ -1,6 +1,12 @@
 -- +migrate Up
 -- SQL in section 'Up' is executed when this migration is applied
 
+CREATE TYPE outbox_message_status AS ENUM (
+    'pending',
+    'dispatched',
+    'canceled'
+);
+
 CREATE TABLE outbox_messages(
     id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     chat_id BIGINT NOT NULL,
@@ -9,12 +15,16 @@ CREATE TABLE outbox_messages(
     msg_type INTEGER NOT NULL,
     payload BYTEA,
     buttons JSONB NOT NULL,
-    is_dispatched BOOLEAN NOT NULL DEFAULT FALSE,
+    status outbox_message_status NOT NULL DEFAULT 'pending',
+    retry_count INTEGER NOT NULL DEFAULT 0,
     created_at TIMESTAMPTZ NOT NULL DEFAULT (CURRENT_TIMESTAMP),
-    dispatched_at TIMESTAMPTZ
+    updated_at TIMESTAMPTZ
 );
+
+CREATE INDEX outbox_messages_pending_idx ON outbox_messages(status) WHERE status = 'pending';
 
 -- +migrate Down
 -- SQL section 'Down' is executed when this migration is rolled back
 
 DROP TABLE outbox_messages;
+DROP TYPE outbox_message_status;

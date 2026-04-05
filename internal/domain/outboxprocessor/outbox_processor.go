@@ -14,10 +14,17 @@ type Repository interface {
 		limit int,
 	) ([]outboxmsg.Message, error)
 
-	OutboxSetDispatched(
+	OutboxUpdateStatus(
 		ctx context.Context,
 		ids []int,
-		dispatchedAt time.Time,
+		status outboxmsg.Status,
+		updatedAt time.Time,
+	) error
+
+	OutboxIncrementRetryCount(
+		ctx context.Context,
+		ids []int,
+		updatedAt time.Time,
 	) error
 }
 

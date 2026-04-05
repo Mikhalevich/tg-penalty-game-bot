@@ -8,10 +8,10 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-func (p *Postgres) OutboxSetDispatched(
+func (p *Postgres) OutboxIncrementRetryCount(
 	ctx context.Context,
 	ids []int,
-	dispatchedAt time.Time,
+	updatedAt time.Time,
 ) error {
 	if len(ids) == 0 {
 		return nil
@@ -21,14 +21,14 @@ func (p *Postgres) OutboxSetDispatched(
 		query = `
 			UPDATE outbox_messages
 			SET
-				is_dispatched = TRUE,
-				dispatched_at = ?
+				retry_count = retry_count + 1,
+				updated_at = ?
 			WHERE
 				id IN(?)
 		`
 	)
 
-	query, args, err := sqlx.In(query, dispatchedAt, ids)
+	query, args, err := sqlx.In(query, updatedAt, ids)
 	if err != nil {
 		return fmt.Errorf("sqlx in: %w", err)
 	}
