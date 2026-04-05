@@ -7,7 +7,11 @@ import (
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/msginfo"
 )
 
-func (l *Leaderboard) PlayerPosition(ctx context.Context, chatID msginfo.ChatID) error {
+func (l *Leaderboard) PlayerPosition(
+	ctx context.Context,
+	chatID msginfo.ChatID,
+	messageID msginfo.MessageID,
+) error {
 	currentPlayer, err := l.playerProvider.GetPlayerByChatID(ctx, chatID)
 	if err != nil {
 		return fmt.Errorf("get player by id: %w", err)
@@ -26,7 +30,13 @@ func (l *Leaderboard) PlayerPosition(ctx context.Context, chatID msginfo.ChatID)
 		return nil
 	}
 
-	if err := l.notifier.ShowPlayerLeaderbord(ctx, chatID, currentPlayer.ID, positions); err != nil {
+	if err := l.notifier.ShowPlayerLeaderbord(
+		ctx,
+		chatID,
+		messageID,
+		currentPlayer.ID,
+		positions,
+	); err != nil {
 		return fmt.Errorf("show leaderboard: %w", err)
 	}
 

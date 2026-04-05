@@ -42,8 +42,8 @@ type LeaveGame interface {
 }
 
 type Leaderboard interface {
-	PlayerPosition(ctx context.Context, chatID msginfo.ChatID) error
-	Top(ctx context.Context, chatID msginfo.ChatID) error
+	PlayerPosition(ctx context.Context, chatID msginfo.ChatID, messageID msginfo.MessageID) error
+	Top(ctx context.Context, chatID msginfo.ChatID, messageID msginfo.MessageID) error
 }
 
 type GameShot interface {
