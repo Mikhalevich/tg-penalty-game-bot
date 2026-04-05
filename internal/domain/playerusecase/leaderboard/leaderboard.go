@@ -27,12 +27,14 @@ type Notifier interface {
 	ShowPlayerLeaderbord(
 		ctx context.Context,
 		chatID msginfo.ChatID,
+		messageID msginfo.MessageID,
 		playerID player.ID,
 		positions []player.Position,
 	) error
 	ShowTopLeaderbord(
 		ctx context.Context,
 		chatID msginfo.ChatID,
+		messageID msginfo.MessageID,
 		playerID player.ID,
 		positions []player.Position,
 	) error

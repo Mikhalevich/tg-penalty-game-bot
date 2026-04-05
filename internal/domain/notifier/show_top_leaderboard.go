@@ -12,13 +12,15 @@ import (
 func (n *Notifier) ShowTopLeaderbord(
 	ctx context.Context,
 	chatID msginfo.ChatID,
+	messageID msginfo.MessageID,
 	playerID player.ID,
 	positions []player.Position,
 ) error {
 	if err := n.sender.SendMessage(ctx, msginfo.Message{
-		ChatID: chatID,
-		Text:   n.makeLeaderboardMsg(playerID, positions),
-		Type:   msginfo.MessageTypeMarkdown,
+		ChatID:     chatID,
+		ReplyMsgID: messageID,
+		Text:       n.makeLeaderboardMsg(playerID, positions),
+		Type:       sendOrEditTextMarkdownType(messageID),
 		Buttons: []button.ButtonRow{
 			{
 				button.LeaderboardPlayer("My position"),

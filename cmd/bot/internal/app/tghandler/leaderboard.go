@@ -12,6 +12,7 @@ func (t *TGHandler) Leaderboard(ctx context.Context, msg tgbot.BotMessage, sende
 	if err := t.leaderboard.PlayerPosition(
 		ctx,
 		msginfo.ChatIDFromInt64(msg.ChatID),
+		msginfo.MessageIDFromInt(0),
 	); err != nil {
 		return fmt.Errorf("my position: %w", err)
 	}

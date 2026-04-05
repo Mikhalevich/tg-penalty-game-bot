@@ -19,11 +19,22 @@ func (m *messageSender) SendMessage(
 		if _, err := m.bot.SendMessage(ctx, &bot.SendMessageParams{
 			ChatID:          msg.ChatID.Int64(),
 			Text:            msg.Text,
-			ParseMode:       parseMode(msg.Type),
+			ParseMode:       textParseMode(msg.Type),
 			ReplyParameters: replyParameters(msg.ReplyMsgID),
 			ReplyMarkup:     makeButtonsMarkup(msg.Buttons...),
 		}); err != nil {
 			return fmt.Errorf("send text message: %w", err)
+		}
+
+	case msginfo.MessageTypeEditMarkdown:
+		if _, err := m.bot.EditMessageText(ctx, &bot.EditMessageTextParams{
+			ChatID:      msg.ChatID.Int64(),
+			MessageID:   msg.ReplyMsgID.Int(),
+			Text:        msg.Text,
+			ParseMode:   models.ParseModeMarkdown,
+			ReplyMarkup: makeButtonsMarkup(msg.Buttons...),
+		}); err != nil {
+			return fmt.Errorf("eidt message text: %w", err)
 		}
 
 	case msginfo.MessageTypePNG:
@@ -41,7 +52,7 @@ func (m *messageSender) SendMessage(
 	return nil
 }
 
-func parseMode(mt msginfo.MessageType) models.ParseMode {
+func textParseMode(mt msginfo.MessageType) models.ParseMode {
 	if mt == msginfo.MessageTypeMarkdown {
 		return models.ParseModeMarkdown
 	}
