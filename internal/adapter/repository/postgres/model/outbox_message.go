@@ -19,9 +19,10 @@ type OutboxMessage struct {
 	Type           int           `db:"msg_type"`
 	Payload        []byte        `db:"payload"`
 	Button         jsonb.JSONB   `db:"buttons"`
-	IsDispatched   bool          `db:"is_dispatched"`
+	Status         string        `db:"status"`
+	RetryCount     int           `db:"retry_count"`
 	CreatedAt      time.Time     `db:"created_at"`
-	DispatchedAt   sql.NullTime  `db:"dispatched_at"`
+	UpdatedAt      sql.NullTime  `db:"updated_at"`
 }
 
 func intToNullInt64(value int) sql.NullInt64 {
@@ -67,7 +68,8 @@ func ToOutboxMessage(msg OutboxMessage) (outboxmsg.Message, error) {
 	}
 
 	return outboxmsg.Message{
-		ID: msg.ID,
+		ID:         msg.ID,
+		RetryCount: msg.RetryCount,
 		Message: msginfo.Message{
 			ChatID:     msginfo.ChatIDFromInt64(msg.ChatID),
 			ReplyMsgID: msginfo.MessageIDFromInt(int(msg.ReplyMessageID.Int64)),

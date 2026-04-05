@@ -46,7 +46,8 @@ type ButtonRedis struct {
 }
 
 type Worker struct {
-	Count     int           `yaml:"count" required:"true"`
-	Interval  time.Duration `yaml:"interval" required:"true"`
-	BatchSize int           `yaml:"batch_size" required:"true"`
+	Count         int           `yaml:"count" required:"true"`
+	Interval      time.Duration `yaml:"interval" required:"true"`
+	BatchSize     int           `yaml:"batch_size" required:"true"`
+	MaxRetryCount int           `yaml:"max_retry_count" required:"true"`
 }

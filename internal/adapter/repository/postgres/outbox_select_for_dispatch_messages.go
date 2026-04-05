@@ -23,11 +23,12 @@ func (p *Postgres) OutboxSelectForDispatchMessages(
 				msg_text,
 				msg_type,
 				payload,
-				buttons
+				buttons,
+				retry_count
 			FROM
 				outbox_messages
 			WHERE
-				is_dispatched = FALSE
+				status = 'pending'
 			ORDER BY
 				id
 			LIMIT

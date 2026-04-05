@@ -10,7 +10,7 @@ import (
 )
 
 type Processor interface {
-	ProcessMessage(ctx context.Context, batchSize int) error
+	ProcessMessage(ctx context.Context, batchSize int, maxRetryCoun int) error
 }
 
 type App struct {
@@ -31,7 +31,7 @@ func (a *App) Run(
 
 	runWorkers(ctx, "message", messageCfg, &wgr,
 		func(ctx context.Context) error {
-			return a.processor.ProcessMessage(ctx, messageCfg.BatchSize)
+			return a.processor.ProcessMessage(ctx, messageCfg.BatchSize, messageCfg.MaxRetryCount)
 		},
 	)
 

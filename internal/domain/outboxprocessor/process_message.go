@@ -4,40 +4,55 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/outboxmsg"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/infra/logger"
 )
 
-func (o *OutboxProcessor) ProcessMessage(ctx context.Context, batchSize int) error {
+func (o *OutboxProcessor) ProcessMessage(
+	ctx context.Context,
+	batchSize int,
+	maxRetryCount int,
+) error {
 	if err := o.transactor.Transaction(ctx, func(ctx context.Context) error {
 		msgs, err := o.repository.OutboxSelectForDispatchMessages(ctx, batchSize)
 		if err != nil {
 			return fmt.Errorf("select outbox messages: %w", err)
 		}
 
-		ids := make([]int, 0, len(msgs))
+		var (
+			results = o.sendMessages(ctx, msgs, maxRetryCount)
+			now     = o.timeProvider.Now()
+		)
 
-		for _, msg := range msgs {
-			if err := o.sender.SendMessage(ctx, msg.Message); err != nil {
-				logger.FromContext(ctx).
-					WithFields(
-						logger.Fields{
-							"chat_id":  msg.ChatID,
-							"text":     msg.Text,
-							"msg_type": msg.Type,
-						},
-					).
-					WithError(err).
-					Error("send message")
-
-				continue
+		if len(results.DispatchedIDs) > 0 {
+			if err := o.repository.OutboxUpdateStatus(
+				ctx,
+				results.DispatchedIDs,
+				outboxmsg.StatusDispatched,
+				now,
+			); err != nil {
+				return fmt.Errorf("set dispatched: %w", err)
 			}
-
-			ids = append(ids, msg.ID)
 		}
 
-		if len(ids) > 0 {
-			if err := o.repository.OutboxSetDispatched(ctx, ids, o.timeProvider.Now()); err != nil {
-				return fmt.Errorf("set dispatched: %w", err)
+		if len(results.CanceledIDs) > 0 {
+			if err := o.repository.OutboxUpdateStatus(
+				ctx,
+				results.CanceledIDs,
+				outboxmsg.StatusCanceled,
+				now,
+			); err != nil {
+				return fmt.Errorf("set canceled: %w", err)
+			}
+		}
+
+		if len(results.IncrementRetryCountIDs) > 0 {
+			if err := o.repository.OutboxIncrementRetryCount(
+				ctx,
+				results.IncrementRetryCountIDs,
+				now,
+			); err != nil {
+				return fmt.Errorf("increment retry count: %w", err)
 			}
 		}
 
@@ -47,4 +62,49 @@ func (o *OutboxProcessor) ProcessMessage(ctx context.Context, batchSize int) err
 	}
 
 	return nil
+}
+
+type sendResuts struct {
+	DispatchedIDs          []int
+	CanceledIDs            []int
+	IncrementRetryCountIDs []int
+}
+
+func (o *OutboxProcessor) sendMessages(
+	ctx context.Context,
+	msgs []outboxmsg.Message,
+	maxRetryCount int,
+) sendResuts {
+	results := sendResuts{
+		DispatchedIDs: make([]int, 0, len(msgs)),
+	}
+
+	for _, msg := range msgs {
+		if err := o.sender.SendMessage(ctx, msg.Message); err != nil {
+			if msg.RetryCount < maxRetryCount {
+				results.IncrementRetryCountIDs = append(results.IncrementRetryCountIDs, msg.ID)
+
+				continue
+			}
+
+			logger.FromContext(ctx).
+				WithFields(
+					logger.Fields{
+						"chat_id":  msg.ChatID,
+						"text":     msg.Text,
+						"msg_type": msg.Type,
+					},
+				).
+				WithError(err).
+				Error("send message")
+
+			results.CanceledIDs = append(results.CanceledIDs, msg.ID)
+
+			continue
+		}
+
+		results.DispatchedIDs = append(results.DispatchedIDs, msg.ID)
+	}
+
+	return results
 }
