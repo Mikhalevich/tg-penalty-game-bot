@@ -83,7 +83,11 @@ func (g *GameShot) startNextRound(
 	}
 
 	if !currentGame.IsFinished() {
-		if err := g.notifier.GameNewRound(ctx, currentGame.ID, currentGame.State); err != nil {
+		if err := g.notifier.GameNewRound(
+			ctx,
+			currentGame.ID,
+			currentGame.State,
+		); err != nil {
 			return fmt.Errorf("start next round: %w", err)
 		}
 
@@ -98,7 +102,7 @@ func (g *GameShot) startNextRound(
 		return fmt.Errorf("change players game status: %w", err)
 	}
 
-	if err := g.notifier.GameFinish(ctx, currentGame.State); err != nil {
+	if err := g.notifier.GameFinish(ctx, currentGame.State, currentGame.StateUpdatedAt); err != nil {
 		return fmt.Errorf("game finish: %w", err)
 	}
 

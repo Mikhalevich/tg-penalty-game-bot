@@ -28,7 +28,7 @@ type PlayerStatusChanger interface {
 }
 
 type Notifier interface {
-	GameFinish(ctx context.Context, state game.State) error
+	GameFinish(ctx context.Context, state game.State, finishedAt time.Time) error
 	GameCanceled(ctx context.Context, players []game.Player) error
 }
 
@@ -106,7 +106,7 @@ func (s *LeaveGame) LeaveGame(
 func (s *LeaveGame) sendNotifications(ctx context.Context, currentGame game.Game) error {
 	switch currentGame.Status {
 	case game.GameStatusCompleted:
-		if err := s.notifier.GameFinish(ctx, currentGame.State); err != nil {
+		if err := s.notifier.GameFinish(ctx, currentGame.State, currentGame.StateUpdatedAt); err != nil {
 			return fmt.Errorf("game finish notification: %w", err)
 		}
 

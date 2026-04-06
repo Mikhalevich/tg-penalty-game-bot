@@ -31,7 +31,7 @@ type PlayerStatusChanger interface {
 type Notifier interface {
 	GameNewRound(ctx context.Context, gameID game.ID, state game.State) error
 	GameRoundFinish(ctx context.Context, state game.State) error
-	GameFinish(ctx context.Context, state game.State) error
+	GameFinish(ctx context.Context, state game.State, finishedAt time.Time) error
 }
 
 type ForceShot struct {
@@ -140,7 +140,7 @@ func (s *ForceShot) startNextRound(
 		return fmt.Errorf("change players game status: %w", err)
 	}
 
-	if err := s.notifier.GameFinish(ctx, currentGame.State); err != nil {
+	if err := s.notifier.GameFinish(ctx, currentGame.State, currentGame.StateUpdatedAt); err != nil {
 		return fmt.Errorf("game finish: %w", err)
 	}
 

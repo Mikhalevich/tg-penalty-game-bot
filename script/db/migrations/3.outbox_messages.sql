@@ -18,10 +18,11 @@ CREATE TABLE outbox_messages(
     status outbox_message_status NOT NULL DEFAULT 'pending',
     retry_count INTEGER NOT NULL DEFAULT 0,
     created_at TIMESTAMPTZ NOT NULL DEFAULT (CURRENT_TIMESTAMP),
-    updated_at TIMESTAMPTZ
+    updated_at TIMESTAMPTZ,
+    visibility_at TIMESTAMPTZ NOT NULL
 );
 
-CREATE INDEX outbox_messages_pending_idx ON outbox_messages(status) WHERE status = 'pending';
+CREATE INDEX outbox_messages_pending_idx ON outbox_messages(status, visibility_at) WHERE status = 'pending';
 
 -- +migrate Down
 -- SQL section 'Down' is executed when this migration is rolled back

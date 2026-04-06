@@ -3,6 +3,7 @@ package postgres
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/jmoiron/sqlx"
 
@@ -12,6 +13,7 @@ import (
 
 func (p *Postgres) OutboxSelectForDispatchMessages(
 	ctx context.Context,
+	visibilityAt time.Time,
 	limit int,
 ) ([]outboxmsg.Message, error) {
 	var (
@@ -28,18 +30,26 @@ func (p *Postgres) OutboxSelectForDispatchMessages(
 			FROM
 				outbox_messages
 			WHERE
-				status = 'pending'
+				status = 'pending' AND
+				visibility_at <= $1
 			ORDER BY
 				id
 			LIMIT
-				$1
+				$2
 			FOR UPDATE SKIP LOCKED
 		`
 
 		outboxMsgs []model.OutboxMessage
 	)
 
-	if err := sqlx.SelectContext(ctx, p.transactor.ExtContext(ctx), &outboxMsgs, query, limit); err != nil {
+	if err := sqlx.SelectContext(
+		ctx,
+		p.transactor.ExtContext(ctx),
+		&outboxMsgs,
+		query,
+		visibilityAt,
+		limit,
+	); err != nil {
 		return nil, fmt.Errorf("select messages: %w", err)
 	}
 

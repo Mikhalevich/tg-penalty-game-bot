@@ -150,6 +150,7 @@ func (g *Game) StartNextRound(startedAt time.Time) error {
 	}
 
 	g.State.CurrentRoundIdx++
+	g.StateUpdatedAt = startedAt
 
 	if g.State.CurrentRoundIdx >= len(g.State.Rounds) {
 		g.Status = GameStatusCompleted
