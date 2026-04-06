@@ -38,11 +38,8 @@ func (t *TGHandler) DefaultCallbackQuery(ctx context.Context, msg tgbot.BotMessa
 	case button.OperationStopSearchGame:
 		return t.processStopFindButton(ctx, chatID)
 
-	case button.OperationLeaderboardPlayer:
-		return t.processPlayerLeaderboard(ctx, chatID, msginfo.MessageIDFromInt(msg.MessageID))
-
-	case button.OperationLeaderboardTop:
-		return t.processTopLeaderboard(ctx, chatID, msginfo.MessageIDFromInt(msg.MessageID))
+	case button.OperationLeaderboardPage:
+		return t.processLeaderboardPage(ctx, chatID, msginfo.MessageIDFromInt(msg.MessageID), btn)
 	}
 
 	return nil
@@ -106,25 +103,19 @@ func (t *TGHandler) processStopFindButton(
 	return nil
 }
 
-func (t *TGHandler) processPlayerLeaderboard(
+func (t *TGHandler) processLeaderboardPage(
 	ctx context.Context,
 	chatID msginfo.ChatID,
 	messageID msginfo.MessageID,
+	btn *button.Button,
 ) error {
-	if err := t.leaderboard.PlayerPosition(ctx, chatID, messageID); err != nil {
-		return fmt.Errorf("leaderboard player: %w", err)
+	payload, err := button.GetPayload[button.LeaderboardPagePayload](*btn)
+	if err != nil {
+		return fmt.Errorf("leaderboard page payload: %w", err)
 	}
 
-	return nil
-}
-
-func (t *TGHandler) processTopLeaderboard(
-	ctx context.Context,
-	chatID msginfo.ChatID,
-	messageID msginfo.MessageID,
-) error {
-	if err := t.leaderboard.Top(ctx, chatID, messageID); err != nil {
-		return fmt.Errorf("leaderboard top: %w", err)
+	if err := t.leaderboard.Page(ctx, chatID, messageID, payload.PageNumber); err != nil {
+		return fmt.Errorf("leaderboard player: %w", err)
 	}
 
 	return nil

@@ -9,10 +9,11 @@ import (
 )
 
 func (t *TGHandler) Leaderboard(ctx context.Context, msg tgbot.BotMessage, sender tgbot.MessageSender) error {
-	if err := t.leaderboard.PlayerPosition(
+	if err := t.leaderboard.Page(
 		ctx,
 		msginfo.ChatIDFromInt64(msg.ChatID),
 		msginfo.MessageIDFromInt(0),
+		1,
 	); err != nil {
 		return fmt.Errorf("my position: %w", err)
 	}
