@@ -7,13 +7,13 @@ import (
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/player"
 )
 
-const (
-	positionsLimit = 10
-)
-
 type Repository interface {
-	PlayerScorePosition(ctx context.Context, playerID player.ID, limit int) ([]player.Position, error)
-	PlayerScoreTop(ctx context.Context, limit int) ([]player.Position, error)
+	PlayerScorePositionsFrom(
+		ctx context.Context,
+		positionFrom int,
+		limit int,
+	) ([]player.Position, error)
+	PlayerScoreMaxPosition(ctx context.Context) (int, error)
 }
 
 type PlayerProvider interface {
@@ -24,18 +24,13 @@ type PlayerProvider interface {
 }
 
 type Notifier interface {
-	ShowPlayerLeaderbord(
+	ShowLeaderboard(
 		ctx context.Context,
 		chatID msginfo.ChatID,
 		messageID msginfo.MessageID,
 		playerID player.ID,
-		positions []player.Position,
-	) error
-	ShowTopLeaderbord(
-		ctx context.Context,
-		chatID msginfo.ChatID,
-		messageID msginfo.MessageID,
-		playerID player.ID,
+		pageNumber int,
+		pagesCount int,
 		positions []player.Position,
 	) error
 	LeaderboardRestrict(ctx context.Context, chatID msginfo.ChatID) error

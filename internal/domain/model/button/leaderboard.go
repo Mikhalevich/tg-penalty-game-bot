@@ -1,9 +1,13 @@
 package button
 
-func LeaderboardPlayer(caption string) Button {
-	return CreateButtonWithoutPayload(caption, OperationLeaderboardPlayer)
+type LeaderboardPagePayload struct {
+	PageNumber int
 }
 
-func LeaderboardTop(caption string) Button {
-	return CreateButtonWithoutPayload(caption, OperationLeaderboardTop)
+func LeaderboardPage(caption string, pageNumber int) (Button, error) {
+	return CreateButton(caption, OperationLeaderboardPage,
+		LeaderboardPagePayload{
+			PageNumber: pageNumber,
+		},
+	)
 }
