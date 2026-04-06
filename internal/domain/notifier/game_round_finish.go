@@ -17,7 +17,7 @@ func (n *Notifier) GameRoundFinish(ctx context.Context, state game.State) error 
 	)
 
 	for _, plr := range state.LivePlayers() {
-		if err := n.sendShotImage(
+		if err := n.sendShotImageForFinishRound(
 			ctx,
 			plr,
 			msg,
@@ -48,7 +48,7 @@ func shotImageTypeByPlayerID(playerID, attackerID player.ID) shotimage.ImageType
 	return shotimage.ImageTypeDefend
 }
 
-func (n *Notifier) sendShotImage(
+func (n *Notifier) sendShotImageForFinishRound(
 	ctx context.Context,
 	plr game.Player,
 	msg string,

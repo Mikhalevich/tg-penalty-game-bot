@@ -13,16 +13,15 @@ func (o *OutboxProcessor) ProcessMessage(
 	batchSize int,
 	maxRetryCount int,
 ) error {
+	now := o.timeProvider.Now()
+
 	if err := o.transactor.Transaction(ctx, func(ctx context.Context) error {
-		msgs, err := o.repository.OutboxSelectForDispatchMessages(ctx, batchSize)
+		msgs, err := o.repository.OutboxSelectForDispatchMessages(ctx, now, batchSize)
 		if err != nil {
 			return fmt.Errorf("select outbox messages: %w", err)
 		}
 
-		var (
-			results = o.sendMessages(ctx, msgs, maxRetryCount)
-			now     = o.timeProvider.Now()
-		)
+		results := o.sendMessages(ctx, msgs, maxRetryCount)
 
 		if len(results.DispatchedIDs) > 0 {
 			if err := o.repository.OutboxUpdateStatus(

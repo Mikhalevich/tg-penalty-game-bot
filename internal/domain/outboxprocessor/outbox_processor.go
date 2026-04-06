@@ -11,6 +11,7 @@ import (
 type Repository interface {
 	OutboxSelectForDispatchMessages(
 		ctx context.Context,
+		visibilityAt time.Time,
 		limit int,
 	) ([]outboxmsg.Message, error)
 

@@ -3,6 +3,7 @@ package notifier
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/button"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/game"
@@ -19,63 +20,82 @@ const (
 	middleSideSymbol = "🖐"
 )
 
-func (n *Notifier) GameNewRound(ctx context.Context, gameID game.ID, state game.State) error {
+const (
+	newRoundDelay = time.Second * 2
+)
+
+func (n *Notifier) GameNewRound(
+	ctx context.Context,
+	gameID game.ID,
+	state game.State,
+) error {
 	var (
 		cRound      = state.CurrentRound()
 		roundNumber = state.CurrentRoundNumber()
 	)
 
-	attackerPlayer := state.PlayerByID(cRound.Attack.PlayerID)
-	if !attackerPlayer.IsBot() {
-		attackerButtons, err := makeShotSideButtons(gameID, roundNumber)
-		if err != nil {
-			return fmt.Errorf("make buttons: %w", err)
-		}
-
-		payload, err := shotimage.ShotImage{
-			Type: shotimage.ImageTypePrepareAttack,
-		}.GOBEncode()
-
-		if err != nil {
-			return fmt.Errorf("make shot attacker payload: %w", err)
-		}
-
-		if err := n.sender.SendMessage(ctx, msginfo.Message{
-			ChatID:  attackerPlayer.ChatID,
-			Text:    "Attack",
-			Type:    msginfo.MessageTypeShotImage,
-			Payload: payload,
-			Buttons: []button.ButtonRow{attackerButtons},
-		}); err != nil {
-			return fmt.Errorf("send attacker msg: %w", err)
-		}
+	if err := n.sendShotImageForNewRound(
+		ctx,
+		state.PlayerByID(cRound.Attack.PlayerID),
+		gameID,
+		roundNumber,
+		"Attack",
+		shotimage.ImageTypePrepareAttack,
+		cRound.Attack.CreatedAt.Add(newRoundDelay),
+	); err != nil {
+		return fmt.Errorf("send attacker shot image: %w", err)
 	}
 
-	defenderPlayer := state.PlayerByID(cRound.Defend.PlayerID)
+	if err := n.sendShotImageForNewRound(
+		ctx,
+		state.PlayerByID(cRound.Defend.PlayerID),
+		gameID,
+		roundNumber,
+		"Defend",
+		shotimage.ImageTypePrepareDefend,
+		cRound.Defend.CreatedAt.Add(newRoundDelay),
+	); err != nil {
+		return fmt.Errorf("send defender shot image: %w", err)
+	}
 
-	if !defenderPlayer.IsBot() {
-		defenderButtons, err := makeShotSideButtons(gameID, roundNumber)
-		if err != nil {
-			return fmt.Errorf("make buttons: %w", err)
-		}
+	return nil
+}
 
-		payload, err := shotimage.ShotImage{
-			Type: shotimage.ImageTypePrepareDefend,
-		}.GOBEncode()
+func (n *Notifier) sendShotImageForNewRound(
+	ctx context.Context,
+	plr game.Player,
+	gameID game.ID,
+	roundNumber int,
+	caption string,
+	imageType shotimage.ImageType,
+	visibilityAt time.Time,
+) error {
+	if plr.IsBot() {
+		return nil
+	}
 
-		if err != nil {
-			return fmt.Errorf("make shot defender payload: %w", err)
-		}
+	shotButtons, err := makeShotSideButtons(gameID, roundNumber)
+	if err != nil {
+		return fmt.Errorf("make buttons: %w", err)
+	}
 
-		if err := n.sender.SendMessage(ctx, msginfo.Message{
-			ChatID:  defenderPlayer.ChatID,
-			Text:    "Defend",
-			Type:    msginfo.MessageTypeShotImage,
-			Payload: payload,
-			Buttons: []button.ButtonRow{defenderButtons},
-		}); err != nil {
-			return fmt.Errorf("send defender msg: %w", err)
-		}
+	payload, err := shotimage.ShotImage{
+		Type: imageType,
+	}.GOBEncode()
+
+	if err != nil {
+		return fmt.Errorf("make shot attacker payload: %w", err)
+	}
+
+	if err := n.sender.SendMessage(ctx, msginfo.Message{
+		ChatID:       plr.ChatID,
+		Text:         caption,
+		Type:         msginfo.MessageTypeShotImage,
+		Payload:      payload,
+		Buttons:      []button.ButtonRow{shotButtons},
+		VisibilityAt: visibilityAt,
+	}); err != nil {
+		return fmt.Errorf("send shot image: %w", err)
 	}
 
 	return nil

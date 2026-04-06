@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/button"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/game"
@@ -11,11 +12,18 @@ import (
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/player"
 )
 
-func (n *Notifier) GameFinish(ctx context.Context, state game.State) error {
-	msg := n.makeScoreMsg("Game Finished", state)
+const (
+	gameFinishedDelay = time.Second * 2
+)
+
+func (n *Notifier) GameFinish(ctx context.Context, state game.State, finishedAt time.Time) error {
+	var (
+		msg          = n.makeScoreMsg("Game Finished", state)
+		visibilityAt = finishedAt.Add(gameFinishedDelay)
+	)
 
 	for _, plr := range state.LivePlayers() {
-		if err := n.sendMsgToPlayer(ctx, plr, msg); err != nil {
+		if err := n.sendMsgToPlayerWithVisiblity(ctx, plr, msg, visibilityAt); err != nil {
 			return fmt.Errorf("send msg to player: %w", err)
 		}
 	}
@@ -38,6 +46,30 @@ func (n *Notifier) sendMsgToPlayer(
 		Text:    msg,
 		Type:    msginfo.MessageTypeMarkdown,
 		Buttons: buttons,
+	}); err != nil {
+		return fmt.Errorf("send message: %w", err)
+	}
+
+	return nil
+}
+
+func (n *Notifier) sendMsgToPlayerWithVisiblity(
+	ctx context.Context,
+	plr game.Player,
+	msg string,
+	visibilityAt time.Time,
+	buttons ...button.ButtonRow,
+) error {
+	if plr.IsBot() {
+		return nil
+	}
+
+	if err := n.sender.SendMessage(ctx, msginfo.Message{
+		ChatID:       plr.ChatID,
+		Text:         msg,
+		Type:         msginfo.MessageTypeMarkdown,
+		Buttons:      buttons,
+		VisibilityAt: visibilityAt,
 	}); err != nil {
 		return fmt.Errorf("send message: %w", err)
 	}

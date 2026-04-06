@@ -23,6 +23,7 @@ type OutboxMessage struct {
 	RetryCount     int           `db:"retry_count"`
 	CreatedAt      time.Time     `db:"created_at"`
 	UpdatedAt      sql.NullTime  `db:"updated_at"`
+	VisibilityAt   time.Time     `db:"visibility_at"`
 }
 
 func intToNullInt64(value int) sql.NullInt64 {
@@ -45,6 +46,7 @@ func ToDBOutboxMessage(msg msginfo.Message) (OutboxMessage, error) {
 		Type:           msg.Type.Int(),
 		Payload:        msg.Payload,
 		Button:         jbButtons,
+		VisibilityAt:   msg.VisibilityAt,
 	}, nil
 }
 
