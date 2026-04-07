@@ -24,7 +24,7 @@ func (p *Postgres) SetIdleForLongReadyToGamePlayerStatus(
 				current_game_id = :current_game_id
 			WHERE
 				game_status = :game_status_ready_for_game AND
-				game_status_changd_at <= :start_search_before
+				game_status_changed_at <= :start_search_before
 			RETURNING
 				id,
 				chat_id,
