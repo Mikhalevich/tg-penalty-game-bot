@@ -93,7 +93,7 @@ func (s *ForceShot) updateGameShot(
 	currentGame game.Game,
 	currentTime time.Time,
 ) error {
-	currentGame.MakeForceShots(game.ShotSideMiddle, currentTime)
+	currentGame.MakeMissShots(currentTime)
 
 	if !currentGame.TryToCompleteRound() {
 		return nil

@@ -23,10 +23,6 @@ func (r Round) IsCompleted() bool {
 	return r.Result != RoundResultNotCompleted
 }
 
-func (r Round) IsGoal() bool {
-	return r.Result == RoundResultGoal
-}
-
 type State struct {
 	Player1         Player
 	Player2         Player
