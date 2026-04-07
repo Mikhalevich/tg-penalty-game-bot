@@ -10,6 +10,17 @@ import (
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/player"
 )
 
+type Repository interface {
+	ChangePlayerGameStatus(
+		ctx context.Context,
+		playerID player.ID,
+		gameID game.ID,
+		status player.GameStatus,
+		changedTime time.Time,
+		prevoiusStatuses ...player.GameStatus,
+	) error
+}
+
 type PlayerProvider interface {
 	GetPlayerByChatID(
 		ctx context.Context,
@@ -30,21 +41,31 @@ type TimeProvider interface {
 	Now() time.Time
 }
 
+type Notifier interface {
+	StopSearchGame(ctx context.Context, chatID msginfo.ChatID) error
+}
+
 type LeaveGame struct {
+	repo           Repository
 	playerProvider PlayerProvider
 	gameLeaver     GameLeaver
 	timeProvider   TimeProvider
+	notifier       Notifier
 }
 
 func New(
+	repo Repository,
 	playerProvider PlayerProvider,
 	gameLeaver GameLeaver,
 	timeProvider TimeProvider,
+	notifier Notifier,
 ) *LeaveGame {
 	return &LeaveGame{
+		repo:           repo,
 		playerProvider: playerProvider,
 		gameLeaver:     gameLeaver,
 		timeProvider:   timeProvider,
+		notifier:       notifier,
 	}
 }
 
@@ -59,7 +80,20 @@ func (s *LeaveGame) LeaveGame(ctx context.Context, chatID msginfo.ChatID) error 
 		return nil
 
 	case player.GameStatusReadyForGame:
-		return nil
+		if err := s.repo.ChangePlayerGameStatus(
+			ctx,
+			currentPlayer.ID,
+			"",
+			player.GameStatusIdle,
+			s.timeProvider.Now(),
+			player.GameStatusReadyForGame,
+		); err != nil {
+			return fmt.Errorf("change player status: %w", err)
+		}
+
+		if err := s.notifier.StopSearchGame(ctx, currentPlayer.ChatID); err != nil {
+			return fmt.Errorf("stop search game: %w", err)
+		}
 
 	case player.GameStatusInGame:
 		if err := s.gameLeaver.LeaveGame(

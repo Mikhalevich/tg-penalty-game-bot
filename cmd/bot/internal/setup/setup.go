@@ -76,8 +76,9 @@ func StartBot(ctx context.Context, cfg config.Config) error {
 		gameShotService        = gameshot.New(pgDB, pgDB.Transactor(), changeStatusService, notificationService)
 		playerGameShotService  = playergameshot.New(playerProvider, gameShotService, timeProvider, msgProcessor)
 		leaveGameService       = leavegame.New(pgDB, pgDB.Transactor(), changeStatusService, notificationService)
-		leavePlayerGameService = playerleavegame.New(playerProvider, leaveGameService, timeProvider)
-		leaderboardService     = leaderboard.New(pgDB, playerProvider, notificationService)
+		leavePlayerGameService = playerleavegame.New(pgDB, playerProvider,
+			leaveGameService, timeProvider, notificationService)
+		leaderboardService = leaderboard.New(pgDB, playerProvider, notificationService)
 	)
 
 	if err := app.Start(
