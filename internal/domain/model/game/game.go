@@ -165,11 +165,11 @@ func (g *Game) StartNextRound(startedAt time.Time) error {
 	return nil
 }
 
-func (g *Game) MakeForceShots(side ShotSide, shotAt time.Time) {
+func (g *Game) MakeMissShots(shotAt time.Time) {
 	round := g.currentRoundPtr()
 
-	updateIfNoShot(&round.Attack, side, shotAt)
-	updateIfNoShot(&round.Defend, side, shotAt)
+	updateIfNoShot(&round.Attack, ShotSideMiss, shotAt)
+	updateIfNoShot(&round.Defend, ShotSideMiss, shotAt)
 
 	g.StateUpdatedAt = shotAt
 }

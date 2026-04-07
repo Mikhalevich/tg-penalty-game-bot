@@ -33,11 +33,20 @@ func (n *Notifier) GameRoundFinish(ctx context.Context, state game.State) error 
 }
 
 func goalMsg(round game.Round) string {
-	if round.IsGoal() {
+	switch round.Result {
+	case game.RoundResultGoal:
 		return "Goal"
+
+	case game.RoundResultSave:
+		return "Save"
+
+	case game.RoundResultMiss:
+		return "Miss"
+
+	case game.RoundResultNotCompleted:
 	}
 
-	return "Save"
+	return ""
 }
 
 func shotImageTypeByPlayerID(playerID, attackerID player.ID) shotimage.ImageType {
