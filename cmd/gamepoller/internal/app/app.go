@@ -21,21 +21,28 @@ type LeaderboradRefresher interface {
 	RefreshScoreLeaderboard(ctx context.Context) error
 }
 
+type ExpiredSearchGamer interface {
+	StopSearch(ctx context.Context, searchPeriod time.Duration) error
+}
+
 type App struct {
 	matchmakingProcessor  MatchmakingProcessor
 	expiredShotsProcessor ExpiredShotsProcessor
 	leaderboradRefresher  LeaderboradRefresher
+	expiredSearchGamer    ExpiredSearchGamer
 }
 
 func New(
 	matchmakingProcessor MatchmakingProcessor,
 	expiredShotsProcessor ExpiredShotsProcessor,
 	leaderboradRefresher LeaderboradRefresher,
+	expiredSearchGamer ExpiredSearchGamer,
 ) *App {
 	return &App{
 		matchmakingProcessor:  matchmakingProcessor,
 		expiredShotsProcessor: expiredShotsProcessor,
 		leaderboradRefresher:  leaderboradRefresher,
+		expiredSearchGamer:    expiredSearchGamer,
 	}
 }
 
@@ -44,6 +51,7 @@ func (a *App) Run(
 	matchmakingCfg config.Worker,
 	expiredShotsCfg config.ExpiredShotsWorker,
 	leaderboardCfg config.Worker,
+	expiredSearchGameCfg config.ExpiredSearchGameWorker,
 ) {
 	var wgr sync.WaitGroup
 
@@ -69,6 +77,12 @@ func (a *App) Run(
 	runWorkers(ctx, "leaderboard refresher", leaderboardCfg.Count, leaderboardCfg.Interval, &wgr,
 		func(ctx context.Context) error {
 			return a.leaderboradRefresher.RefreshScoreLeaderboard(ctx)
+		},
+	)
+
+	runWorkers(ctx, "expired search game", expiredSearchGameCfg.Count, expiredSearchGameCfg.Interval, &wgr,
+		func(ctx context.Context) error {
+			return a.expiredSearchGamer.StopSearch(ctx, expiredSearchGameCfg.SearchExpireDuration)
 		},
 	)
 
