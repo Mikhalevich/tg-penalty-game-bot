@@ -5,9 +5,10 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/jmoiron/sqlx"
+
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/adapter/repository/postgres/model"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/player"
-	"github.com/jmoiron/sqlx"
 )
 
 func (p *Postgres) SetIdleForLongReadyToGamePlayerStatus(
@@ -20,7 +21,7 @@ func (p *Postgres) SetIdleForLongReadyToGamePlayerStatus(
 			UPDATE player SET
 				game_status = :game_status_idle,
 				game_status_changed_at = :game_status_changed_at,
-				current_game_id = :current_game_id,
+				current_game_id = :current_game_id
 			WHERE
 				game_status = :game_status_ready_for_game AND
 				game_status_changd_at <= :start_search_before
