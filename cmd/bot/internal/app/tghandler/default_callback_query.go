@@ -8,6 +8,7 @@ import (
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/button"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/game"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/msginfo"
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/perror"
 )
 
 func (t *TGHandler) DefaultCallbackQuery(ctx context.Context, msg tgbot.BotMessage, sender tgbot.MessageSender) error {
@@ -22,6 +23,12 @@ func (t *TGHandler) DefaultCallbackQuery(ctx context.Context, msg tgbot.BotMessa
 
 	btn, err := t.buttonProvider.GetButton(ctx, button.IDFromString(msg.Data))
 	if err != nil {
+		if perror.IsType(err, perror.TypeNotFound) {
+			sender.SendMessage(ctx, msg.ChatID, "Button expired")
+
+			return nil
+		}
+
 		return fmt.Errorf("get button: %w", err)
 	}
 
