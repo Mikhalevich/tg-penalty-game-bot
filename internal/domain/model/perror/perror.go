@@ -28,8 +28,7 @@ func ParseError(err error) Error {
 }
 
 func IsType(err error, t Type) bool {
-	var perr Error
-	if errors.As(err, &perr) {
+	if perr, ok := errors.AsType[Error](err); ok {
 		if perr.Type == t {
 			return true
 		}
@@ -39,8 +38,7 @@ func IsType(err error, t Type) bool {
 }
 
 func IsTypeWithError(err error, t Type) (Error, bool) {
-	var perr Error
-	if errors.As(err, &perr) {
+	if perr, ok := errors.AsType[Error](err); ok {
 		if perr.Type == t {
 			return perr, true
 		}
