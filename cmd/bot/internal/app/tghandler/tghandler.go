@@ -28,7 +28,7 @@ type ChangeName interface {
 
 type FindGame interface {
 	FindGame(ctx context.Context, chatID msginfo.ChatID) error
-	StopFind(ctx context.Context, chatID msginfo.ChatID) error
+	StopFind(ctx context.Context, chatID msginfo.ChatID, messageID msginfo.MessageID) error
 }
 
 type StartGame interface {
@@ -38,7 +38,7 @@ type StartGame interface {
 }
 
 type LeaveGame interface {
-	LeaveGame(ctx context.Context, chatID msginfo.ChatID) error
+	LeaveGame(ctx context.Context, chatID msginfo.ChatID, messageID msginfo.MessageID) error
 }
 
 type Leaderboard interface {
