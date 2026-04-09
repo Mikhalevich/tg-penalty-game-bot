@@ -33,6 +33,14 @@ type ShotStater interface {
 	ShotState(ctx context.Context, currentPlayer player.Player) error
 }
 
+type MessageDeleter interface {
+	DeleteMessage(
+		ctx context.Context,
+		chatID msginfo.ChatID,
+		messageID msginfo.MessageID,
+	) error
+}
+
 type Notifier interface {
 	SearchGame(ctx context.Context, chatID msginfo.ChatID) error
 	StopSearchGame(ctx context.Context, chatID msginfo.ChatID) error
@@ -43,6 +51,7 @@ type FindGame struct {
 	playerProvider PlayerProvider
 	timeProvider   TimeProvider
 	shotStater     ShotStater
+	messageDeleter MessageDeleter
 	notifier       Notifier
 }
 
@@ -51,6 +60,7 @@ func New(
 	playerProvider PlayerProvider,
 	timeProvider TimeProvider,
 	shotStater ShotStater,
+	messageDeleter MessageDeleter,
 	notifier Notifier,
 ) *FindGame {
 	return &FindGame{
@@ -58,6 +68,7 @@ func New(
 		playerProvider: playerProvider,
 		timeProvider:   timeProvider,
 		shotStater:     shotStater,
+		messageDeleter: messageDeleter,
 		notifier:       notifier,
 	}
 }

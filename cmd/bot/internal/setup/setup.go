@@ -65,9 +65,10 @@ func StartBot(ctx context.Context, cfg config.Config) error {
 		welcomeService      = welcome.New(playerProvider, notificationService)
 		changeNameService   = changename.New(pgDB, playerProvider, timeProvider,
 			notificationService, cfg.ChangeNameInterval)
-		getGameService         = getgame.New(pgDB)
-		gameShotStateService   = gameshotstate.New(getGameService, notificationService)
-		findGameSerivce        = findgame.New(pgDB, playerProvider, timeProvider, gameShotStateService, notificationService)
+		getGameService       = getgame.New(pgDB)
+		gameShotStateService = gameshotstate.New(getGameService, notificationService)
+		findGameSerivce      = findgame.New(pgDB, playerProvider, timeProvider,
+			gameShotStateService, msgProcessor, notificationService)
 		changeStatusService    = changestatus.New(pgDB)
 		startGameService       = startgame.New(pgDB, pgDB.Transactor(), changeStatusService, notificationService)
 		joinGameService        = joingame.New(pgDB, pgDB.Transactor(), changeStatusService, notificationService)
@@ -77,7 +78,7 @@ func StartBot(ctx context.Context, cfg config.Config) error {
 		playerGameShotService  = playergameshot.New(playerProvider, gameShotService, timeProvider, msgProcessor)
 		leaveGameService       = leavegame.New(pgDB, pgDB.Transactor(), changeStatusService, notificationService)
 		leavePlayerGameService = playerleavegame.New(pgDB, playerProvider,
-			leaveGameService, timeProvider, notificationService)
+			leaveGameService, timeProvider, msgProcessor, notificationService)
 		leaderboardService = leaderboard.New(pgDB, playerProvider, notificationService)
 	)
 
