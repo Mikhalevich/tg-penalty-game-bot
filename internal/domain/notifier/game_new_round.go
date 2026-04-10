@@ -17,7 +17,7 @@ const (
 	missSymbol       = "❌"
 	leftSideSymbol   = "👈"
 	rightSideSymbol  = "👉"
-	middleSideSymbol = "🖐"
+	middleSideSymbol = "👆"
 )
 
 const (
