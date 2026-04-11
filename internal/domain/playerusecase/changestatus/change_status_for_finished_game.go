@@ -14,7 +14,7 @@ func (c *ChangeStatus) ChangeStatusForFinishedGame(
 	finishedGame game.Game,
 	finishedAt time.Time,
 ) error {
-	if finishedGame.Type == game.GameTypeFriendly {
+	if !finishedGame.IsRatingGame() {
 		if err := c.repo.ChangePlayersGameStatus(
 			ctx,
 			finishedGame.PlayerIDs(),

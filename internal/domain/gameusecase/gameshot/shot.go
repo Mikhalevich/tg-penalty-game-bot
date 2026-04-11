@@ -125,8 +125,10 @@ func (g *GameShot) finishGame(
 		return fmt.Errorf("change players game status: %w", err)
 	}
 
-	if err := g.repo.InsertShots(ctx, currentGame.State.CompletedShots()); err != nil {
-		return fmt.Errorf("insert shots: %w", err)
+	if currentGame.IsRatingGame() {
+		if err := g.repo.InsertShots(ctx, currentGame.State.CompletedShots()); err != nil {
+			return fmt.Errorf("insert shots: %w", err)
+		}
 	}
 
 	if err := g.notifier.GameFinish(ctx, currentGame.State, currentGame.StateUpdatedAt); err != nil {

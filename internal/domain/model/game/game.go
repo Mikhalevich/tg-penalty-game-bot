@@ -55,6 +55,10 @@ func (g *Game) IsInProgress() bool {
 	return g.Status == GameStatusInProgress
 }
 
+func (g *Game) IsRatingGame() bool {
+	return g.Type == GameTypeRating
+}
+
 func (g *Game) Cancel(canceledAt time.Time) {
 	g.Status = GameStatusCanceled
 	g.StateUpdatedAt = canceledAt
