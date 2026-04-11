@@ -32,6 +32,10 @@ func LeaveGameButton(caption string) button.Button {
 	return button.CreateButtonWithoutPayload(caption, button.OperationLeaveGame)
 }
 
+func ShotStatsButton(caption string) button.Button {
+	return button.CreateButtonWithoutPayload(caption, button.OperationShotStats)
+}
+
 func StopSearchGame(caption string) button.Button {
 	return button.CreateButtonWithoutPayload(caption, button.OperationStopSearchGame)
 }

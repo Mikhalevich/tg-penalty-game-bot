@@ -23,6 +23,7 @@ import (
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/gameusecase/getgame"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/gameusecase/joingame"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/gameusecase/leavegame"
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/gameusecase/shotstats"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/gameusecase/startgame"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/messageprocessor"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/notifier"
@@ -35,9 +36,11 @@ import (
 	playerleavegame "github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playerusecase/leavegame"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playerusecase/playerprovider"
 	playerstartgame "github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playerusecase/startgame"
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playerusecase/viewstats"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playerusecase/welcome"
 )
 
+//nolint:funlen
 func StartBot(ctx context.Context, cfg config.Config) error {
 	botAPI, err := bot.New(cfg.Bot.Token, bot.WithSkipGetMe())
 	if err != nil {
@@ -80,6 +83,9 @@ func StartBot(ctx context.Context, cfg config.Config) error {
 		leavePlayerGameService = playerleavegame.New(pgDB, playerProvider,
 			leaveGameService, timeProvider, msgProcessor, notificationService)
 		leaderboardService = leaderboard.New(pgDB, playerProvider, notificationService)
+		shotStatService    = shotstats.New(pgDB)
+		viewStatsService   = viewstats.New(playerProvider, getGameService,
+			shotStatService, msgProcessor, notificationService)
 	)
 
 	if err := app.Start(
@@ -94,6 +100,7 @@ func StartBot(ctx context.Context, cfg config.Config) error {
 		playerGameShotService,
 		leavePlayerGameService,
 		leaderboardService,
+		viewStatsService,
 	); err != nil {
 		return fmt.Errorf("app start: %w", err)
 	}

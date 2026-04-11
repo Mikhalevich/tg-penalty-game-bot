@@ -6,12 +6,12 @@ import (
 	"time"
 
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/game"
-	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/player"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/infra/logger"
 )
 
 type Repository interface {
 	GetShotExpiredRatingGames(ctx context.Context, expiredTime time.Time, limit int) ([]game.Game, error)
+	InsertShots(ctx context.Context, shots []game.Shot) error
 	UpdateGame(ctx context.Context, game game.Game) error
 }
 
@@ -20,11 +20,10 @@ type TimeProvider interface {
 }
 
 type PlayerStatusChanger interface {
-	ChangePlayersGameStatus(
+	ChangeStatusForFinishedGame(
 		ctx context.Context,
-		playerIDs []player.ID,
-		status player.GameStatus,
-		changedAt time.Time,
+		finishedGame game.Game,
+		finishedAt time.Time,
 	) error
 }
 
@@ -103,7 +102,7 @@ func (s *ForceShot) updateGameShot(
 		return fmt.Errorf("round finish: %w", err)
 	}
 
-	if err := s.startNextRound(ctx, &currentGame, currentTime); err != nil {
+	if err := s.startNewRound(ctx, &currentGame, currentTime); err != nil {
 		return fmt.Errorf("start next round: %w", err)
 	}
 
@@ -114,7 +113,7 @@ func (s *ForceShot) updateGameShot(
 	return nil
 }
 
-func (s *ForceShot) startNextRound(
+func (s *ForceShot) startNewRound(
 	ctx context.Context,
 	currentGame *game.Game,
 	startedAt time.Time,
@@ -123,21 +122,42 @@ func (s *ForceShot) startNextRound(
 		return fmt.Errorf("start next round: %w", err)
 	}
 
-	if !currentGame.IsFinished() {
-		if err := s.notifier.GameNewRound(ctx, currentGame.ID, currentGame.State); err != nil {
-			return fmt.Errorf("start next round: %w", err)
+	if currentGame.IsFinished() {
+		if err := s.finishGame(ctx, currentGame, startedAt); err != nil {
+			return fmt.Errorf("finish game: %w", err)
 		}
 
 		return nil
 	}
 
-	if err := s.playerStatusChanger.ChangePlayersGameStatus(
+	if err := s.notifier.GameNewRound(
 		ctx,
-		currentGame.PlayerIDs(),
-		player.GameStatusIdle,
-		startedAt,
+		currentGame.ID,
+		currentGame.State,
+	); err != nil {
+		return fmt.Errorf("start next round: %w", err)
+	}
+
+	return nil
+}
+
+func (s *ForceShot) finishGame(
+	ctx context.Context,
+	currentGame *game.Game,
+	finishedAt time.Time,
+) error {
+	if err := s.playerStatusChanger.ChangeStatusForFinishedGame(
+		ctx,
+		*currentGame,
+		finishedAt,
 	); err != nil {
 		return fmt.Errorf("change players game status: %w", err)
+	}
+
+	if currentGame.IsRatingGame() {
+		if err := s.repo.InsertShots(ctx, currentGame.State.CompletedShots()); err != nil {
+			return fmt.Errorf("insert shots: %w", err)
+		}
 	}
 
 	if err := s.notifier.GameFinish(ctx, currentGame.State, currentGame.StateUpdatedAt); err != nil {

@@ -45,6 +45,14 @@ type Leaderboard interface {
 	Page(ctx context.Context, chatID msginfo.ChatID, messageID msginfo.MessageID, pageNumber int) error
 }
 
+type ShotStats interface {
+	ViewStatsOnStartGameMessage(
+		ctx context.Context,
+		chatID msginfo.ChatID,
+		messageID msginfo.MessageID,
+	) error
+}
+
 type GameShot interface {
 	Shot(
 		ctx context.Context,
@@ -66,6 +74,7 @@ type TGHandler struct {
 	gameShot       GameShot
 	leaveGame      LeaveGame
 	leaderboard    Leaderboard
+	shotStats      ShotStats
 }
 
 func New(
@@ -78,6 +87,7 @@ func New(
 	gameShot GameShot,
 	leaveGame LeaveGame,
 	leaderboard Leaderboard,
+	shotStats ShotStats,
 ) *TGHandler {
 	return &TGHandler{
 		buttonProvider: buttonProvider,
@@ -89,5 +99,6 @@ func New(
 		gameShot:       gameShot,
 		leaveGame:      leaveGame,
 		leaderboard:    leaderboard,
+		shotStats:      shotStats,
 	}
 }

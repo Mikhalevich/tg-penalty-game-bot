@@ -34,7 +34,8 @@ CREATE TYPE shot_side AS ENUM (
     'no_shot',
     'left',
     'right',
-    'middle'
+    'middle',
+    'miss'
 );
 
 CREATE TABLE shot(
@@ -46,10 +47,12 @@ CREATE TABLE shot(
     side shot_side NOT NULL DEFAULT 'no_shot',
     completed_at TIMESTAMPTZ,
 
+    CONSTRAINT pk_shots PRIMARY KEY (game_id, player_id, round),
     CONSTRAINT fk_shots_player FOREIGN KEY(player_id) REFERENCES player(id),
-    CONSTRAINT fk_shots_game FOREIGN KEY(game_id) REFERENCES game(id),
-    CONSTRAINT pk_shots PRIMARY KEY (game_id, player_id, round)
+    CONSTRAINT fk_shots_game FOREIGN KEY(game_id) REFERENCES game(id)
 );
+
+CREATE INDEX shot_player_id_created_at_idx ON shot(player_id, shot_type, created_at);
 
 -- +migrate Down
 -- SQL section 'Down' is executed when this migration is rolled back

@@ -42,6 +42,9 @@ func (t *TGHandler) DefaultCallbackQuery(ctx context.Context, msg tgbot.BotMessa
 	case button.OperationLeaveGame:
 		return t.processLeaveGameButton(ctx, chatID, msgID)
 
+	case button.OperationShotStats:
+		return t.processShotStatsOnStartGameMessage(ctx, chatID, msgID)
+
 	case button.OperationStopSearchGame:
 		return t.processStopFindButton(ctx, chatID, msgID)
 
@@ -125,6 +128,18 @@ func (t *TGHandler) processLeaderboardPage(
 
 	if err := t.leaderboard.Page(ctx, chatID, messageID, payload.PageNumber); err != nil {
 		return fmt.Errorf("leaderboard player: %w", err)
+	}
+
+	return nil
+}
+
+func (t *TGHandler) processShotStatsOnStartGameMessage(
+	ctx context.Context,
+	chatID msginfo.ChatID,
+	messageID msginfo.MessageID,
+) error {
+	if err := t.shotStats.ViewStatsOnStartGameMessage(ctx, chatID, messageID); err != nil {
+		return fmt.Errorf("view stats on start game msg: %w", err)
 	}
 
 	return nil
