@@ -52,6 +52,8 @@ CREATE TABLE shot(
     CONSTRAINT fk_shots_game FOREIGN KEY(game_id) REFERENCES game(id)
 );
 
+CREATE INDEX shot_player_id_created_at_idx ON shot(player_id, shot_type, created_at);
+
 -- +migrate Down
 -- SQL section 'Down' is executed when this migration is rolled back
 

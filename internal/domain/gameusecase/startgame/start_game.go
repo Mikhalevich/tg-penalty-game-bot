@@ -34,7 +34,11 @@ type PlayerStatusChanger interface {
 
 type Notifier interface {
 	GameNewRound(ctx context.Context, gameID game.ID, state game.State) error
-	GameStart(ctx context.Context, player1, player2 game.Player) error
+	GameStart(
+		ctx context.Context,
+		gameType game.GameType,
+		player1, player2 game.Player,
+	) error
 	GameLink(ctx context.Context, chatID msginfo.ChatID, gameID game.ID) error
 }
 
@@ -117,7 +121,9 @@ func (s *StartGame) sendNotificationForCreatedGame(ctx context.Context, currentG
 		}
 
 	case game.GameStatusInProgress:
-		if err := s.notifier.GameStart(ctx, currentGame.State.Player1, currentGame.State.Player2); err != nil {
+		if err := s.notifier.GameStart(ctx, currentGame.Type,
+			currentGame.State.Player1, currentGame.State.Player2,
+		); err != nil {
 			return fmt.Errorf("start game: %w", err)
 		}
 

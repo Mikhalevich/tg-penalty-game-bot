@@ -28,7 +28,11 @@ type PlayerStatusChanger interface {
 }
 
 type Notifier interface {
-	GameStart(ctx context.Context, player1, player2 game.Player) error
+	GameStart(
+		ctx context.Context,
+		gameType game.GameType,
+		player1, player2 game.Player,
+	) error
 	GameNewRound(ctx context.Context, gameID game.ID, state game.State) error
 }
 
@@ -91,7 +95,9 @@ func (j *JoinGame) processJoin(
 			return fmt.Errorf("join player: %w", err)
 		}
 
-		if err := j.notifier.GameStart(ctx, currentGame.State.Player1, currentGame.State.Player2); err != nil {
+		if err := j.notifier.GameStart(ctx, currentGame.Type,
+			currentGame.State.Player1, currentGame.State.Player2,
+		); err != nil {
 			return fmt.Errorf("start game: %w", err)
 		}
 
