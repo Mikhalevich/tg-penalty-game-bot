@@ -4,6 +4,10 @@ import (
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/player"
 )
 
+const (
+	shotsPerRound = 2
+)
+
 type RoundResult int
 
 const (
@@ -60,4 +64,18 @@ func (s State) PlayerByID(playerID player.ID) Player {
 	}
 
 	return s.Player2
+}
+
+func (s State) CompletedShots() []Shot {
+	shots := make([]Shot, 0, len(s.Rounds)*shotsPerRound)
+
+	for _, round := range s.Rounds {
+		if !round.IsCompleted() {
+			continue
+		}
+
+		shots = append(shots, round.Attack, round.Defend)
+	}
+
+	return shots
 }
