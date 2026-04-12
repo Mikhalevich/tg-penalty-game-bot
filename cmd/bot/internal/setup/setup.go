@@ -67,7 +67,7 @@ func StartBot(ctx context.Context, cfg config.Config) error {
 		playerProvider      = playerprovider.New(pgDB, nameGenerator, timeProvider)
 		welcomeService      = welcome.New(playerProvider, notificationService)
 		changeNameService   = changename.New(pgDB, playerProvider, timeProvider,
-			notificationService, cfg.ChangeNameInterval)
+			notificationService, cfg.ChangeName.RetryInterval, cfg.ChangeName.MaxLen)
 		getGameService       = getgame.New(pgDB)
 		gameShotStateService = gameshotstate.New(getGameService, notificationService)
 		findGameSerivce      = findgame.New(pgDB, playerProvider, timeProvider,

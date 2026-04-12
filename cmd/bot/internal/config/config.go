@@ -11,7 +11,7 @@ type Config struct {
 	Postgres            Postgres            `yaml:"postgres" required:"true"`
 	ButtonRedis         ButtonRedis         `yaml:"button_redis" required:"true"`
 	RandomNameGenerator RandomNameGenerator `yaml:"random_name_generator" required:"true"`
-	ChangeNameInterval  time.Duration       `yaml:"change_name_interval" required:"true"`
+	ChangeName          ChangeName          `yaml:"change_name" required:"true"`
 }
 
 func (c *Config) Level() string {
@@ -49,4 +49,9 @@ type ButtonRedis struct {
 type RandomNameGenerator struct {
 	Prefix string `yaml:"prefix" required:"true"`
 	Length int    `yaml:"length" required:"true"`
+}
+
+type ChangeName struct {
+	MaxLen        int           `yaml:"max_len" required:"true"`
+	RetryInterval time.Duration `yaml:"retry_interval" required:"true"`
 }
