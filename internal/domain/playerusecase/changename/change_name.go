@@ -28,6 +28,7 @@ type Notifier interface {
 	ChangeName(ctx context.Context, plr player.Player, fullName, userName string) error
 	NameChanged(ctx context.Context, plr player.Player, msgID msginfo.MessageID) error
 	NameAlreadyRegistered(ctx context.Context, plr player.Player, msgID msginfo.MessageID) error
+	NameIsTooLong(ctx context.Context, chatID msginfo.ChatID, maxNameLen int) error
 }
 
 type ChangeName struct {
@@ -36,6 +37,7 @@ type ChangeName struct {
 	timeProvider      TimeProvider
 	notifier          Notifier
 	changeNameTimeout time.Duration
+	maxNameLen        int
 }
 
 func New(
@@ -44,6 +46,7 @@ func New(
 	timeProvider TimeProvider,
 	notifier Notifier,
 	changeNameTimeout time.Duration,
+	maxNameLen int,
 ) *ChangeName {
 	return &ChangeName{
 		repo:              repo,
@@ -51,5 +54,6 @@ func New(
 		timeProvider:      timeProvider,
 		notifier:          notifier,
 		changeNameTimeout: changeNameTimeout,
+		maxNameLen:        maxNameLen,
 	}
 }

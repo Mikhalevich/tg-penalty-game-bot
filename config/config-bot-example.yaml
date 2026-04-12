@@ -14,4 +14,6 @@ button_redis:
 random_name_generator:
   prefix: "player_"
   length: 5
-change_name_interval: 24h
+change_name:
+  max_len: 255
+  retry_interval: 24h
