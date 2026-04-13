@@ -3,6 +3,7 @@ package tghandler
 import (
 	"context"
 
+	"github.com/Mikhalevich/tg-penalty-game-bot/cmd/bot/internal/app/tgbot"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/button"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/game"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/msginfo"
@@ -64,7 +65,10 @@ type GameShot interface {
 	) error
 }
 
+type cbHandler func(ctx context.Context, msg tgbot.BotMessage, btn *button.Button) error
+
 type TGHandler struct {
+	cbHanlers      map[button.Operation]cbHandler
 	buttonProvider ButtonProvider
 	playerProvider PlayerProvider
 	welcome        Welcome
@@ -89,7 +93,7 @@ func New(
 	leaderboard Leaderboard,
 	shotStats ShotStats,
 ) *TGHandler {
-	return &TGHandler{
+	tgh := &TGHandler{
 		buttonProvider: buttonProvider,
 		playerProvider: playerProvider,
 		welcome:        welcome,
@@ -100,5 +104,21 @@ func New(
 		leaveGame:      leaveGame,
 		leaderboard:    leaderboard,
 		shotStats:      shotStats,
+	}
+
+	tgh.registerCBHandlers()
+
+	return tgh
+}
+
+func (t *TGHandler) registerCBHandlers() {
+	t.cbHanlers = map[button.Operation]cbHandler{
+		button.OperationChangeName:        t.cbChangeName,
+		button.OperationChangeNameTrigger: t.cbChangeNameTrigger,
+		button.OperationShotSide:          t.cbShotSide,
+		button.OperationLeaveGame:         t.cbLeaveGame,
+		button.OperationShotStats:         t.cbShotStatsOnStartGameMessage,
+		button.OperationStopSearchGame:    t.cbStopFindButton,
+		button.OperationLeaderboardPage:   t.cbLeaderboardPage,
 	}
 }
