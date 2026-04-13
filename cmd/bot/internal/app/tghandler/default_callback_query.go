@@ -11,16 +11,10 @@ import (
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/perror"
 )
 
-//nolint:cyclop
 func (t *TGHandler) DefaultCallbackQuery(ctx context.Context, msg tgbot.BotMessage, sender tgbot.MessageSender) error {
 	if msg.Data == "" {
 		return nil
 	}
-
-	var (
-		chatID = msginfo.ChatIDFromInt64(msg.ChatID)
-		msgID  = msginfo.MessageIDFromInt(msg.MessageID)
-	)
 
 	btn, err := t.buttonProvider.GetButton(ctx, button.IDFromString(msg.Data))
 	if err != nil {
@@ -33,36 +27,21 @@ func (t *TGHandler) DefaultCallbackQuery(ctx context.Context, msg tgbot.BotMessa
 		return fmt.Errorf("get button: %w", err)
 	}
 
-	switch btn.Operation {
-	case button.OperationChangeName:
-		return t.processChangeNameButton(ctx, chatID, msgID, btn)
+	hndlr, ok := t.cbHanlers[btn.Operation]
+	if !ok {
+		return fmt.Errorf("invalid operation %v", btn.Operation)
+	}
 
-	case button.OperationChangeNameTrigger:
-		return t.processChangeNameTriggerButton(ctx, chatID, msg.User.FullName(), msg.User.Username)
-
-	case button.OperationShotSide:
-		return t.processShotSideButton(ctx, chatID, msgID, btn)
-
-	case button.OperationLeaveGame:
-		return t.processLeaveGameButton(ctx, chatID, msgID)
-
-	case button.OperationShotStats:
-		return t.processShotStatsOnStartGameMessage(ctx, chatID, msgID)
-
-	case button.OperationStopSearchGame:
-		return t.processStopFindButton(ctx, chatID, msgID)
-
-	case button.OperationLeaderboardPage:
-		return t.processLeaderboardPage(ctx, chatID, msgID, btn)
+	if err := hndlr(ctx, msg, btn); err != nil {
+		return fmt.Errorf("process cb handler: %w", err)
 	}
 
 	return nil
 }
 
-func (t *TGHandler) processChangeNameButton(
+func (t *TGHandler) cbChangeName(
 	ctx context.Context,
-	chatID msginfo.ChatID,
-	msgID msginfo.MessageID,
+	msg tgbot.BotMessage,
 	btn *button.Button,
 ) error {
 	payload, err := button.GetPayload[button.ChangeNamePayload](*btn)
@@ -70,24 +49,28 @@ func (t *TGHandler) processChangeNameButton(
 		return fmt.Errorf("get payload: %w", err)
 	}
 
-	if err := t.changeDisplayName(ctx, chatID, msgID, payload.DisplayName); err != nil {
+	if err := t.changeDisplayName(
+		ctx,
+		msginfo.ChatIDFromInt64(msg.ChatID),
+		msginfo.MessageIDFromInt(msg.MessageID),
+		payload.DisplayName,
+	); err != nil {
 		return fmt.Errorf("change display name: %w", err)
 	}
 
 	return nil
 }
 
-func (t *TGHandler) processChangeNameTriggerButton(
+func (t *TGHandler) cbChangeNameTrigger(
 	ctx context.Context,
-	chatID msginfo.ChatID,
-	fullName string,
-	userName string,
+	msg tgbot.BotMessage,
+	btn *button.Button,
 ) error {
 	if err := t.changeName.SetChangeDisplayNameTrigger(
 		ctx,
-		chatID,
-		fullName,
-		userName,
+		msginfo.ChatIDFromInt64(msg.ChatID),
+		msg.User.FullName(),
+		msg.User.Username,
 	); err != nil {
 		return fmt.Errorf("set change name trigger: %w", err)
 	}
@@ -95,10 +78,9 @@ func (t *TGHandler) processChangeNameTriggerButton(
 	return nil
 }
 
-func (t *TGHandler) processShotSideButton(
+func (t *TGHandler) cbShotSide(
 	ctx context.Context,
-	chatID msginfo.ChatID,
-	msgID msginfo.MessageID,
+	msg tgbot.BotMessage,
 	btn *button.Button,
 ) error {
 	payload, err := button.GetPayload[game.ShotSidePayload](*btn)
@@ -106,41 +88,71 @@ func (t *TGHandler) processShotSideButton(
 		return fmt.Errorf("get payload: %w", err)
 	}
 
-	if err := t.gameShot.Shot(ctx, chatID, msgID, payload.GameID, payload.Round, payload.Side); err != nil {
+	if err := t.gameShot.Shot(
+		ctx,
+		msginfo.ChatIDFromInt64(msg.ChatID),
+		msginfo.MessageIDFromInt(msg.MessageID),
+		payload.GameID,
+		payload.Round,
+		payload.Side,
+	); err != nil {
 		return fmt.Errorf("shot: %w", err)
 	}
 
 	return nil
 }
 
-func (t *TGHandler) processLeaveGameButton(
+func (t *TGHandler) cbLeaveGame(
 	ctx context.Context,
-	chatID msginfo.ChatID,
-	messageID msginfo.MessageID,
+	msg tgbot.BotMessage,
+	btn *button.Button,
 ) error {
-	if err := t.leaveGame.LeaveGame(ctx, chatID, messageID); err != nil {
+	if err := t.leaveGame.LeaveGame(
+		ctx,
+		msginfo.ChatIDFromInt64(msg.ChatID),
+		msginfo.MessageIDFromInt(msg.MessageID),
+	); err != nil {
 		return fmt.Errorf("leave game: %w", err)
 	}
 
 	return nil
 }
 
-func (t *TGHandler) processStopFindButton(
+func (t *TGHandler) cbShotStatsOnStartGameMessage(
 	ctx context.Context,
-	chatID msginfo.ChatID,
-	messageID msginfo.MessageID,
+	msg tgbot.BotMessage,
+	btn *button.Button,
 ) error {
-	if err := t.findGame.StopFind(ctx, chatID, messageID); err != nil {
+	if err := t.shotStats.ViewStatsOnStartGameMessage(
+		ctx,
+		msginfo.ChatIDFromInt64(msg.ChatID),
+		msginfo.MessageIDFromInt(msg.MessageID),
+	); err != nil {
+		return fmt.Errorf("view stats on start game msg: %w", err)
+	}
+
+	return nil
+}
+
+func (t *TGHandler) cbStopFindButton(
+	ctx context.Context,
+	msg tgbot.BotMessage,
+	btn *button.Button,
+) error {
+	if err := t.findGame.StopFind(
+		ctx,
+		msginfo.ChatIDFromInt64(msg.ChatID),
+		msginfo.MessageIDFromInt(msg.MessageID),
+	); err != nil {
 		return fmt.Errorf("stop find: %w", err)
 	}
 
 	return nil
 }
 
-func (t *TGHandler) processLeaderboardPage(
+func (t *TGHandler) cbLeaderboardPage(
 	ctx context.Context,
-	chatID msginfo.ChatID,
-	messageID msginfo.MessageID,
+	msg tgbot.BotMessage,
 	btn *button.Button,
 ) error {
 	payload, err := button.GetPayload[button.LeaderboardPagePayload](*btn)
@@ -148,20 +160,13 @@ func (t *TGHandler) processLeaderboardPage(
 		return fmt.Errorf("leaderboard page payload: %w", err)
 	}
 
-	if err := t.leaderboard.Page(ctx, chatID, messageID, payload.PageNumber); err != nil {
+	if err := t.leaderboard.Page(
+		ctx,
+		msginfo.ChatIDFromInt64(msg.ChatID),
+		msginfo.MessageIDFromInt(msg.MessageID),
+		payload.PageNumber,
+	); err != nil {
 		return fmt.Errorf("leaderboard player: %w", err)
-	}
-
-	return nil
-}
-
-func (t *TGHandler) processShotStatsOnStartGameMessage(
-	ctx context.Context,
-	chatID msginfo.ChatID,
-	messageID msginfo.MessageID,
-) error {
-	if err := t.shotStats.ViewStatsOnStartGameMessage(ctx, chatID, messageID); err != nil {
-		return fmt.Errorf("view stats on start game msg: %w", err)
 	}
 
 	return nil
