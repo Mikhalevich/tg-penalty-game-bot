@@ -11,6 +11,7 @@ import (
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/perror"
 )
 
+//nolint:cyclop
 func (t *TGHandler) DefaultCallbackQuery(ctx context.Context, msg tgbot.BotMessage, sender tgbot.MessageSender) error {
 	if msg.Data == "" {
 		return nil
@@ -35,6 +36,9 @@ func (t *TGHandler) DefaultCallbackQuery(ctx context.Context, msg tgbot.BotMessa
 	switch btn.Operation {
 	case button.OperationChangeName:
 		return t.processChangeNameButton(ctx, chatID, msgID, btn)
+
+	case button.OperationChangeNameTrigger:
+		return t.processChangeNameTriggerButton(ctx, chatID, msg.User.FullName(), msg.User.Username)
 
 	case button.OperationShotSide:
 		return t.processShotSideButton(ctx, chatID, msgID, btn)
@@ -68,6 +72,24 @@ func (t *TGHandler) processChangeNameButton(
 
 	if err := t.changeDisplayName(ctx, chatID, msgID, payload.DisplayName); err != nil {
 		return fmt.Errorf("change display name: %w", err)
+	}
+
+	return nil
+}
+
+func (t *TGHandler) processChangeNameTriggerButton(
+	ctx context.Context,
+	chatID msginfo.ChatID,
+	fullName string,
+	userName string,
+) error {
+	if err := t.changeName.SetChangeDisplayNameTrigger(
+		ctx,
+		chatID,
+		fullName,
+		userName,
+	); err != nil {
+		return fmt.Errorf("set change name trigger: %w", err)
 	}
 
 	return nil

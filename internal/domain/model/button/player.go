@@ -11,3 +11,7 @@ func ChangeName(caption, displayName string) (Button, error) {
 		},
 	)
 }
+
+func ChangeNameTrigger(caption string) Button {
+	return CreateButtonWithoutPayload(caption, OperationChangeNameTrigger)
+}

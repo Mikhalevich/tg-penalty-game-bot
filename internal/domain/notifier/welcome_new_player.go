@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/button"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/msginfo"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/player"
 )
@@ -16,6 +17,11 @@ func (n *Notifier) WelcomeNewPlayer(ctx context.Context, plr player.Player) erro
 		ChatID: plr.ChatID,
 		Text:   welcomeMsg,
 		Type:   msginfo.MessageTypeMarkdown,
+		Buttons: []button.ButtonRow{
+			{
+				button.ChangeNameTrigger("Change name"),
+			},
+		},
 	}); err != nil {
 		return fmt.Errorf("send message: %w", err)
 	}
