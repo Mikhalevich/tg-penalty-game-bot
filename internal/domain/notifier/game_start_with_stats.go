@@ -14,14 +14,14 @@ func (n *Notifier) StartGameWithStats(
 	ctx context.Context,
 	chatID msginfo.ChatID,
 	messageID msginfo.MessageID,
-	playerAgainst game.Player,
+	displayName string,
 	shotStats game.ShotStats,
 ) error {
 	if err := n.sendStartGameWithStats(
 		ctx,
 		chatID,
 		messageID,
-		n.statsMsg(playerAgainst, shotStats),
+		n.statsMsg(displayName, shotStats),
 	); err != nil {
 		return fmt.Errorf("send start game to first player: %w", err)
 	}
@@ -29,9 +29,9 @@ func (n *Notifier) StartGameWithStats(
 	return nil
 }
 
-func (n *Notifier) statsMsg(plr game.Player, shotStats game.ShotStats) string {
+func (n *Notifier) statsMsg(displayName string, shotStats game.ShotStats) string {
 	return fmt.Sprintf("%s\n*Attack*\n%s\n*Defend*\n%s",
-		n.startGameAgainstMsg(plr),
+		n.startGameAgainstMsg(displayName),
 		n.playerStatsMsg(shotStats.Attack),
 		n.playerStatsMsg(shotStats.Defend),
 	)

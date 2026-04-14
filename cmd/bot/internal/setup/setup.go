@@ -83,9 +83,7 @@ func StartBot(ctx context.Context, cfg config.Config) error {
 		leavePlayerGameService = playerleavegame.New(pgDB, playerProvider,
 			leaveGameService, timeProvider, msgProcessor, notificationService)
 		leaderboardService = leaderboard.New(pgDB, playerProvider, notificationService)
-		shotStatService    = shotstats.New(pgDB)
-		viewStatsService   = viewstats.New(playerProvider, getGameService,
-			shotStatService, msgProcessor, notificationService)
+		viewStatsService   = viewstats.New(shotstats.New(pgDB), notificationService)
 	)
 
 	if err := app.Start(
