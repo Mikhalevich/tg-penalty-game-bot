@@ -17,7 +17,7 @@ func (n *Notifier) GameStart(
 		ctx,
 		gameType,
 		player1,
-		n.startGameAgainstMsg(player2.DisplayName),
+		player2,
 	); err != nil {
 		return fmt.Errorf("send start game to first player: %w", err)
 	}
@@ -26,7 +26,7 @@ func (n *Notifier) GameStart(
 		ctx,
 		gameType,
 		player2,
-		n.startGameAgainstMsg(player1.DisplayName),
+		player1,
 	); err != nil {
 		return fmt.Errorf("send start game to second player: %w", err)
 	}
@@ -38,13 +38,15 @@ func (n *Notifier) sendStartGameNotification(
 	ctx context.Context,
 	gameType game.GameType,
 	plr game.Player,
-	msg string,
+	plrAgainst game.Player,
 ) error {
 	if plr.IsBot() {
 		return nil
 	}
 
-	buttons, err := buttonsByGameType(gameType, plr)
+	msg := n.startGameAgainstMsg(plrAgainst.DisplayName)
+
+	buttons, err := buttonsByGameType(gameType, plrAgainst)
 	if err != nil {
 		return fmt.Errorf("create buttons: %w", err)
 	}
