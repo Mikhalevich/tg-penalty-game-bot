@@ -137,7 +137,7 @@ func (t *TGBot) wrapHandler(pattern string, handler Handler) bot.HandlerFunc {
 
 func makeMsgFromUpdate(update *models.Update) BotMessage {
 	if update.Message != nil {
-		msg := fillBaseMessage(update.Message)
+		msg := fillBaseMessage(update.Message, update.Message.From)
 		msg.Args = commandArgs(update.Message)
 
 		if update.Message.SuccessfulPayment != nil {
@@ -154,7 +154,7 @@ func makeMsgFromUpdate(update *models.Update) BotMessage {
 
 	if update.CallbackQuery != nil {
 		if update.CallbackQuery.Message.Message != nil {
-			msg := fillBaseMessage(update.CallbackQuery.Message.Message)
+			msg := fillBaseMessage(update.CallbackQuery.Message.Message, &update.CallbackQuery.From)
 			msg.Data = update.CallbackQuery.Data
 
 			return msg
@@ -184,18 +184,18 @@ func makeMsgFromUpdate(update *models.Update) BotMessage {
 	return BotMessage{}
 }
 
-func fillBaseMessage(msg *models.Message) BotMessage {
+func fillBaseMessage(msg *models.Message, user *models.User) BotMessage {
 	botMsg := BotMessage{
 		MessageID: msg.ID,
 		ChatID:    msg.Chat.ID,
 		Text:      msg.Text,
 	}
 
-	if msg.From != nil {
+	if user != nil {
 		botMsg.User = User{
-			FirstName: msg.From.FirstName,
-			LastName:  msg.From.LastName,
-			Username:  msg.From.Username,
+			FirstName: user.FirstName,
+			LastName:  user.LastName,
+			Username:  user.Username,
 		}
 	}
 
