@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/button"
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/player"
 )
 
 type ShotSidePayload struct {
@@ -32,8 +33,26 @@ func LeaveGameButton(caption string) button.Button {
 	return button.CreateButtonWithoutPayload(caption, button.OperationLeaveGame)
 }
 
-func ShotStatsButton(caption string) button.Button {
-	return button.CreateButtonWithoutPayload(caption, button.OperationShotStats)
+type ShotStatsPayload struct {
+	PlayerID    player.ID
+	DisplayName string
+}
+
+func ShotStatsButton(caption string, playerID player.ID, playerDisplayName string) (button.Button, error) {
+	btn, err := button.CreateButton(
+		caption,
+		button.OperationShotStats,
+		ShotStatsPayload{
+			PlayerID:    playerID,
+			DisplayName: playerDisplayName,
+		},
+	)
+
+	if err != nil {
+		return button.Button{}, fmt.Errorf("create button: %w", err)
+	}
+
+	return btn, nil
 }
 
 func StopSearchGame(caption string) button.Button {

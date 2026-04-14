@@ -13,11 +13,21 @@ func (n *Notifier) GameStart(
 	gameType game.GameType,
 	player1, player2 game.Player,
 ) error {
-	if err := n.sendStartGameNotification(ctx, gameType, player1, n.startGameAgainstMsg(player2)); err != nil {
+	if err := n.sendStartGameNotification(
+		ctx,
+		gameType,
+		player1,
+		n.startGameAgainstMsg(player2.DisplayName),
+	); err != nil {
 		return fmt.Errorf("send start game to first player: %w", err)
 	}
 
-	if err := n.sendStartGameNotification(ctx, gameType, player2, n.startGameAgainstMsg(player1)); err != nil {
+	if err := n.sendStartGameNotification(
+		ctx,
+		gameType,
+		player2,
+		n.startGameAgainstMsg(player1.DisplayName),
+	); err != nil {
 		return fmt.Errorf("send start game to second player: %w", err)
 	}
 
@@ -34,11 +44,16 @@ func (n *Notifier) sendStartGameNotification(
 		return nil
 	}
 
+	buttons, err := buttonsByGameType(gameType, plr)
+	if err != nil {
+		return fmt.Errorf("create buttons: %w", err)
+	}
+
 	if err := n.sendMsgToPlayer(
 		ctx,
 		plr,
 		msg,
-		buttonsByGameType(gameType)...,
+		buttons...,
 	); err != nil {
 		return fmt.Errorf("send msg to player: %w", err)
 	}
@@ -46,25 +61,30 @@ func (n *Notifier) sendStartGameNotification(
 	return nil
 }
 
-func buttonsByGameType(gameType game.GameType) []button.ButtonRow {
-	if gameType == game.GameTypeRating {
+func buttonsByGameType(gameType game.GameType, plr game.Player) ([]button.ButtonRow, error) {
+	if gameType != game.GameTypeRating {
 		return []button.ButtonRow{
 			{
 				game.LeaveGameButton("Leave"),
 			},
-			{
-				game.ShotStatsButton("View Statistics"),
-			},
-		}
+		}, nil
+	}
+
+	statsBtn, err := game.ShotStatsButton("View Statistics", plr.ID, plr.DisplayName)
+	if err != nil {
+		return nil, fmt.Errorf("create view statistics button: %w", err)
 	}
 
 	return []button.ButtonRow{
 		{
 			game.LeaveGameButton("Leave"),
 		},
-	}
+		{
+			statsBtn,
+		},
+	}, nil
 }
 
-func (n *Notifier) startGameAgainstMsg(plr game.Player) string {
-	return fmt.Sprintf("Game started against *%s*", n.escaper.EscapeMarkdown(plr.DisplayName))
+func (n *Notifier) startGameAgainstMsg(displayName string) string {
+	return fmt.Sprintf("Game started against *%s*", n.escaper.EscapeMarkdown(displayName))
 }

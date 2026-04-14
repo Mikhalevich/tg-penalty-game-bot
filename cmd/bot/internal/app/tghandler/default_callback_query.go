@@ -123,10 +123,17 @@ func (t *TGHandler) cbShotStatsOnStartGameMessage(
 	msg tgbot.BotMessage,
 	btn *button.Button,
 ) error {
+	payload, err := button.GetPayload[game.ShotStatsPayload](*btn)
+	if err != nil {
+		return fmt.Errorf("stats payload: %w", err)
+	}
+
 	if err := t.shotStats.ViewStatsOnStartGameMessage(
 		ctx,
 		msginfo.ChatIDFromInt64(msg.ChatID),
 		msginfo.MessageIDFromInt(msg.MessageID),
+		payload.PlayerID,
+		payload.DisplayName,
 	); err != nil {
 		return fmt.Errorf("view stats on start game msg: %w", err)
 	}

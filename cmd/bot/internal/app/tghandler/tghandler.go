@@ -51,6 +51,8 @@ type ShotStats interface {
 		ctx context.Context,
 		chatID msginfo.ChatID,
 		messageID msginfo.MessageID,
+		playerID player.ID,
+		playerDisplayName string,
 	) error
 }
 
