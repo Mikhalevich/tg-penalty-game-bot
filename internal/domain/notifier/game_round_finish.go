@@ -22,8 +22,9 @@ func (n *Notifier) GameRoundFinish(ctx context.Context, state game.State) error 
 			plr,
 			msg,
 			shotImageTypeByPlayerID(plr.ID, cRound.Attack.PlayerID),
-			cRound.Attack.Side,
-			cRound.Defend.Side,
+			cRound.Attack.ExpectedSide,
+			cRound.Attack.ActualSide,
+			cRound.Defend.ActualSide,
 		); err != nil {
 			return fmt.Errorf("send shot image: %w", err)
 		}
@@ -62,17 +63,19 @@ func (n *Notifier) sendShotImageForFinishRound(
 	plr game.Player,
 	msg string,
 	imageType shotimage.ImageType,
-	attackerSide game.ShotSide,
-	defenderSide game.ShotSide,
+	attackerExpectedSide game.ShotSide,
+	attackerActualSide game.ShotSide,
+	defenderActualSide game.ShotSide,
 ) error {
 	if plr.IsBot() {
 		return nil
 	}
 
 	payload, err := shotimage.ShotImage{
-		Type:         imageType,
-		AttackerSide: attackerSide,
-		DefenderSide: defenderSide,
+		Type:                 imageType,
+		AttackerExpectedSide: attackerExpectedSide,
+		AttackerActualSide:   attackerActualSide,
+		DefenderActualSide:   defenderActualSide,
 	}.GOBEncode()
 
 	if err != nil {

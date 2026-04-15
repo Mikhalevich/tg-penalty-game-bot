@@ -44,7 +44,8 @@ CREATE TABLE shot(
     round INTEGER NOT NULL,
     shot_type shot_type NOT NULL,
     created_at TIMESTAMPTZ NOT NULL,
-    side shot_side NOT NULL DEFAULT 'no_shot',
+    expected_side shot_side NOT NULL DEFAULT 'no_shot',
+    actual_side shot_side NOT NULL DEFAULT 'no_shot',
     completed_at TIMESTAMPTZ,
 
     CONSTRAINT pk_shots PRIMARY KEY (game_id, player_id, round),

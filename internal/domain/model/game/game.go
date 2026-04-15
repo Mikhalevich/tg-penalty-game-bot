@@ -1,6 +1,7 @@
 package game
 
 import (
+	"math/rand"
 	"time"
 
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/msginfo"
@@ -10,6 +11,9 @@ import (
 
 const (
 	ShotsInitial = 5
+
+	percent100 = 100
+	percent10  = 10
 )
 
 type ID string
@@ -102,7 +106,7 @@ func (g *Game) JoinPlayerAndStartGame(plr Player, joinedAt time.Time) error {
 func (g *Game) PlayerShot(shot Shot) error {
 	inGameShot := g.shotByPlayerID(shot.PlayerID)
 
-	if inGameShot.Side != ShotSideNoShot {
+	if inGameShot.ExpectedSide != ShotSideNoShot {
 		return perror.AlreadyExists("shot already exist")
 	}
 
@@ -114,12 +118,26 @@ func (g *Game) PlayerShot(shot Shot) error {
 		return perror.InvalidRound()
 	}
 
-	inGameShot.Side = shot.Side
+	inGameShot.ExpectedSide = shot.ExpectedSide
+	inGameShot.ActualSide = calculateActualSide(shot.ExpectedSide)
 	inGameShot.CompletedAt = shot.CompletedAt
 
 	g.StateUpdatedAt = shot.CompletedAt
 
 	return nil
+}
+
+func isPercentMatch(percent int) bool {
+	//nolint:gosec
+	return rand.Int()%percent100 <= percent
+}
+
+func calculateActualSide(side ShotSide) ShotSide {
+	if isPercentMatch(percent10) {
+		return ShotSideMiss
+	}
+
+	return side
 }
 
 // TryToCompleteRound complete round if both players make shots
@@ -128,8 +146,8 @@ func (g *Game) PlayerShot(shot Shot) error {
 func (g *Game) TryToCompleteRound() bool {
 	cRound := g.currentRoundPtr()
 
-	if (cRound.Attack.Side == ShotSideNoShot) ||
-		(cRound.Defend.Side == ShotSideNoShot) {
+	if (cRound.Attack.ActualSide == ShotSideNoShot) ||
+		(cRound.Defend.ActualSide == ShotSideNoShot) {
 		return false
 	}
 
@@ -197,17 +215,17 @@ func (g *Game) currentRoundPtr() *Round {
 	return &g.State.Rounds[g.State.CurrentRoundIdx]
 }
 
-func updateShot(shot *Shot, side ShotSide, shotAt time.Time) {
-	shot.Side = side
+func updateActualShot(shot *Shot, side ShotSide, shotAt time.Time) {
+	shot.ActualSide = side
 	shot.CompletedAt = shotAt
 }
 
 func updateIfNoShot(shot *Shot, side ShotSide, shotAt time.Time) {
-	if shot.Side != ShotSideNoShot || shot.PlayerID == 0 {
+	if shot.ActualSide != ShotSideNoShot || shot.PlayerID == 0 {
 		return
 	}
 
-	updateShot(shot, side, shotAt)
+	updateActualShot(shot, side, shotAt)
 }
 
 func missShotForPlayerOrMiddleOtherwise(
@@ -216,7 +234,7 @@ func missShotForPlayerOrMiddleOtherwise(
 	completedAt time.Time,
 ) {
 	if shot.PlayerID == missShotPlayerID {
-		updateShot(shot, ShotSideMiss, completedAt)
+		updateActualShot(shot, ShotSideMiss, completedAt)
 
 		return
 	}
@@ -250,10 +268,10 @@ func (g *Game) updateAttackerGoals(attackerID player.ID, isGoal bool) {
 
 func updateRoundResults(round *Round) {
 	switch {
-	case round.Attack.Side == ShotSideMiss:
+	case round.Attack.ActualSide == ShotSideMiss:
 		round.Result = RoundResultMiss
 
-	case round.Attack.Side != round.Defend.Side:
+	case round.Attack.ActualSide != round.Defend.ActualSide:
 		round.Result = RoundResultGoal
 
 	default:

@@ -21,7 +21,7 @@ func (p *Postgres) PlayerShotStatsByCurrentMonth(
 			WITH total_shots AS (
 				SELECT
 					shot_type,
-					side,
+					expected_side AS side,
 					COUNT(*) AS total_count
 				FROM
 					shot
@@ -30,7 +30,7 @@ func (p *Postgres) PlayerShotStatsByCurrentMonth(
 					shot_type = $2 AND
 					created_at >= DATE_TRUNC('month', CURRENT_DATE)
 				GROUP BY
-					shot_type, side
+					shot_type, expected_side
 			)
 			SELECT
 				side,
