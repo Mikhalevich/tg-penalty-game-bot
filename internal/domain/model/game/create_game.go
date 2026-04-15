@@ -94,10 +94,11 @@ func makePendingShot(
 	shotType ShotType,
 ) Shot {
 	return Shot{
-		GameID:   gameID,
-		PlayerID: playerID,
-		Round:    roundNumber,
-		Type:     shotType,
-		Side:     ShotSideNoShot,
+		GameID:       gameID,
+		PlayerID:     playerID,
+		Round:        roundNumber,
+		Type:         shotType,
+		ExpectedSide: ShotSideNoShot,
+		ActualSide:   ShotSideNoShot,
 	}
 }

@@ -74,7 +74,13 @@ func (s State) CompletedShots() []Shot {
 			continue
 		}
 
-		shots = append(shots, round.Attack, round.Defend)
+		if round.Attack.ExpectedSide != ShotSideNoShot {
+			shots = append(shots, round.Attack)
+		}
+
+		if round.Defend.ExpectedSide != ShotSideNoShot {
+			shots = append(shots, round.Defend)
+		}
 	}
 
 	return shots

@@ -32,11 +32,12 @@ func (ss ShotSide) String() string {
 }
 
 type Shot struct {
-	GameID      ID
-	PlayerID    player.ID
-	Round       int
-	Type        ShotType
-	CreatedAt   time.Time
-	Side        ShotSide
-	CompletedAt time.Time
+	GameID       ID
+	PlayerID     player.ID
+	Round        int
+	Type         ShotType
+	CreatedAt    time.Time
+	ExpectedSide ShotSide
+	ActualSide   ShotSide
+	CompletedAt  time.Time
 }

@@ -26,11 +26,11 @@ func (g *GameShot) Shot(
 	}
 
 	if err := g.gameController.Shot(ctx, game.Shot{
-		GameID:      gameID,
-		PlayerID:    currentPlayer.ID,
-		Round:       round,
-		Side:        side,
-		CompletedAt: g.timeProvider.Now(),
+		GameID:       gameID,
+		PlayerID:     currentPlayer.ID,
+		Round:        round,
+		ExpectedSide: side,
+		CompletedAt:  g.timeProvider.Now(),
 	}); err != nil {
 		return fmt.Errorf("game shot: %w", err)
 	}

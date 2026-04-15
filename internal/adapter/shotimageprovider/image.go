@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/game"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/shotimage"
 )
 
@@ -45,10 +46,18 @@ func imageFolderAndName(shot shotimage.ShotImage) (string, string) {
 		return prepareFolder, defendFile
 
 	case shotimage.ImageTypeAttack:
-		return attackFolder, fmt.Sprintf("%s_%s", shot.AttackerSide, shot.DefenderSide)
+		if shot.AttackerActualSide == game.ShotSideMiss {
+			return attackFolder, fmt.Sprintf("%s_%s_%s", shot.AttackerActualSide, shot.AttackerExpectedSide, shot.DefenderActualSide)
+		}
+
+		return attackFolder, fmt.Sprintf("%s_%s", shot.AttackerActualSide, shot.DefenderActualSide)
 
 	case shotimage.ImageTypeDefend:
-		return defendFolder, fmt.Sprintf("%s_%s", shot.AttackerSide, shot.DefenderSide)
+		if shot.AttackerActualSide == game.ShotSideMiss {
+			return attackFolder, fmt.Sprintf("%s_%s_%s", shot.AttackerActualSide, shot.AttackerExpectedSide, shot.DefenderActualSide)
+		}
+
+		return defendFolder, fmt.Sprintf("%s_%s", shot.AttackerActualSide, shot.DefenderActualSide)
 	}
 
 	return "", ""

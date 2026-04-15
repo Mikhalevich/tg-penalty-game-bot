@@ -19,7 +19,8 @@ func (p *Postgres) InsertShots(ctx context.Context, shots []game.Shot) error {
 				round,
 				shot_type,
 				created_at,
-				side,
+				expected_side,
+				actual_side,
 				completed_at
 			) VALUES (
 				:game_id,
@@ -27,7 +28,8 @@ func (p *Postgres) InsertShots(ctx context.Context, shots []game.Shot) error {
 				:round,
 				:shot_type,
 				:created_at,
-				:side,
+				:expected_side,
+				:actual_side,
 				:completed_at
 			)
 		`

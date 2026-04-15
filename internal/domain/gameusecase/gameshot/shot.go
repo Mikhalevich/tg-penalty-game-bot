@@ -16,7 +16,6 @@ var (
 		game.ShotSideLeft,
 		game.ShotSideMiddle,
 		game.ShotSideRight,
-		game.ShotSideMiss,
 	}
 )
 
@@ -144,11 +143,11 @@ func (g *GameShot) processBotShot(
 	completedAt time.Time,
 ) error {
 	if err := currentGame.PlayerShot(game.Shot{
-		GameID:      currentGame.ID,
-		PlayerID:    0,
-		Round:       round,
-		Side:        generateBotSide(),
-		CompletedAt: completedAt,
+		GameID:       currentGame.ID,
+		PlayerID:     0,
+		Round:        round,
+		ExpectedSide: generateBotSide(),
+		CompletedAt:  completedAt,
 	}); err != nil {
 		return fmt.Errorf("player shot: %w", err)
 	}

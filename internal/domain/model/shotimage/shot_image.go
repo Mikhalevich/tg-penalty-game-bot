@@ -22,9 +22,10 @@ func (it ImageType) String() string {
 }
 
 type ShotImage struct {
-	Type         ImageType
-	AttackerSide game.ShotSide
-	DefenderSide game.ShotSide
+	Type                 ImageType
+	AttackerExpectedSide game.ShotSide
+	AttackerActualSide   game.ShotSide
+	DefenderActualSide   game.ShotSide
 }
 
 func (si ShotImage) GOBEncode() ([]byte, error) {
