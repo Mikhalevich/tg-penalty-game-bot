@@ -59,7 +59,7 @@ func imageFolderAndName(shot shotimage.ShotImage) (string, string) {
 
 	case shotimage.ImageTypeDefend:
 		if shot.AttackerActualSide == game.ShotSideMiss {
-			return attackFolder,
+			return defendFolder,
 				fmt.Sprintf("%s_%s_%s",
 					shot.AttackerActualSide,
 					shot.AttackerExpectedSide,
