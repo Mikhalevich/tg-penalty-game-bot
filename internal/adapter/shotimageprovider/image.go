@@ -47,14 +47,24 @@ func imageFolderAndName(shot shotimage.ShotImage) (string, string) {
 
 	case shotimage.ImageTypeAttack:
 		if shot.AttackerActualSide == game.ShotSideMiss {
-			return attackFolder, fmt.Sprintf("%s_%s_%s", shot.AttackerActualSide, shot.AttackerExpectedSide, shot.DefenderActualSide)
+			return attackFolder,
+				fmt.Sprintf("%s_%s_%s",
+					shot.AttackerActualSide,
+					shot.AttackerExpectedSide,
+					shot.DefenderActualSide,
+				)
 		}
 
 		return attackFolder, fmt.Sprintf("%s_%s", shot.AttackerActualSide, shot.DefenderActualSide)
 
 	case shotimage.ImageTypeDefend:
 		if shot.AttackerActualSide == game.ShotSideMiss {
-			return attackFolder, fmt.Sprintf("%s_%s_%s", shot.AttackerActualSide, shot.AttackerExpectedSide, shot.DefenderActualSide)
+			return attackFolder,
+				fmt.Sprintf("%s_%s_%s",
+					shot.AttackerActualSide,
+					shot.AttackerExpectedSide,
+					shot.DefenderActualSide,
+				)
 		}
 
 		return defendFolder, fmt.Sprintf("%s_%s", shot.AttackerActualSide, shot.DefenderActualSide)

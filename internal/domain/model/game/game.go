@@ -128,6 +128,7 @@ func (g *Game) PlayerShot(shot Shot) error {
 }
 
 func isPercentMatch(percent int) bool {
+	//nolint:gosec
 	return rand.Int()%percent100 <= percent
 }
 
