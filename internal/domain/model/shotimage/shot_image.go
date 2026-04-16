@@ -15,6 +15,9 @@ const (
 	ImageTypePrepareDefend = "prepare_defend"
 	ImageTypeAttack        = "attack"
 	ImageTypeDefend        = "defend"
+	ImageTypeWin           = "win"
+	ImageTypeLose          = "lose"
+	ImageTypeDraw          = "draw"
 )
 
 func (it ImageType) String() string {

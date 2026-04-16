@@ -10,6 +10,7 @@ import (
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/game"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/msginfo"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/player"
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/shotimage"
 )
 
 const (
@@ -22,10 +23,71 @@ func (n *Notifier) GameFinish(ctx context.Context, state game.State, finishedAt 
 		visibilityAt = finishedAt.Add(gameFinishedDelay)
 	)
 
-	for _, plr := range state.LivePlayers() {
-		if err := n.sendMsgToPlayerWithVisiblity(ctx, plr, msg, visibilityAt); err != nil {
-			return fmt.Errorf("send msg to player: %w", err)
+	if err := n.sendFinishGameMsg(
+		ctx,
+		state.Player1,
+		makeResultImage(state.Player1.GoalsScored, state.Player2.GoalsScored),
+		msg,
+		visibilityAt,
+	); err != nil {
+		return fmt.Errorf("finish notification for player1: %w", err)
+	}
+
+	if err := n.sendFinishGameMsg(
+		ctx,
+		state.Player2,
+		makeResultImage(state.Player2.GoalsScored, state.Player1.GoalsScored),
+		msg,
+		visibilityAt,
+	); err != nil {
+		return fmt.Errorf("finish notification for player1: %w", err)
+	}
+
+	return nil
+}
+
+func makeResultImage(score1, score2 int) shotimage.ShotImage {
+	switch {
+	case score1 > score2:
+		return shotimage.ShotImage{
+			Type: shotimage.ImageTypeWin,
 		}
+
+	case score1 < score2:
+		return shotimage.ShotImage{
+			Type: shotimage.ImageTypeLose,
+		}
+	}
+
+	return shotimage.ShotImage{
+		Type: shotimage.ImageTypeDraw,
+	}
+}
+
+func (n *Notifier) sendFinishGameMsg(
+	ctx context.Context,
+	plr game.Player,
+	resImage shotimage.ShotImage,
+	caption string,
+	visibilityAt time.Time,
+) error {
+	if plr.IsBot() {
+		return nil
+	}
+
+	payload, err := resImage.GOBEncode()
+	if err != nil {
+		return fmt.Errorf("gob enbode: %w", err)
+	}
+
+	if err := n.sender.SendMessage(ctx, msginfo.Message{
+		ChatID:       plr.ChatID,
+		Text:         caption,
+		Type:         msginfo.MessageTypeShotImage,
+		Payload:      payload,
+		VisibilityAt: visibilityAt,
+	}); err != nil {
+		return fmt.Errorf("send message: %w", err)
 	}
 
 	return nil
@@ -46,30 +108,6 @@ func (n *Notifier) sendMsgToPlayer(
 		Text:    msg,
 		Type:    msginfo.MessageTypeMarkdown,
 		Buttons: buttons,
-	}); err != nil {
-		return fmt.Errorf("send message: %w", err)
-	}
-
-	return nil
-}
-
-func (n *Notifier) sendMsgToPlayerWithVisiblity(
-	ctx context.Context,
-	plr game.Player,
-	msg string,
-	visibilityAt time.Time,
-	buttons ...button.ButtonRow,
-) error {
-	if plr.IsBot() {
-		return nil
-	}
-
-	if err := n.sender.SendMessage(ctx, msginfo.Message{
-		ChatID:       plr.ChatID,
-		Text:         msg,
-		Type:         msginfo.MessageTypeMarkdown,
-		Buttons:      buttons,
-		VisibilityAt: visibilityAt,
 	}); err != nil {
 		return fmt.Errorf("send message: %w", err)
 	}
