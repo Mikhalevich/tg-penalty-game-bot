@@ -13,7 +13,7 @@ import (
 func (n *Notifier) GameRoundFinish(ctx context.Context, state game.State) error {
 	var (
 		cRound = state.CurrentRound()
-		msg    = n.makeScoreMsg(goalMsg(cRound), state)
+		msg    = fmt.Sprintf("*%s*\n%s", goalMsg(cRound), makeScoreMsg(state))
 	)
 
 	for _, plr := range state.LivePlayers() {
