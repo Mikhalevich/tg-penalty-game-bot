@@ -10,8 +10,8 @@ import (
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/player"
 )
 
-type GameProvider interface {
-	GetGameByID(ctx context.Context, gameID game.ID) (game.Game, error)
+type Repository interface {
+	GetGame(ctx context.Context, gameID game.ID) (game.Game, error)
 }
 
 type Notifier interface {
@@ -22,20 +22,21 @@ type Notifier interface {
 		shotType game.ShotType,
 		roundNumber int,
 	) error
+	PlayerAlreadyInGame(ctx context.Context, plr player.Player) error
 }
 
 type GameShotState struct {
-	gameProvider GameProvider
-	notifier     Notifier
+	repo     Repository
+	notifier Notifier
 }
 
 func New(
-	gameProvider GameProvider,
+	repo Repository,
 	notifier Notifier,
 ) *GameShotState {
 	return &GameShotState{
-		gameProvider: gameProvider,
-		notifier:     notifier,
+		repo:     repo,
+		notifier: notifier,
 	}
 }
 
@@ -44,9 +45,17 @@ func (s *GameShotState) ShotState(ctx context.Context, currentPlayer player.Play
 		return errors.New("player not in game")
 	}
 
-	currentGame, err := s.gameProvider.GetGameByID(ctx, game.IDFromString(currentPlayer.CurrentGameID))
+	currentGame, err := s.repo.GetGame(ctx, game.IDFromString(currentPlayer.CurrentGameID))
 	if err != nil {
 		return fmt.Errorf("get game by id: %w", err)
+	}
+
+	if !currentGame.IsPending() {
+		if err := s.notifier.PlayerAlreadyInGame(ctx, currentPlayer); err != nil {
+			return fmt.Errorf("already in game notification: %w", err)
+		}
+
+		return nil
 	}
 
 	if !currentGame.IsInProgress() {
@@ -54,33 +63,48 @@ func (s *GameShotState) ShotState(ctx context.Context, currentPlayer player.Play
 			currentGame.ID.String(), currentGame.Status.String())
 	}
 
-	var (
-		currentRound = currentGame.State.CurrentRound()
-		roundNumber  = currentGame.State.CurrentRoundNumber()
-	)
+	if err := s.sendShotStateNotification(
+		ctx,
+		currentPlayer,
+		currentGame.ID,
+		currentGame.State.CurrentRound(),
+		currentGame.State.CurrentRoundNumber(),
+	); err != nil {
+		return fmt.Errorf("send shot state notification: %w", err)
+	}
 
-	if currentRound.IsCompleted() {
+	return nil
+}
+
+func (s *GameShotState) sendShotStateNotification(
+	ctx context.Context,
+	currentPlayer player.Player,
+	gameID game.ID,
+	round game.Round,
+	roundNumber int,
+) error {
+	if round.IsCompleted() {
 		return fmt.Errorf("last raund is completed, game_id: %q round: %d",
-			currentGame.ID.String(), roundNumber)
+			gameID.String(), roundNumber)
 	}
 
 	var shotType game.ShotType
 	switch currentPlayer.ID {
-	case currentRound.Attack.PlayerID:
+	case round.Attack.PlayerID:
 		shotType = game.ShotTypeAttack
 
-	case currentRound.Defend.PlayerID:
+	case round.Defend.PlayerID:
 		shotType = game.ShotTypeDefend
 
 	default:
 		return fmt.Errorf("invalid player for game, player_id: %d game_id: %q",
-			currentPlayer.ID.Int(), currentGame.ID.String())
+			currentPlayer.ID.Int(), gameID.String())
 	}
 
 	if err := s.notifier.GameShotState(
 		ctx,
 		currentPlayer.ChatID,
-		currentGame.ID,
+		gameID,
 		shotType,
 		roundNumber,
 	); err != nil {
