@@ -14,8 +14,12 @@ const (
 	prepareFolder = "prepare"
 	attackFolder  = "attack"
 	defendFolder  = "defend"
+	resultFolder  = "result"
 	attackFile    = "attack"
 	defendFile    = "defend"
+	winFile       = "win"
+	loseFile      = "lose"
+	drawFile      = "draw"
 )
 
 func (sip *ShotImageProvider) Image(
@@ -68,6 +72,15 @@ func imageFolderAndName(shot shotimage.ShotImage) (string, string) {
 		}
 
 		return defendFolder, fmt.Sprintf("%s_%s", shot.AttackerActualSide, shot.DefenderActualSide)
+
+	case shotimage.ImageTypeWin:
+		return resultFolder, winFile
+
+	case shotimage.ImageTypeLose:
+		return resultFolder, loseFile
+
+	case shotimage.ImageTypeDraw:
+		return resultFolder, drawFile
 	}
 
 	return "", ""
