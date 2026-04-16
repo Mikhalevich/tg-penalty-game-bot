@@ -20,7 +20,7 @@ import (
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/adapter/repository/postgres/transaction"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/adapter/timeprovider"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/gameusecase/gameshot"
-	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/gameusecase/getgame"
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/gameusecase/gameshotstate"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/gameusecase/joingame"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/gameusecase/leavegame"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/gameusecase/shotstats"
@@ -31,7 +31,6 @@ import (
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playerusecase/changestatus"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playerusecase/findgame"
 	playergameshot "github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playerusecase/gameshot"
-	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playerusecase/gameshotstate"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playerusecase/leaderboard"
 	playerleavegame "github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playerusecase/leavegame"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playerusecase/playerprovider"
@@ -68,8 +67,7 @@ func StartBot(ctx context.Context, cfg config.Config) error {
 		welcomeService      = welcome.New(playerProvider, notificationService)
 		changeNameService   = changename.New(pgDB, playerProvider, timeProvider,
 			notificationService, cfg.ChangeName.RetryInterval, cfg.ChangeName.MaxLen)
-		getGameService       = getgame.New(pgDB)
-		gameShotStateService = gameshotstate.New(getGameService, notificationService)
+		gameShotStateService = gameshotstate.New(pgDB, notificationService)
 		findGameSerivce      = findgame.New(pgDB, playerProvider, timeProvider,
 			gameShotStateService, msgProcessor, notificationService)
 		changeStatusService    = changestatus.New(pgDB)

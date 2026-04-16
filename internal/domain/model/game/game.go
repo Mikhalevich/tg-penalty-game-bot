@@ -59,6 +59,10 @@ func (g *Game) IsInProgress() bool {
 	return g.Status == GameStatusInProgress
 }
 
+func (g *Game) IsPending() bool {
+	return g.Status == GameStatusPending
+}
+
 func (g *Game) IsRatingGame() bool {
 	return g.Type == GameTypeRating
 }
