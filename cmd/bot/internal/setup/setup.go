@@ -74,7 +74,7 @@ func StartBot(ctx context.Context, cfg config.Config) error {
 		startGameService       = startgame.New(pgDB, pgDB.Transactor(), changeStatusService, notificationService)
 		joinGameService        = joingame.New(pgDB, pgDB.Transactor(), changeStatusService, notificationService)
 		playerStartGameService = playerstartgame.New(pgDB, pgDB.Transactor(),
-			playerProvider, startGameService, joinGameService, timeProvider, gameShotStateService, notificationService)
+			playerProvider, startGameService, joinGameService, pgDB, timeProvider, gameShotStateService, notificationService)
 		gameShotService        = gameshot.New(pgDB, pgDB.Transactor(), changeStatusService, notificationService)
 		playerGameShotService  = playergameshot.New(playerProvider, gameShotService, timeProvider, msgProcessor)
 		leaveGameService       = leavegame.New(pgDB, pgDB.Transactor(), changeStatusService, notificationService)

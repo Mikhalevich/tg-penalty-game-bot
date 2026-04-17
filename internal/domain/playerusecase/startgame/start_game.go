@@ -39,6 +39,10 @@ type GameJoiner interface {
 	JoinGame(ctx context.Context, gameID game.ID, plr game.Player, joineddAt time.Time) error
 }
 
+type GameGetter interface {
+	GetGame(ctx context.Context, gameID game.ID) (game.Game, error)
+}
+
 type TimeProvider interface {
 	Now() time.Time
 }
@@ -49,6 +53,8 @@ type ShotStater interface {
 
 type Notifier interface {
 	PlayerAlreadyInGame(ctx context.Context, plr player.Player) error
+	LinkActivated(ctx context.Context, chatID msginfo.ChatID) error
+	LinkCanceled(ctx context.Context, chatID msginfo.ChatID) error
 }
 
 type StartGame struct {
@@ -57,6 +63,7 @@ type StartGame struct {
 	playerProvider PlayerProvider
 	gameRunner     GameRunner
 	gameJoiner     GameJoiner
+	gameGetter     GameGetter
 	timeProvider   TimeProvider
 	shotStater     ShotStater
 	notifier       Notifier
@@ -68,6 +75,7 @@ func New(
 	playerProvider PlayerProvider,
 	gameRunner GameRunner,
 	gameJoiner GameJoiner,
+	gameGetter GameGetter,
 	timeProvider TimeProvider,
 	shotStater ShotStater,
 	notifier Notifier,
@@ -78,6 +86,7 @@ func New(
 		playerProvider: playerProvider,
 		gameRunner:     gameRunner,
 		gameJoiner:     gameJoiner,
+		gameGetter:     gameGetter,
 		timeProvider:   timeProvider,
 		shotStater:     shotStater,
 		notifier:       notifier,

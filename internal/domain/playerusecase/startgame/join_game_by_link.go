@@ -27,6 +27,15 @@ func (s *StartGame) JoinGameByLink(
 		return nil
 	}
 
+	ok, err := s.validateGameForJoin(ctx, chatID, gameID)
+	if err != nil {
+		return fmt.Errorf("validate game for join: %w", err)
+	}
+
+	if !ok {
+		return nil
+	}
+
 	now := s.timeProvider.Now()
 
 	if err := s.transactor.Transaction(ctx, func(ctx context.Context) error {
@@ -56,4 +65,37 @@ func (s *StartGame) JoinGameByLink(
 	}
 
 	return nil
+}
+
+// validateGameForJoin validates game status for avalability to join
+// returns true if player can join to game or false otherwise.
+func (s *StartGame) validateGameForJoin(
+	ctx context.Context,
+	chatID msginfo.ChatID,
+	gameID game.ID,
+) (bool, error) {
+	currentGame, err := s.gameGetter.GetGame(ctx, gameID)
+	if err != nil {
+		return false, fmt.Errorf("get game: %w", err)
+	}
+
+	switch currentGame.Status {
+	case game.GameStatusInProgress, game.GameStatusCompleted:
+		if err := s.notifier.LinkActivated(ctx, chatID); err != nil {
+			return false, fmt.Errorf("link activated: %w", err)
+		}
+
+		return false, nil
+
+	case game.GameStatusCanceled:
+		if err := s.notifier.LinkCanceled(ctx, chatID); err != nil {
+			return false, fmt.Errorf("link canceled: %w", err)
+		}
+
+		return false, nil
+
+	case game.GameStatusPending:
+	}
+
+	return true, nil
 }
