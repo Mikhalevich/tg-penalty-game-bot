@@ -50,28 +50,10 @@ func imageFolderAndName(shot shotimage.ShotImage) (string, string) {
 		return prepareFolder, defendFile
 
 	case shotimage.ImageTypeAttack:
-		if shot.AttackerActualSide == game.ShotSideMiss {
-			return attackFolder,
-				fmt.Sprintf("%s_%s_%s",
-					shot.AttackerActualSide,
-					shot.AttackerExpectedSide,
-					shot.DefenderActualSide,
-				)
-		}
-
-		return attackFolder, fmt.Sprintf("%s_%s", shot.AttackerActualSide, shot.DefenderActualSide)
+		return attackShotImage(attackFolder, shot)
 
 	case shotimage.ImageTypeDefend:
-		if shot.AttackerActualSide == game.ShotSideMiss {
-			return defendFolder,
-				fmt.Sprintf("%s_%s_%s",
-					shot.AttackerActualSide,
-					shot.AttackerExpectedSide,
-					shot.DefenderActualSide,
-				)
-		}
-
-		return defendFolder, fmt.Sprintf("%s_%s", shot.AttackerActualSide, shot.DefenderActualSide)
+		return attackShotImage(defendFolder, shot)
 
 	case shotimage.ImageTypeWin:
 		return resultFolder, winFile
@@ -84,4 +66,22 @@ func imageFolderAndName(shot shotimage.ShotImage) (string, string) {
 	}
 
 	return "", ""
+}
+
+// attackShotImage helper for imageFolderAndName for shotimage.ImageTypeAttack and shotimage.ImageTypeDefend.
+func attackShotImage(folder string, shot shotimage.ShotImage) (string, string) {
+	if shot.AttackerActualSide == game.ShotSideMiss {
+		return folder,
+			fmt.Sprintf("%s_%s_%s",
+				shot.AttackerActualSide,
+				shot.AttackerExpectedSide,
+				shot.DefenderActualSide,
+			)
+	}
+
+	return folder,
+		fmt.Sprintf("%s_%s",
+			shot.AttackerActualSide,
+			shot.DefenderActualSide,
+		)
 }
