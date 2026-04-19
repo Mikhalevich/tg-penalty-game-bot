@@ -11,6 +11,8 @@ GOPRIVATE = GOPRIVATE=github.com/Mikhalevich/
 LINTER_NAME := golangci-lint
 LINTER_VERSION := v2.11.4
 
+APP_TAG = 0.1.0
+
 .PHONY: all build test compose-up compose-down load-test-data vendor install-linter lint fmt tools-update generate
 
 all: build
@@ -57,3 +59,9 @@ tools-update:
 
 generate:
 	$(ENV_PATH) go generate ./...
+
+minikube-load-images:
+	minikube image build -t bot:${APP_TAG} -f ./script/docker/bot.Dockerfile . \
+	minikube image build -t sqlmigrate:${APP_TAG} -f ./script/docker/sqlmigrate.Dockerfile . \
+	minikube image build -t outboxpoller:${APP_TAG} -f ./script/docker/outboxpoller.Dockerfile . \
+	minikube image build -t gamepoller:${APP_TAG} -f ./script/docker/gamepoller.Dockerfile .
