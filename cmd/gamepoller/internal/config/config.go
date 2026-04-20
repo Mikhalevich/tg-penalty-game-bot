@@ -7,7 +7,6 @@ import (
 type Config struct {
 	LogLevel                      string                  `yaml:"log_level" required:"true"`
 	Tracing                       Tracing                 `yaml:"tracing" required:"true"`
-	Bot                           Bot                     `yaml:"bot" required:"true"`
 	Postgres                      Postgres                `yaml:"postgres" required:"true"`
 	MatchmakingWorker             Worker                  `yaml:"matchmaking_worker" required:"true"`
 	ExpiredShotsWorker            ExpiredShotsWorker      `yaml:"expired_shots_worker" required:"true"`
@@ -30,10 +29,6 @@ func (c *Config) TracingEndpoint() string {
 type Tracing struct {
 	Endpoint    string `yaml:"endpoint" required:"true"`
 	ServiceName string `yaml:"service_name" required:"true"`
-}
-
-type Bot struct {
-	Token string `yaml:"token" required:"true"`
 }
 
 type Postgres struct {
