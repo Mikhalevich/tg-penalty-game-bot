@@ -2,8 +2,6 @@ log_level: "info"
 tracing:
   endpoint: "jaeger:4318"
   service_name: "penalty-game-poller"
-bot:
-  token: "bot_token"
 postgres:
   connection: "host=postgres port=5432 user=bot password=bot dbname=bot sslmode=disable"
 matchmaking_worker:

@@ -4,13 +4,12 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/go-telegram/bot"
 	"github.com/jmoiron/sqlx"
 	"github.com/uptrace/opentelemetry-go-extra/otelsql"
 
 	"github.com/Mikhalevich/tg-penalty-game-bot/cmd/gamepoller/internal/app"
 	"github.com/Mikhalevich/tg-penalty-game-bot/cmd/gamepoller/internal/config"
-	"github.com/Mikhalevich/tg-penalty-game-bot/internal/adapter/messagesender"
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/adapter/markdownescaper"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/adapter/repository/postgres"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/adapter/repository/postgres/driver"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/adapter/repository/postgres/transaction"
@@ -24,14 +23,6 @@ import (
 )
 
 func StartWorker(ctx context.Context, cfg config.Config) error {
-	botAPI, err := bot.New(
-		cfg.Bot.Token,
-		bot.WithSkipGetMe(),
-	)
-	if err != nil {
-		return fmt.Errorf("creating bot api: %w", err)
-	}
-
 	pgDB, dbCleanup, err := MakePostgres(cfg.Postgres)
 	if err != nil {
 		return fmt.Errorf("make postgres: %w", err)
@@ -40,8 +31,7 @@ func StartWorker(ctx context.Context, cfg config.Config) error {
 	defer dbCleanup()
 
 	var (
-		msgSender            = messagesender.New(botAPI)
-		notificationService  = notifier.New(pgDB, msgSender)
+		notificationService  = notifier.New(pgDB, markdownescaper.New())
 		changeStatusService  = changestatus.New(pgDB)
 		timeProvider         = timeprovider.New()
 		startGameService     = startgame.New(pgDB, pgDB.Transactor(), changeStatusService, notificationService)
