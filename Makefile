@@ -61,10 +61,7 @@ generate:
 	$(ENV_PATH) go generate ./...
 
 minikube-load-images:
-	minikube image build -t bot:${APP_TAG} -f ./script/docker/bot.Dockerfile . \
-	minikube image build -t sqlmigrate:${APP_TAG} -f ./script/docker/sqlmigrate.Dockerfile . \
-	minikube image build -t outboxpoller:${APP_TAG} -f ./script/docker/outboxpoller.Dockerfile . \
-	minikube image build -t gamepoller:${APP_TAG} -f ./script/docker/gamepoller.Dockerfile .
+	./script/k8s/minikube/load_images.sh ${APP_TAG}
 
 minikube-apply:
 	kubectl apply -f ./script/k8s/minikube
