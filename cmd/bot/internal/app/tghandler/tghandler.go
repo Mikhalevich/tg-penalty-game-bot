@@ -25,6 +25,7 @@ type Welcome interface {
 type ChangeName interface {
 	SetChangeDisplayNameTrigger(ctx context.Context, chatID msginfo.ChatID, fullName, userName string) error
 	ChangeDisplayName(ctx context.Context, chatID msginfo.ChatID, msgID msginfo.MessageID, displayName string) error
+	Cancel(ctx context.Context, chatID msginfo.ChatID) error
 }
 
 type FindGame interface {
@@ -117,6 +118,7 @@ func (t *TGHandler) registerCBHandlers() {
 	t.cbHanlers = map[button.Operation]cbHandler{
 		button.OperationChangeName:        t.cbChangeName,
 		button.OperationChangeNameTrigger: t.cbChangeNameTrigger,
+		button.OperationChangeNameCancel:  t.cbChangeNameCancel,
 		button.OperationShotSide:          t.cbShotSide,
 		button.OperationLeaveGame:         t.cbLeaveGame,
 		button.OperationShotStats:         t.cbShotStatsOnStartGameMessage,

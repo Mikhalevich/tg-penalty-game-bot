@@ -13,20 +13,27 @@ import (
 func (p *Postgres) SetChangeDisplayNameTrigger(
 	ctx context.Context,
 	chatID msginfo.ChatID,
+	trigger bool,
 ) error {
 	var (
 		query = `
 			UPDATE player
 			SET
-				is_change_name_triggered = TRUE
+				is_change_name_triggered = :is_change_name_triggered
 			WHERE
 				chat_id = :chat_id
 		`
 	)
 
-	res, err := sqlx.NamedExecContext(ctx, p.transactor.ExtContext(ctx), query, map[string]any{
-		"chat_id": chatID.Int64(),
-	})
+	res, err := sqlx.NamedExecContext(
+		ctx,
+		p.transactor.ExtContext(ctx),
+		query,
+		map[string]any{
+			"is_change_name_triggered": trigger,
+			"chat_id":                  chatID.Int64(),
+		},
+	)
 
 	if err != nil {
 		return fmt.Errorf("named exec context: %w", err)
