@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gamepoller-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gamepoller
+  template:
+    metadata:
+      labels:
+        app: gamepoller
+    spec:
+      initContainers:
+      - name: gamepoller-db-migrations
+        image: sqlmigrate:0.1.0
+        volumeMounts:
+        - name: db-migrate-config-volume
+          mountPath: /app/config
+      containers:
+      - name: gamepoller
+        image: gamepoller:0.1.0
+        command: ["/app/gamepoller"]
+        args: ["-config", "/app/config/config-gamepoller.yaml"]
+        volumeMounts:
+        - name: config-volume
+          mountPath: /app/config
+      volumes:
+      - name: config-volume
+        configMap:
+          name: gamepoller-cm
+      - name: db-migrate-config-volume
+        configMap:
+          name: sqlmigrate-cm
