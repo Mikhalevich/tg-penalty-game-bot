@@ -31,8 +31,8 @@ func (c *ChangeName) SetChangeDisplayNameTrigger(
 		return nil
 	}
 
-	if err := c.repo.SetChangeDisplayNameTrigger(ctx, plr.ChatID); err != nil {
-		return fmt.Errorf("repo set change display name trigger: %w", err)
+	if err := c.repo.SetChangeDisplayNameTrigger(ctx, plr.ChatID, true); err != nil {
+		return fmt.Errorf("repo up change display name trigger: %w", err)
 	}
 
 	if err := c.notifier.ChangeName(ctx, plr, fullName, userName); err != nil {

@@ -5,6 +5,7 @@ type Operation string
 const (
 	OperationChangeName        Operation = "ChangeName"
 	OperationChangeNameTrigger Operation = "ChangeNameTrigger"
+	OperationChangeNameCancel  Operation = "ChangeNameCancel"
 	OperationShotSide          Operation = "ShotSide"
 	OperationLeaveGame         Operation = "LeaveGame"
 	OperationShotStats         Operation = "ShotStats"

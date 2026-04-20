@@ -10,20 +10,18 @@ import (
 )
 
 const (
-	nameButtonsCount = 2
+	nameButtonsCount = 3
 )
 
-func (n *Notifier) ChangeName(ctx context.Context, plr player.Player, fullName, userName string) error {
-	buttons := make([]button.ButtonRow, 0, nameButtonsCount)
-
-	buttons, err := appendChanageNameButton(buttons, fullName)
+func (n *Notifier) ChangeName(
+	ctx context.Context,
+	plr player.Player,
+	fullName,
+	userName string,
+) error {
+	buttons, err := makeChanageNameButton(fullName, userName)
 	if err != nil {
 		return fmt.Errorf("create button by full name: %w", err)
-	}
-
-	buttons, err = appendChanageNameButton(buttons, userName)
-	if err != nil {
-		return fmt.Errorf("create button by username: %w", err)
 	}
 
 	if err := n.sender.SendMessage(ctx, msginfo.Message{
@@ -38,18 +36,31 @@ func (n *Notifier) ChangeName(ctx context.Context, plr player.Player, fullName, 
 	return nil
 }
 
-func appendChanageNameButton(
-	buttons []button.ButtonRow,
-	displayName string,
+func makeChanageNameButton(
+	fullName,
+	userName string,
 ) ([]button.ButtonRow, error) {
-	if displayName != "" {
-		btn, err := button.ChangeName(fmt.Sprintf("Use: %q", displayName), displayName)
+	buttons := make([]button.ButtonRow, 0, nameButtonsCount)
+
+	if fullName != "" {
+		btn, err := button.ChangeName(fmt.Sprintf("Use: %q", fullName), fullName)
 		if err != nil {
 			return nil, fmt.Errorf("create chanage name button: %w", err)
 		}
 
 		buttons = append(buttons, button.Row(btn))
 	}
+
+	if userName != "" {
+		btn, err := button.ChangeName(fmt.Sprintf("Use: %q", userName), userName)
+		if err != nil {
+			return nil, fmt.Errorf("create chanage name button: %w", err)
+		}
+
+		buttons = append(buttons, button.Row(btn))
+	}
+
+	buttons = append(buttons, button.Row(button.ChangeNameCancel("Cancel")))
 
 	return buttons, nil
 }

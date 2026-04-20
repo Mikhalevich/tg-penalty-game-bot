@@ -10,7 +10,7 @@ import (
 
 type Repository interface {
 	ChangeDisplayName(ctx context.Context, chatID msginfo.ChatID, displayName string, changedAt time.Time) error
-	SetChangeDisplayNameTrigger(ctx context.Context, chatID msginfo.ChatID) error
+	SetChangeDisplayNameTrigger(ctx context.Context, chatID msginfo.ChatID, trigger bool) error
 
 	IsAlreadyExistsError(err error) bool
 }

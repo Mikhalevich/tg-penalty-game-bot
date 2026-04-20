@@ -78,6 +78,21 @@ func (t *TGHandler) cbChangeNameTrigger(
 	return nil
 }
 
+func (t *TGHandler) cbChangeNameCancel(
+	ctx context.Context,
+	msg tgbot.BotMessage,
+	btn *button.Button,
+) error {
+	if err := t.changeName.Cancel(
+		ctx,
+		msginfo.ChatIDFromInt64(msg.ChatID),
+	); err != nil {
+		return fmt.Errorf("change name cancel: %w", err)
+	}
+
+	return nil
+}
+
 func (t *TGHandler) cbShotSide(
 	ctx context.Context,
 	msg tgbot.BotMessage,
