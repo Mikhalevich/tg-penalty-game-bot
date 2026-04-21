@@ -35,9 +35,5 @@ func (g *GameShot) Shot(
 		return fmt.Errorf("game shot: %w", err)
 	}
 
-	if err := g.messageDeleter.DeleteMessage(ctx, chatID, msgID); err != nil {
-		return fmt.Errorf("delete message: %w", err)
-	}
-
 	return nil
 }

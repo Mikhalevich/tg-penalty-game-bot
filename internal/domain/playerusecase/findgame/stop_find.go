@@ -27,10 +27,6 @@ func (fg *FindGame) StopFind(
 		}
 	}
 
-	if err := fg.messageDeleter.DeleteMessage(ctx, chatID, messageID); err != nil {
-		return fmt.Errorf("delete message: %w", err)
-	}
-
 	return nil
 }
 

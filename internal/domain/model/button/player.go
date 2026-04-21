@@ -5,7 +5,7 @@ type ChangeNamePayload struct {
 }
 
 func ChangeName(caption, displayName string) (Button, error) {
-	return CreateButton(caption, OperationChangeName,
+	return CreateButton(caption, OperationChangeName, true,
 		ChangeNamePayload{
 			DisplayName: displayName,
 		},
@@ -13,9 +13,9 @@ func ChangeName(caption, displayName string) (Button, error) {
 }
 
 func ChangeNameTrigger(caption string) Button {
-	return CreateButtonWithoutPayload(caption, OperationChangeNameTrigger)
+	return CreateButtonWithoutPayload(caption, OperationChangeNameTrigger, true)
 }
 
 func ChangeNameCancel(caption string) Button {
-	return CreateButtonWithoutPayload(caption, OperationChangeNameCancel)
+	return CreateButtonWithoutPayload(caption, OperationChangeNameCancel, true)
 }

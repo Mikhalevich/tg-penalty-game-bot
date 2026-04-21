@@ -19,10 +19,11 @@ func IDFromString(s string) ID {
 }
 
 type Button struct {
-	ID        ID
-	Caption   string
-	Operation Operation
-	Payload   []byte
+	ID                   ID
+	Caption              string
+	Operation            Operation
+	IsDeleteAfterProcess bool
+	Payload              []byte
 }
 
 type ButtonRow []Button
@@ -62,6 +63,7 @@ func gobDecodePayload[Payload any](b []byte) (Payload, error) {
 func CreateButton[P any](
 	caption string,
 	operation Operation,
+	isDelete bool,
 	payload P,
 ) (Button, error) {
 	payloadBytes, err := gobEncodePayload(payload)
@@ -70,21 +72,24 @@ func CreateButton[P any](
 	}
 
 	return Button{
-		ID:        IDFromString(generateID()),
-		Caption:   caption,
-		Operation: operation,
-		Payload:   payloadBytes,
+		ID:                   IDFromString(generateID()),
+		Caption:              caption,
+		Operation:            operation,
+		IsDeleteAfterProcess: isDelete,
+		Payload:              payloadBytes,
 	}, nil
 }
 
 func CreateButtonWithoutPayload(
 	caption string,
 	operation Operation,
+	isDelete bool,
 ) Button {
 	return Button{
-		ID:        IDFromString(generateID()),
-		Caption:   caption,
-		Operation: operation,
+		ID:                   IDFromString(generateID()),
+		Caption:              caption,
+		Operation:            operation,
+		IsDeleteAfterProcess: isDelete,
 	}
 }
 

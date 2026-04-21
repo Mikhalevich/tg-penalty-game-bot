@@ -5,7 +5,7 @@ type LeaderboardPagePayload struct {
 }
 
 func LeaderboardPage(caption string, pageNumber int) (Button, error) {
-	return CreateButton(caption, OperationLeaderboardPage,
+	return CreateButton(caption, OperationLeaderboardPage, false,
 		LeaderboardPagePayload{
 			PageNumber: pageNumber,
 		},

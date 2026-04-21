@@ -14,7 +14,10 @@ type ShotSidePayload struct {
 }
 
 func ShotSideButton(caption string, gameID ID, round int, side ShotSide) (button.Button, error) {
-	btn, err := button.CreateButton(caption, button.OperationShotSide,
+	btn, err := button.CreateButton(
+		caption,
+		button.OperationShotSide,
+		true,
 		ShotSidePayload{
 			GameID: gameID,
 			Round:  round,
@@ -30,7 +33,7 @@ func ShotSideButton(caption string, gameID ID, round int, side ShotSide) (button
 }
 
 func LeaveGameButton(caption string) button.Button {
-	return button.CreateButtonWithoutPayload(caption, button.OperationLeaveGame)
+	return button.CreateButtonWithoutPayload(caption, button.OperationLeaveGame, true)
 }
 
 type ShotStatsPayload struct {
@@ -42,6 +45,7 @@ func ShotStatsButton(caption string, playerID player.ID, playerDisplayName strin
 	btn, err := button.CreateButton(
 		caption,
 		button.OperationShotStats,
+		false,
 		ShotStatsPayload{
 			PlayerID:    playerID,
 			DisplayName: playerDisplayName,
@@ -56,5 +60,5 @@ func ShotStatsButton(caption string, playerID player.ID, playerDisplayName strin
 }
 
 func StopSearchGame(caption string) button.Button {
-	return button.CreateButtonWithoutPayload(caption, button.OperationStopSearchGame)
+	return button.CreateButtonWithoutPayload(caption, button.OperationStopSearchGame, true)
 }
