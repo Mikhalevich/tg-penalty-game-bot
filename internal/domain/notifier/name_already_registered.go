@@ -5,19 +5,18 @@ import (
 	"fmt"
 
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/msginfo"
-	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/player"
 )
 
 func (n *Notifier) NameAlreadyRegistered(
 	ctx context.Context,
-	plr player.Player,
-	msgID msginfo.MessageID,
+	chatID msginfo.ChatID,
+	displayName string,
 ) error {
 	if err := n.sender.SendMessage(ctx, msginfo.Message{
-		ChatID:     plr.ChatID,
-		ReplyMsgID: msgID,
-		Text:       "Name already registered, please try again",
-		Type:       msginfo.MessageTypePlain,
+		ChatID: chatID,
+		Text: fmt.Sprintf("Name *%s* already registered, please try again",
+			n.escaper.EscapeMarkdown(displayName)),
+		Type: msginfo.MessageTypeMarkdown,
 	}); err != nil {
 		return fmt.Errorf("send message: %w", err)
 	}

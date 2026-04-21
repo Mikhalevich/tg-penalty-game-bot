@@ -2,6 +2,7 @@ package changename
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"unicode/utf8"
 
@@ -11,7 +12,6 @@ import (
 func (c *ChangeName) ChangeDisplayName(
 	ctx context.Context,
 	chatID msginfo.ChatID,
-	msgID msginfo.MessageID,
 	displayName string,
 ) error {
 	if utf8.RuneCountInString(displayName) > c.maxNameLen {
@@ -28,14 +28,20 @@ func (c *ChangeName) ChangeDisplayName(
 	}
 
 	if !currentPlayer.IsChangeNameTriggered {
-		return fmt.Errorf("change name not triggered: %w", err)
+		return errors.New("change name not triggered")
 	}
 
 	if err := c.repo.ChangeDisplayName(ctx, chatID, displayName, c.timeProvider.Now()); err != nil {
 		if c.repo.IsAlreadyExistsError(err) {
-			if err := c.notifier.NameAlreadyRegistered(ctx, currentPlayer, msgID); err != nil {
+			if err := c.notifier.NameAlreadyRegistered(
+				ctx,
+				currentPlayer.ChatID,
+				displayName,
+			); err != nil {
 				return fmt.Errorf("name already redistered notification: %w", err)
 			}
+
+			return nil
 		}
 
 		return fmt.Errorf("repo change display name: %w", err)
@@ -43,7 +49,7 @@ func (c *ChangeName) ChangeDisplayName(
 
 	currentPlayer.DisplayName = displayName
 
-	if err := c.notifier.NameChanged(ctx, currentPlayer, msgID); err != nil {
+	if err := c.notifier.NameChanged(ctx, currentPlayer); err != nil {
 		return fmt.Errorf("name changed notification: %w", err)
 	}
 

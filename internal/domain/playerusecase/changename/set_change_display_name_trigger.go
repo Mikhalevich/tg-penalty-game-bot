@@ -19,6 +19,10 @@ func (c *ChangeName) SetChangeDisplayNameTrigger(
 		return fmt.Errorf("get player by chat id: %w", err)
 	}
 
+	if plr.IsChangeNameTriggered {
+		return nil
+	}
+
 	var (
 		lastNameChangedInterval = time.Since(plr.NameChangedAt)
 	)
