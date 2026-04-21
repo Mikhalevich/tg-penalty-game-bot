@@ -53,6 +53,7 @@ type BotMessage struct {
 
 type MessageSender interface {
 	SendMessage(ctx context.Context, chatID int64, msg string)
+	DeleteMessage(ctx context.Context, chatID int64, messageID int)
 }
 
 type Handler func(ctx context.Context, msg BotMessage, sender MessageSender) error

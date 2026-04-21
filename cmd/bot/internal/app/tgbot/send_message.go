@@ -15,6 +15,21 @@ func (t *TGBot) SendMessage(ctx context.Context, chatID int64, msg string) {
 	}); err != nil {
 		logger.FromContext(ctx).
 			WithError(err).
-			Error("send message error")
+			Error("send message")
+	}
+}
+
+func (t *TGBot) DeleteMessage(
+	ctx context.Context,
+	chatID int64,
+	messageID int,
+) {
+	if _, err := t.bot.DeleteMessage(ctx, &bot.DeleteMessageParams{
+		ChatID:    chatID,
+		MessageID: messageID,
+	}); err != nil {
+		logger.FromContext(ctx).
+			WithError(err).
+			Error("delete message")
 	}
 }

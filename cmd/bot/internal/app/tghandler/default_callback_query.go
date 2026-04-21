@@ -36,6 +36,10 @@ func (t *TGHandler) DefaultCallbackQuery(ctx context.Context, msg tgbot.BotMessa
 		return fmt.Errorf("process cb handler: %w", err)
 	}
 
+	if btn.IsDeleteAfterProcess {
+		sender.DeleteMessage(ctx, msg.ChatID, msg.MessageID)
+	}
+
 	return nil
 }
 

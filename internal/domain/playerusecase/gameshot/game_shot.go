@@ -24,31 +24,20 @@ type TimeProvider interface {
 	Now() time.Time
 }
 
-type MessageDeleter interface {
-	DeleteMessage(
-		ctx context.Context,
-		chatID msginfo.ChatID,
-		messageID msginfo.MessageID,
-	) error
-}
-
 type GameShot struct {
 	playerProvider PlayerProvider
 	gameController GameController
 	timeProvider   TimeProvider
-	messageDeleter MessageDeleter
 }
 
 func New(
 	playerProvider PlayerProvider,
 	gameController GameController,
 	timeProvider TimeProvider,
-	messageDeleter MessageDeleter,
 ) *GameShot {
 	return &GameShot{
 		playerProvider: playerProvider,
 		gameController: gameController,
 		timeProvider:   timeProvider,
-		messageDeleter: messageDeleter,
 	}
 }
