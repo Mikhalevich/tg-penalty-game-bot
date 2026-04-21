@@ -56,7 +56,6 @@ func (t *TGHandler) cbChangeName(
 	if err := t.changeDisplayName(
 		ctx,
 		msginfo.ChatIDFromInt64(msg.ChatID),
-		msginfo.MessageIDFromInt(msg.MessageID),
 		payload.DisplayName,
 	); err != nil {
 		return fmt.Errorf("change display name: %w", err)
