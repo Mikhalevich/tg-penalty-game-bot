@@ -22,7 +22,11 @@ func (g *GameShot) Shot(
 	}
 
 	if !currentPlayer.IsInGame(gameID.String()) {
-		return fmt.Errorf("not in game %s", gameID)
+		if err := g.notifier.PlayerNotInGame(ctx, chatID); err != nil {
+			return fmt.Errorf("not in game notification: %w", err)
+		}
+
+		return nil
 	}
 
 	if err := g.gameController.Shot(ctx, game.Shot{

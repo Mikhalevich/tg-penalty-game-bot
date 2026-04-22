@@ -24,20 +24,27 @@ type TimeProvider interface {
 	Now() time.Time
 }
 
+type Notifier interface {
+	PlayerNotInGame(ctx context.Context, chatID msginfo.ChatID) error
+}
+
 type GameShot struct {
 	playerProvider PlayerProvider
 	gameController GameController
 	timeProvider   TimeProvider
+	notifier       Notifier
 }
 
 func New(
 	playerProvider PlayerProvider,
 	gameController GameController,
 	timeProvider TimeProvider,
+	notifier Notifier,
 ) *GameShot {
 	return &GameShot{
 		playerProvider: playerProvider,
 		gameController: gameController,
 		timeProvider:   timeProvider,
+		notifier:       notifier,
 	}
 }

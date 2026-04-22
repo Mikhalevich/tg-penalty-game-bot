@@ -50,7 +50,7 @@ func (s *GameShotState) ShotState(ctx context.Context, currentPlayer player.Play
 		return fmt.Errorf("get game by id: %w", err)
 	}
 
-	if !currentGame.IsPending() {
+	if currentGame.IsPending() {
 		if err := s.notifier.PlayerAlreadyInGame(ctx, currentPlayer); err != nil {
 			return fmt.Errorf("already in game notification: %w", err)
 		}
