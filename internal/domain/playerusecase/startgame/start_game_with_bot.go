@@ -7,6 +7,7 @@ import (
 
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/game"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/msginfo"
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/perror"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/player"
 )
 
@@ -28,11 +29,7 @@ func (s *StartGame) StartGameWithBot(
 		return nil
 
 	case player.GameStatusReadyForGame:
-		if err := s.notifier.PlayerAlreadyInGame(ctx, currentPlayer); err != nil {
-			return fmt.Errorf("already in game notitication: %w", err)
-		}
-
-		return nil
+		return perror.InSearchGameState()
 
 	case player.GameStatusIdle:
 	}

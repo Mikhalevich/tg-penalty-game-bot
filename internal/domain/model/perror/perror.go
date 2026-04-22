@@ -18,13 +18,13 @@ func New(t Type, msg string) Error {
 	}
 }
 
-func ParseError(err error) Error {
+func ParseError(err error) (Error, bool) {
 	var perr Error
 	if errors.As(err, &perr) {
-		return perr
+		return perr, true
 	}
 
-	return New(TypeUnspecified, "unspecified error")
+	return New(TypeUnspecified, "unspecified error"), false
 }
 
 func IsType(err error, t Type) bool {
@@ -85,4 +85,16 @@ func InvalidRound() Error {
 
 func RoundNotCompleted() Error {
 	return New(TypeRoundNotCompleted, "round not completed")
+}
+
+func AlreadyInGame() Error {
+	return New(TypeAlreadyInGame, "already in game")
+}
+
+func NotInGame() Error {
+	return New(TypeNotInGame, "not in game")
+}
+
+func InSearchGameState() Error {
+	return New(TypeInSearchGameState, "searching for game")
 }

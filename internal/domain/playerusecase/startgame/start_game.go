@@ -52,7 +52,6 @@ type ShotStater interface {
 }
 
 type Notifier interface {
-	PlayerAlreadyInGame(ctx context.Context, plr player.Player) error
 	LinkActivated(ctx context.Context, chatID msginfo.ChatID) error
 	LinkCanceled(ctx context.Context, chatID msginfo.ChatID) error
 }

@@ -6,6 +6,7 @@ import (
 
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/game"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/msginfo"
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/perror"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/player"
 )
 
@@ -20,11 +21,7 @@ func (s *StartGame) JoinGameByLink(
 	}
 
 	if currentPlayer.GameStatus != player.GameStatusIdle {
-		if err := s.notifier.PlayerAlreadyInGame(ctx, currentPlayer); err != nil {
-			return fmt.Errorf("already in game notitication: %w", err)
-		}
-
-		return nil
+		return perror.AlreadyInGame()
 	}
 
 	ok, err := s.validateGameForJoin(ctx, chatID, gameID)
