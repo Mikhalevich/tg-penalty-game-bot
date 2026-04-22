@@ -7,6 +7,7 @@ import (
 
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/game"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/msginfo"
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/perror"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/player"
 )
 
@@ -22,7 +23,6 @@ type Notifier interface {
 		shotType game.ShotType,
 		roundNumber int,
 	) error
-	PlayerAlreadyInGame(ctx context.Context, plr player.Player) error
 }
 
 type GameShotState struct {
@@ -50,12 +50,8 @@ func (s *GameShotState) ShotState(ctx context.Context, currentPlayer player.Play
 		return fmt.Errorf("get game by id: %w", err)
 	}
 
-	if !currentGame.IsPending() {
-		if err := s.notifier.PlayerAlreadyInGame(ctx, currentPlayer); err != nil {
-			return fmt.Errorf("already in game notification: %w", err)
-		}
-
-		return nil
+	if currentGame.IsPending() {
+		return perror.AlreadyInGame()
 	}
 
 	if !currentGame.IsInProgress() {

@@ -6,6 +6,7 @@ import (
 
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/game"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/msginfo"
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/perror"
 )
 
 func (g *GameShot) Shot(
@@ -22,7 +23,7 @@ func (g *GameShot) Shot(
 	}
 
 	if !currentPlayer.IsInGame(gameID.String()) {
-		return fmt.Errorf("not in game %s", gameID)
+		return perror.NotInGame()
 	}
 
 	if err := g.gameController.Shot(ctx, game.Shot{

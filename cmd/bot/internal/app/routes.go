@@ -6,6 +6,8 @@ import (
 )
 
 func makeRoutes(tbot *tgbot.TGBot, handler *tghandler.TGHandler) {
+	tbot.AddMiddleware(handler.ErrorMiddleware)
+
 	tbot.AddTextCommand("start", handler.Start)
 
 	tbot.AddMenuCommand("play_rating", "🔎 find player for a rating game", handler.FindGame)

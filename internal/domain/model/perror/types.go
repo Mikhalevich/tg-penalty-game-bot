@@ -12,4 +12,7 @@ const (
 	TypeInvalidGameState
 	TypeInvalidRound
 	TypeRoundNotCompleted
+	TypeAlreadyInGame
+	TypeNotInGame
+	TypeInSearchGameState
 )

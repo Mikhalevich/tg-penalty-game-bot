@@ -97,6 +97,7 @@ func StartBot(ctx context.Context, cfg config.Config) error {
 		leavePlayerGameService,
 		leaderboardService,
 		viewStatsService,
+		notificationService,
 	); err != nil {
 		return fmt.Errorf("app start: %w", err)
 	}

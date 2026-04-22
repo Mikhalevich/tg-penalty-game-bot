@@ -68,6 +68,10 @@ type GameShot interface {
 	) error
 }
 
+type Notifier interface {
+	ParseError(ctx context.Context, chatID msginfo.ChatID, err error) error
+}
+
 type cbHandler func(ctx context.Context, msg tgbot.BotMessage, btn *button.Button) error
 
 type TGHandler struct {
@@ -82,6 +86,7 @@ type TGHandler struct {
 	leaveGame      LeaveGame
 	leaderboard    Leaderboard
 	shotStats      ShotStats
+	notifier       Notifier
 }
 
 func New(
@@ -95,6 +100,7 @@ func New(
 	leaveGame LeaveGame,
 	leaderboard Leaderboard,
 	shotStats ShotStats,
+	notifier Notifier,
 ) *TGHandler {
 	tgh := &TGHandler{
 		buttonProvider: buttonProvider,
@@ -107,6 +113,7 @@ func New(
 		leaveGame:      leaveGame,
 		leaderboard:    leaderboard,
 		shotStats:      shotStats,
+		notifier:       notifier,
 	}
 
 	tgh.registerCBHandlers()
