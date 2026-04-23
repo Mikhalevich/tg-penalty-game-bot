@@ -63,7 +63,7 @@ generate:
 minikube-load-images:
 	./script/k8s/minikube/load_images.sh ${APP_TAG}
 
-minikube-apply:
+minikube-apply: minikube-load-images
 	kubectl apply -f ./script/k8s/minikube
 
 minikube-delete:
