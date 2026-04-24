@@ -1,4 +1,4 @@
-package buttonrespository
+package redisbr
 
 import (
 	"bytes"
@@ -15,22 +15,22 @@ import (
 )
 
 var (
-	_ messageprocessor.ButtonRepository = (*ButtonRepository)(nil)
+	_ messageprocessor.ButtonRepository = (*RedisButtonRepository)(nil)
 )
 
-type ButtonRepository struct {
+type RedisButtonRepository struct {
 	client *redis.Client
 	ttl    time.Duration
 }
 
-func New(client *redis.Client, ttl time.Duration) *ButtonRepository {
-	return &ButtonRepository{
+func New(client *redis.Client, ttl time.Duration) *RedisButtonRepository {
+	return &RedisButtonRepository{
 		client: client,
 		ttl:    ttl,
 	}
 }
 
-func (r *ButtonRepository) IsNotFoundError(err error) bool {
+func (r *RedisButtonRepository) IsNotFoundError(err error) bool {
 	return errors.Is(err, redis.Nil)
 }
 

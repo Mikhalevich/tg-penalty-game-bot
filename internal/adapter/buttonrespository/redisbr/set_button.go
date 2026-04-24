@@ -1,4 +1,4 @@
-package buttonrespository
+package redisbr
 
 import (
 	"context"
@@ -9,7 +9,7 @@ import (
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/button"
 )
 
-func (r *ButtonRepository) SetButton(ctx context.Context, btn button.Button) error {
+func (r *RedisButtonRepository) SetButton(ctx context.Context, btn button.Button) error {
 	if err := r.storeButton(ctx, r.client, btn); err != nil {
 		return fmt.Errorf("store button: %w", err)
 	}
@@ -17,7 +17,7 @@ func (r *ButtonRepository) SetButton(ctx context.Context, btn button.Button) err
 	return nil
 }
 
-func (r *ButtonRepository) storeButton(
+func (r *RedisButtonRepository) storeButton(
 	ctx context.Context,
 	cmd redis.StringCmdable,
 	btn button.Button,

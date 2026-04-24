@@ -1,4 +1,4 @@
-package buttonrespository
+package redisbr
 
 import (
 	"context"
@@ -7,7 +7,7 @@ import (
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/button"
 )
 
-func (r *ButtonRepository) GetButton(ctx context.Context, id button.ID) (*button.Button, error) {
+func (r *RedisButtonRepository) GetButton(ctx context.Context, id button.ID) (*button.Button, error) {
 	key, btnNum := parseButtonID(id)
 	if btnNum == "" {
 		btn, err := r.singleButton(ctx, key)
@@ -26,7 +26,7 @@ func (r *ButtonRepository) GetButton(ctx context.Context, id button.ID) (*button
 	return btn, nil
 }
 
-func (r *ButtonRepository) singleButton(ctx context.Context, key string) (*button.Button, error) {
+func (r *RedisButtonRepository) singleButton(ctx context.Context, key string) (*button.Button, error) {
 	b, err := r.client.GetDel(ctx, key).Bytes()
 	if err != nil {
 		return nil, fmt.Errorf("redis get: %w", err)
@@ -40,7 +40,7 @@ func (r *ButtonRepository) singleButton(ctx context.Context, key string) (*butto
 	return btn, nil
 }
 
-func (r *ButtonRepository) hmapButton(ctx context.Context, key, field string) (*button.Button, error) {
+func (r *RedisButtonRepository) hmapButton(ctx context.Context, key, field string) (*button.Button, error) {
 	b, err := r.client.HGet(ctx, key, field).Result()
 	if err != nil {
 		return nil, fmt.Errorf("hget: %w", err)

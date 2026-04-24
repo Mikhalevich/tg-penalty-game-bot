@@ -1,4 +1,4 @@
-package buttonrespository
+package redisbr
 
 import (
 	"context"
@@ -9,7 +9,7 @@ import (
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/button"
 )
 
-func (r *ButtonRepository) SetButtonRows(
+func (r *RedisButtonRepository) SetButtonRows(
 	ctx context.Context,
 	rows ...button.ButtonRow,
 ) error {
