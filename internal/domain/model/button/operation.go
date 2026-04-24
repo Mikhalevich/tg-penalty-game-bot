@@ -12,3 +12,7 @@ const (
 	OperationStopSearchGame    Operation = "StopSearchGame"
 	OperationLeaderboardPage   Operation = "LeaderboardPage"
 )
+
+func (o Operation) String() string {
+	return string(o)
+}

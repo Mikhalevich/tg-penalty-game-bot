@@ -12,7 +12,7 @@ import (
 
 	"github.com/Mikhalevich/tg-penalty-game-bot/cmd/bot/internal/app"
 	"github.com/Mikhalevich/tg-penalty-game-bot/cmd/bot/internal/config"
-	"github.com/Mikhalevich/tg-penalty-game-bot/internal/adapter/buttonrespository"
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/adapter/buttonrespository/redisbr"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/adapter/messagesender"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/adapter/namegenerator/randomgenerator"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/adapter/repository/postgres"
@@ -52,7 +52,7 @@ func StartBot(ctx context.Context, cfg config.Config) error {
 	}
 	defer dbCleanup()
 
-	btnRepo, err := MakeRedisButtonRepository(ctx, cfg.ButtonRedis)
+	btnRepo, err := MakeButtonRepository(ctx, pgDB, cfg.ButtonRedis)
 	if err != nil {
 		return fmt.Errorf("make button redis: %w", err)
 	}
@@ -128,10 +128,22 @@ func MakePostgres(cfg config.Postgres) (*postgres.Postgres, func(), error) {
 	}, nil
 }
 
+func MakeButtonRepository(
+	ctx context.Context,
+	pgDB *postgres.Postgres,
+	cfg config.ButtonRedis,
+) (messageprocessor.ButtonRepository, error) {
+	if cfg.Addr != "" {
+		return MakeRedisButtonRepository(ctx, cfg)
+	}
+
+	return pgDB, nil
+}
+
 func MakeRedisButtonRepository(
 	ctx context.Context,
 	cfg config.ButtonRedis,
-) (*buttonrespository.ButtonRepository, error) {
+) (*redisbr.RedisButtonRepository, error) {
 	rdb := redis.NewClient(&redis.Options{
 		Addr:     cfg.Addr,
 		Password: cfg.Pwd,
@@ -146,5 +158,5 @@ func MakeRedisButtonRepository(
 		return nil, fmt.Errorf("redis ping: %w", err)
 	}
 
-	return buttonrespository.New(rdb, cfg.TTL), nil
+	return redisbr.New(rdb, cfg.TTL), nil
 }

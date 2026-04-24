@@ -25,11 +25,8 @@ type MarkdownEscaper interface {
 }
 
 type ButtonRepository interface {
-	SetButton(ctx context.Context, btn button.Button) error
-	SetButtonRows(ctx context.Context, rows ...button.ButtonRow) error
-
 	GetButton(ctx context.Context, id button.ID) (*button.Button, error)
-	IsNotFoundError(err error) bool
+	SetButtonRows(ctx context.Context, rows ...button.ButtonRow) error
 }
 
 type ShotImageProvider interface {

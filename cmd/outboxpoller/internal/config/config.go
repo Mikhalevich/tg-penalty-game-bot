@@ -9,7 +9,7 @@ type Config struct {
 	Tracing       Tracing     `yaml:"tracing" required:"true"`
 	Postgres      Postgres    `yaml:"postgres" required:"true"`
 	Bot           Bot         `yaml:"bot" required:"true"`
-	ButtonRedis   ButtonRedis `yaml:"button_redis" required:"true"`
+	ButtonRedis   ButtonRedis `yaml:"button_redis"`
 	MessageWorker Worker      `yaml:"message_worker" required:"true"`
 }
 
@@ -39,10 +39,10 @@ type Bot struct {
 }
 
 type ButtonRedis struct {
-	Addr string        `yaml:"addr" required:"true"`
-	Pwd  string        `yaml:"pwd" required:"true"`
-	DB   int           `yaml:"db" required:"true"`
-	TTL  time.Duration `yaml:"ttl" required:"true"`
+	Addr string        `yaml:"addr"`
+	Pwd  string        `yaml:"pwd"`
+	DB   int           `yaml:"db"`
+	TTL  time.Duration `yaml:"ttl"`
 }
 
 type Worker struct {

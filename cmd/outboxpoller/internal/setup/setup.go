@@ -12,7 +12,7 @@ import (
 
 	"github.com/Mikhalevich/tg-penalty-game-bot/cmd/outboxpoller/internal/app"
 	"github.com/Mikhalevich/tg-penalty-game-bot/cmd/outboxpoller/internal/config"
-	"github.com/Mikhalevich/tg-penalty-game-bot/internal/adapter/buttonrespository"
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/adapter/buttonrespository/redisbr"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/adapter/messagesender"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/adapter/repository/postgres"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/adapter/repository/postgres/driver"
@@ -32,11 +32,6 @@ func StartPoller(
 		return fmt.Errorf("creating bot: %w", err)
 	}
 
-	buttonRepository, err := MakeRedisButtonRepository(ctx, cfg.ButtonRedis)
-	if err != nil {
-		return fmt.Errorf("make redis button repository: %w", err)
-	}
-
 	pgDB, cleanup, err := MakePostgres(cfg.Postgres)
 	if err != nil {
 		return fmt.Errorf("make postgres: %w", err)
@@ -44,10 +39,15 @@ func StartPoller(
 
 	defer cleanup()
 
+	btnRepo, err := MakeButtonRepository(ctx, pgDB, cfg.ButtonRedis)
+	if err != nil {
+		return fmt.Errorf("make redis button repository: %w", err)
+	}
+
 	var (
 		sender          = messagesender.New(botAPI)
 		imageProvider   = shotimageprovider.New()
-		msgProcessor    = messageprocessor.New(sender, sender, buttonRepository, imageProvider)
+		msgProcessor    = messageprocessor.New(sender, sender, btnRepo, imageProvider)
 		timeProvider    = timeprovider.New()
 		outboxProcessor = outboxprocessor.New(
 			pgDB,
@@ -62,10 +62,22 @@ func StartPoller(
 	return nil
 }
 
+func MakeButtonRepository(
+	ctx context.Context,
+	pgDB *postgres.Postgres,
+	cfg config.ButtonRedis,
+) (messageprocessor.ButtonRepository, error) {
+	if cfg.Addr != "" {
+		return MakeRedisButtonRepository(ctx, cfg)
+	}
+
+	return pgDB, nil
+}
+
 func MakeRedisButtonRepository(
 	ctx context.Context,
 	cfg config.ButtonRedis,
-) (*buttonrespository.ButtonRepository, error) {
+) (*redisbr.RedisButtonRepository, error) {
 	rdb := redis.NewClient(&redis.Options{
 		Addr:     cfg.Addr,
 		Password: cfg.Pwd,
@@ -80,7 +92,7 @@ func MakeRedisButtonRepository(
 		return nil, fmt.Errorf("redis ping: %w", err)
 	}
 
-	return buttonrespository.New(rdb, cfg.TTL), nil
+	return redisbr.New(rdb, cfg.TTL), nil
 }
 
 func MakePostgres(cfg config.Postgres) (*postgres.Postgres, func(), error) {
