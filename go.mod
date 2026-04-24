@@ -3,9 +3,9 @@ module github.com/Mikhalevich/tg-penalty-game-bot
 go 1.26.2
 
 require (
-	github.com/go-telegram/bot v1.19.0
+	github.com/go-telegram/bot v1.20.0
 	github.com/google/uuid v1.6.0
-	github.com/jackc/pgx/v5 v5.9.1
+	github.com/jackc/pgx/v5 v5.9.2
 	github.com/jinzhu/configor v1.2.2
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/redis/go-redis/extra/redisotel/v9 v9.18.0
@@ -45,7 +45,7 @@ require (
 	golang.org/x/net v0.49.0 // indirect
 	golang.org/x/sync v0.20.0 // indirect
 	golang.org/x/sys v0.40.0 // indirect
-	golang.org/x/text v0.35.0 // indirect
+	golang.org/x/text v0.36.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20260128011058-8636f8732409 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20260128011058-8636f8732409 // indirect
 	google.golang.org/grpc v1.78.0 // indirect
