@@ -29,7 +29,6 @@ type ButtonRepository interface {
 	SetButtonRows(ctx context.Context, rows ...button.ButtonRow) error
 
 	GetButton(ctx context.Context, id button.ID) (*button.Button, error)
-	IsNotFoundError(err error) bool
 }
 
 type ShotImageProvider interface {
