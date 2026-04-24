@@ -17,7 +17,7 @@ func (p *Postgres) SetButtonRows(
 ) error {
 	var (
 		query = `
-			INSERT INTO(
+			INSERT INTO button(
 				id,
 				caption,
 				operation,
