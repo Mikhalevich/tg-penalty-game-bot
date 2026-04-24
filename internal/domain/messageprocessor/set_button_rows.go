@@ -31,7 +31,9 @@ func (m *MessageProcessor) SetButtonRows(
 			})
 		}
 
-		inlineButtonRows = append(inlineButtonRows, buttonRow)
+		if len(buttonRow) > 0 {
+			inlineButtonRows = append(inlineButtonRows, buttonRow)
+		}
 	}
 
 	return inlineButtonRows, nil

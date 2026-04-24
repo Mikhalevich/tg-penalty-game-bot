@@ -62,6 +62,10 @@ func makeLeaderboardButtons(pageNumber, pagesCount int) ([]button.ButtonRow, err
 		row = append(row, right)
 	}
 
+	if len(row) == 0 {
+		return nil, nil
+	}
+
 	return []button.ButtonRow{row}, nil
 }
 
