@@ -31,7 +31,13 @@ func (p *Postgres) SetButtonRows(
 				:payload
 			)
 		`
+
+		dbRows = model.ToDBButtons(rows)
 	)
+
+	if len(dbRows) == 0 {
+		return nil
+	}
 
 	res, err := sqlx.NamedExecContext(
 		ctx,
