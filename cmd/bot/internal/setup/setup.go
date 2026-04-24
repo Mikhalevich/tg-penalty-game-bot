@@ -52,7 +52,7 @@ func StartBot(ctx context.Context, cfg config.Config) error {
 	}
 	defer dbCleanup()
 
-	btnRepo, err := MakeRedisButtonRepository(ctx, cfg.ButtonRedis)
+	btnRepo, err := MakeButtonRepository(ctx, pgDB, cfg.ButtonRedis)
 	if err != nil {
 		return fmt.Errorf("make button redis: %w", err)
 	}
@@ -126,6 +126,18 @@ func MakePostgres(cfg config.Postgres) (*postgres.Postgres, func(), error) {
 	return p, func() {
 		dbConn.Close()
 	}, nil
+}
+
+func MakeButtonRepository(
+	ctx context.Context,
+	pgDB *postgres.Postgres,
+	cfg config.ButtonRedis,
+) (messageprocessor.ButtonRepository, error) {
+	if cfg.Addr != "" {
+		return MakeRedisButtonRepository(ctx, cfg)
+	}
+
+	return pgDB, nil
 }
 
 func MakeRedisButtonRepository(

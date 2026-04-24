@@ -32,11 +32,6 @@ func StartPoller(
 		return fmt.Errorf("creating bot: %w", err)
 	}
 
-	buttonRepository, err := MakeRedisButtonRepository(ctx, cfg.ButtonRedis)
-	if err != nil {
-		return fmt.Errorf("make redis button repository: %w", err)
-	}
-
 	pgDB, cleanup, err := MakePostgres(cfg.Postgres)
 	if err != nil {
 		return fmt.Errorf("make postgres: %w", err)
@@ -44,10 +39,15 @@ func StartPoller(
 
 	defer cleanup()
 
+	btnRepo, err := MakeButtonRepository(ctx, pgDB, cfg.ButtonRedis)
+	if err != nil {
+		return fmt.Errorf("make redis button repository: %w", err)
+	}
+
 	var (
 		sender          = messagesender.New(botAPI)
 		imageProvider   = shotimageprovider.New()
-		msgProcessor    = messageprocessor.New(sender, sender, buttonRepository, imageProvider)
+		msgProcessor    = messageprocessor.New(sender, sender, btnRepo, imageProvider)
 		timeProvider    = timeprovider.New()
 		outboxProcessor = outboxprocessor.New(
 			pgDB,
@@ -60,6 +60,18 @@ func StartPoller(
 	app.New(outboxProcessor).Run(ctx, cfg.MessageWorker)
 
 	return nil
+}
+
+func MakeButtonRepository(
+	ctx context.Context,
+	pgDB *postgres.Postgres,
+	cfg config.ButtonRedis,
+) (messageprocessor.ButtonRepository, error) {
+	if cfg.Addr != "" {
+		return MakeRedisButtonRepository(ctx, cfg)
+	}
+
+	return pgDB, nil
 }
 
 func MakeRedisButtonRepository(
