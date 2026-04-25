@@ -59,6 +59,10 @@ func AlreadyExists(msg string) Error {
 	return New(TypeAlreadyExists, msg)
 }
 
+func NotExists(msg string) Error {
+	return New(TypeNotExists, msg)
+}
+
 func InvalidParam(msg string) Error {
 	return New(TypeInvalidParam, msg)
 }

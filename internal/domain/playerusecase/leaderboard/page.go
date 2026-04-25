@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/msginfo"
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/perror"
 )
 
 const (
@@ -27,6 +28,9 @@ func (l *Leaderboard) Page(
 	}
 
 	pagesCount := calculatePageCount(maxPosition, playersByPage)
+	if pagesCount == 0 {
+		return perror.NotExists("leaderboard is empty")
+	}
 
 	if pageNumber > pagesCount {
 		return fmt.Errorf("invalid page number: %d, all pages: %d", pageNumber, pagesCount)
