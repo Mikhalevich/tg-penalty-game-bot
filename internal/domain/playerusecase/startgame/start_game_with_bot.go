@@ -48,7 +48,7 @@ func (s *StartGame) startGameWithBot(
 ) error {
 	currentGame := game.CreateGame(
 		ctx,
-		game.GameTypeFriendly,
+		game.GameTypeBot,
 		currentPlayer,
 		player.Player{
 			ID:          0,
