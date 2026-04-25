@@ -26,6 +26,13 @@ spec:
         volumeMounts:
         - name: config-volume
           mountPath: /app/config
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "200m"
+          limits:
+            memory: "256Mi"
+            cpu: "700m"
       volumes:
       - name: config-volume
         configMap:

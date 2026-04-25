@@ -13,5 +13,12 @@ spec:
         app: jaeger
     spec:
       containers:
-      - name: bot
+      - name: jaeger
         image: jaegertracing/all-in-one:1.57
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"

@@ -29,9 +29,9 @@ spec:
         resources:
           requests:
             memory: "64Mi"
-            cpu: "100m"
+            cpu: "200m"
           limits:
-            memory: "128Mi"
+            memory: "256Mi"
             cpu: "700m"
       volumes:
       - name: config-volume
