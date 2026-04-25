@@ -62,3 +62,19 @@ func ShotStatsButton(caption string, playerID player.ID, playerDisplayName strin
 func StopSearchGame(caption string) button.Button {
 	return button.CreateButtonWithoutPayload(caption, button.OperationStopSearchGame, true)
 }
+
+type RepeatGamePayload struct {
+	GameType GameType
+}
+
+func RepeatGameButton(caption string, gameType GameType) (button.Button, error) {
+	btn, err := button.CreateButton(caption, button.OperationRepeatGame, true, RepeatGamePayload{
+		GameType: gameType,
+	})
+
+	if err != nil {
+		return button.Button{}, fmt.Errorf("create button: %w", err)
+	}
+
+	return btn, nil
+}

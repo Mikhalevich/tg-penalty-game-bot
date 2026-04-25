@@ -11,6 +11,7 @@ const (
 	OperationShotStats         Operation = "ShotStats"
 	OperationStopSearchGame    Operation = "StopSearchGame"
 	OperationLeaderboardPage   Operation = "LeaderboardPage"
+	OperationRepeatGame        Operation = "RepeatGame"
 )
 
 func (o Operation) String() string {
