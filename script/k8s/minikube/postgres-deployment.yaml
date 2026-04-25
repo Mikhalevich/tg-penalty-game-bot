@@ -24,3 +24,10 @@ spec:
           value: bot
         - name: POSTGRES_PASSWORD
           value: bot
+        resources:
+          requests:
+            memory: "200Mi"
+            cpu: "300m"
+          limits:
+            memory: "512Mi"
+            cpu: "700m"
