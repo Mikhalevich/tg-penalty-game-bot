@@ -164,7 +164,7 @@ func (t *TGHandler) cbStopFindButton(
 	msg tgbot.BotMessage,
 	btn *button.Button,
 ) error {
-	if err := t.findGame.StopFind(
+	if err := t.startGame.StopFind(
 		ctx,
 		msginfo.ChatIDFromInt64(msg.ChatID),
 		msginfo.MessageIDFromInt(msg.MessageID),

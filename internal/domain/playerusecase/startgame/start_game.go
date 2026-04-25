@@ -54,6 +54,8 @@ type ShotStater interface {
 type Notifier interface {
 	LinkActivated(ctx context.Context, chatID msginfo.ChatID) error
 	LinkCanceled(ctx context.Context, chatID msginfo.ChatID) error
+	SearchGame(ctx context.Context, chatID msginfo.ChatID) error
+	StopSearchGame(ctx context.Context, chatID msginfo.ChatID) error
 }
 
 type StartGame struct {

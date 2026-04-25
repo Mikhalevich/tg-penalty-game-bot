@@ -14,7 +14,6 @@ import (
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/outboxprocessor"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playerusecase/changename"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playerusecase/changestatus"
-	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playerusecase/findgame"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playerusecase/playerprovider"
 	playerstartgame "github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playerusecase/startgame"
 )
@@ -22,7 +21,6 @@ import (
 var (
 	_ changename.Repository      = (*Postgres)(nil)
 	_ changestatus.Repository    = (*Postgres)(nil)
-	_ findgame.Repository        = (*Postgres)(nil)
 	_ playerprovider.Repository  = (*Postgres)(nil)
 	_ playerstartgame.Repository = (*Postgres)(nil)
 
