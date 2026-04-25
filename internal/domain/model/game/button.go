@@ -68,7 +68,7 @@ type RepeatGamePayload struct {
 }
 
 func RepeatGameButton(caption string, gameType GameType) (button.Button, error) {
-	btn, err := button.CreateButton(caption, button.OperationRepeatGame, true, RepeatGamePayload{
+	btn, err := button.CreateButton(caption, button.OperationRepeatGame, false, RepeatGamePayload{
 		GameType: gameType,
 	})
 
