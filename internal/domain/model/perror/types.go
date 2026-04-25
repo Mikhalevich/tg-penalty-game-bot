@@ -6,6 +6,7 @@ const (
 	TypeUnspecified Type = iota
 	TypeNotFound
 	TypeAlreadyExists
+	TypeNotExists
 	TypeInvalidParam
 	TypeTooManyRequests
 	TypeInvalidPlayer
