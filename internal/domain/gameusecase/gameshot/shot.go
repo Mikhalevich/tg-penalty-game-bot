@@ -130,7 +130,7 @@ func (g *GameShot) finishGame(
 		}
 	}
 
-	if err := g.notifier.GameFinish(ctx, currentGame.State, currentGame.StateUpdatedAt); err != nil {
+	if err := g.notifier.GameFinish(ctx, currentGame.Type, currentGame.State, currentGame.StateUpdatedAt); err != nil {
 		return fmt.Errorf("game finish: %w", err)
 	}
 

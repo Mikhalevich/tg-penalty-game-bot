@@ -17,7 +17,12 @@ const (
 	gameFinishedDelay = time.Second * 2
 )
 
-func (n *Notifier) GameFinish(ctx context.Context, state game.State, finishedAt time.Time) error {
+func (n *Notifier) GameFinish(
+	ctx context.Context,
+	gameType game.GameType,
+	state game.State,
+	finishedAt time.Time,
+) error {
 	var (
 		msg          = n.makeFinishGameMsg(state)
 		visibilityAt = finishedAt.Add(gameFinishedDelay)
@@ -28,6 +33,7 @@ func (n *Notifier) GameFinish(ctx context.Context, state game.State, finishedAt 
 		state.Player1,
 		makeResultImage(state.Player1.GoalsScored, state.Player2.GoalsScored),
 		msg,
+		gameType,
 		visibilityAt,
 	); err != nil {
 		return fmt.Errorf("finish notification for player1: %w", err)
@@ -38,6 +44,7 @@ func (n *Notifier) GameFinish(ctx context.Context, state game.State, finishedAt 
 		state.Player2,
 		makeResultImage(state.Player2.GoalsScored, state.Player1.GoalsScored),
 		msg,
+		gameType,
 		visibilityAt,
 	); err != nil {
 		return fmt.Errorf("finish notification for player1: %w", err)
@@ -69,6 +76,7 @@ func (n *Notifier) sendFinishGameMsg(
 	plr game.Player,
 	resImage shotimage.ShotImage,
 	caption string,
+	gameType game.GameType,
 	visibilityAt time.Time,
 ) error {
 	if plr.IsBot() {
@@ -80,17 +88,47 @@ func (n *Notifier) sendFinishGameMsg(
 		return fmt.Errorf("gob enbode: %w", err)
 	}
 
+	buttons, err := makeFinishGameButtons(gameType)
+	if err != nil {
+		return fmt.Errorf("make buttons: %w", err)
+	}
+
 	if err := n.sender.SendMessage(ctx, msginfo.Message{
 		ChatID:       plr.ChatID,
 		Text:         caption,
 		Type:         msginfo.MessageTypeShotImage,
 		Payload:      payload,
+		Buttons:      buttons,
 		VisibilityAt: visibilityAt,
 	}); err != nil {
 		return fmt.Errorf("send message: %w", err)
 	}
 
 	return nil
+}
+
+func makeFinishGameButtons(gameType game.GameType) ([]button.ButtonRow, error) {
+	var caption string
+	switch gameType {
+	case game.GameTypeRating:
+		caption = "Find game"
+
+	case game.GameTypeBot:
+		caption = "Play with bot"
+
+	case game.GameTypeByLink:
+		return nil, nil
+
+	default:
+		return nil, fmt.Errorf("invalid game type: %s", gameType)
+	}
+
+	btn, err := game.RepeatGameButton(caption, gameType)
+	if err != nil {
+		return nil, fmt.Errorf("create repeat button: %w", err)
+	}
+
+	return []button.ButtonRow{button.Row(btn)}, nil
 }
 
 func (n *Notifier) sendMsgToPlayer(

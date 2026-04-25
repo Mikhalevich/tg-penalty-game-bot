@@ -175,6 +175,27 @@ func (t *TGHandler) cbStopFindButton(
 	return nil
 }
 
+func (t *TGHandler) cbRepeatGameButton(
+	ctx context.Context,
+	msg tgbot.BotMessage,
+	btn *button.Button,
+) error {
+	payload, err := button.GetPayload[game.RepeatGamePayload](*btn)
+	if err != nil {
+		return fmt.Errorf("get payload: %w", err)
+	}
+
+	if err := t.startGame.RepeatGame(
+		ctx,
+		msginfo.ChatIDFromInt64(msg.ChatID),
+		payload.GameType,
+	); err != nil {
+		return fmt.Errorf("repeat game: %w", err)
+	}
+
+	return nil
+}
+
 func (t *TGHandler) cbLeaderboardPage(
 	ctx context.Context,
 	msg tgbot.BotMessage,
