@@ -3,7 +3,8 @@
 
 CREATE TYPE game_type AS ENUM (
     'rating',
-    'friendly'
+    'by_link',
+    'bot'
 );
 
 CREATE TYPE game_status AS ENUM (

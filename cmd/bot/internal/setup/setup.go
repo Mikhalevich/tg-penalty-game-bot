@@ -29,7 +29,6 @@ import (
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/notifier"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playerusecase/changename"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playerusecase/changestatus"
-	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playerusecase/findgame"
 	playergameshot "github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playerusecase/gameshot"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playerusecase/leaderboard"
 	playerleavegame "github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playerusecase/leavegame"
@@ -39,7 +38,6 @@ import (
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playerusecase/welcome"
 )
 
-//nolint:funlen
 func StartBot(ctx context.Context, cfg config.Config) error {
 	botAPI, err := bot.New(cfg.Bot.Token, bot.WithSkipGetMe())
 	if err != nil {
@@ -67,9 +65,7 @@ func StartBot(ctx context.Context, cfg config.Config) error {
 		welcomeService      = welcome.New(playerProvider, notificationService)
 		changeNameService   = changename.New(pgDB, playerProvider, timeProvider,
 			notificationService, cfg.ChangeName.RetryInterval, cfg.ChangeName.MaxLen)
-		gameShotStateService = gameshotstate.New(pgDB, notificationService)
-		findGameSerivce      = findgame.New(pgDB, playerProvider, timeProvider,
-			gameShotStateService, notificationService)
+		gameShotStateService   = gameshotstate.New(pgDB, notificationService)
 		changeStatusService    = changestatus.New(pgDB)
 		startGameService       = startgame.New(pgDB, pgDB.Transactor(), changeStatusService, notificationService)
 		joinGameService        = joingame.New(pgDB, pgDB.Transactor(), changeStatusService, notificationService)
@@ -91,7 +87,6 @@ func StartBot(ctx context.Context, cfg config.Config) error {
 		playerProvider,
 		welcomeService,
 		changeNameService,
-		findGameSerivce,
 		playerStartGameService,
 		playerGameShotService,
 		leavePlayerGameService,

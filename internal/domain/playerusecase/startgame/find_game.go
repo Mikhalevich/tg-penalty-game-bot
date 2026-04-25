@@ -3,18 +3,12 @@ package startgame
 import (
 	"context"
 	"fmt"
-	"time"
 
-	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/game"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/msginfo"
-	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/perror"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/player"
 )
 
-func (s *StartGame) StartGameWithBot(
-	ctx context.Context,
-	chatID msginfo.ChatID,
-) error {
+func (s *StartGame) FindGame(ctx context.Context, chatID msginfo.ChatID) error {
 	currentPlayer, err := s.playerProvider.GetPlayerByChatID(ctx, chatID)
 	if err != nil {
 		return fmt.Errorf("get player by chat_id: %w", err)
@@ -29,48 +23,25 @@ func (s *StartGame) StartGameWithBot(
 		return nil
 
 	case player.GameStatusReadyForGame:
-		return perror.InSearchGameState()
+		return nil
 
 	case player.GameStatusIdle:
 	}
-
-	if err := s.startGameWithBot(ctx, currentPlayer, s.timeProvider.Now()); err != nil {
-		return fmt.Errorf("start game with bot: %w", err)
-	}
-
-	return nil
-}
-
-func (s *StartGame) startGameWithBot(
-	ctx context.Context,
-	currentPlayer player.Player,
-	createdAt time.Time,
-) error {
-	currentGame := game.CreateGame(
-		ctx,
-		game.GameTypeBot,
-		currentPlayer,
-		player.Player{
-			ID:          0,
-			DisplayName: "bot",
-		},
-		createdAt,
-	)
 
 	if err := s.transactor.Transaction(ctx, func(ctx context.Context) error {
 		if err := s.repo.ChangePlayerGameStatus(
 			ctx,
 			currentPlayer.ID,
-			currentGame.ID,
-			player.GameStatusInGame,
-			createdAt,
+			"",
+			player.GameStatusReadyForGame,
+			s.timeProvider.Now(),
 			player.GameStatusIdle,
 		); err != nil {
 			return fmt.Errorf("change player game status: %w", err)
 		}
 
-		if err := s.gameRunner.StartGames(ctx, []game.Game{currentGame}); err != nil {
-			return fmt.Errorf("start games: %w", err)
+		if err := s.notifier.SearchGame(ctx, chatID); err != nil {
+			return fmt.Errorf("search notification: %w", err)
 		}
 
 		return nil

@@ -45,7 +45,7 @@ func CreatePendingGame(
 	return Game{
 		ID:        IDFromString(uuid.NewString()),
 		CreatedAt: createdAt,
-		Type:      GameTypeFriendly,
+		Type:      GameTypeByLink,
 		Status:    GameStatusPending,
 		State: State{
 			Player1: CreateGamePlayerFromPlayer(plr),

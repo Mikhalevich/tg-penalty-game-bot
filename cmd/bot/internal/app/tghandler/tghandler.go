@@ -28,15 +28,15 @@ type ChangeName interface {
 	Cancel(ctx context.Context, chatID msginfo.ChatID) error
 }
 
-type FindGame interface {
-	FindGame(ctx context.Context, chatID msginfo.ChatID) error
-	StopFind(ctx context.Context, chatID msginfo.ChatID, messageID msginfo.MessageID) error
-}
-
 type StartGame interface {
 	StartGameWithBot(ctx context.Context, chatID msginfo.ChatID) error
 	StartGameByLink(ctx context.Context, chatID msginfo.ChatID) error
 	JoinGameByLink(ctx context.Context, chatID msginfo.ChatID, gameID game.ID) error
+
+	FindGame(ctx context.Context, chatID msginfo.ChatID) error
+	StopFind(ctx context.Context, chatID msginfo.ChatID, messageID msginfo.MessageID) error
+
+	RepeatGame(ctx context.Context, chatID msginfo.ChatID, gameType game.GameType) error
 }
 
 type LeaveGame interface {
@@ -80,7 +80,6 @@ type TGHandler struct {
 	playerProvider PlayerProvider
 	welcome        Welcome
 	changeName     ChangeName
-	findGame       FindGame
 	startGame      StartGame
 	gameShot       GameShot
 	leaveGame      LeaveGame
@@ -94,7 +93,6 @@ func New(
 	playerProvider PlayerProvider,
 	welcome Welcome,
 	changeName ChangeName,
-	findGame FindGame,
 	startGame StartGame,
 	gameShot GameShot,
 	leaveGame LeaveGame,
@@ -107,7 +105,6 @@ func New(
 		playerProvider: playerProvider,
 		welcome:        welcome,
 		changeName:     changeName,
-		findGame:       findGame,
 		startGame:      startGame,
 		gameShot:       gameShot,
 		leaveGame:      leaveGame,
@@ -130,6 +127,7 @@ func (t *TGHandler) registerCBHandlers() {
 		button.OperationLeaveGame:         t.cbLeaveGame,
 		button.OperationShotStats:         t.cbShotStatsOnStartGameMessage,
 		button.OperationStopSearchGame:    t.cbStopFindButton,
+		button.OperationRepeatGame:        t.cbRepeatGameButton,
 		button.OperationLeaderboardPage:   t.cbLeaderboardPage,
 	}
 }

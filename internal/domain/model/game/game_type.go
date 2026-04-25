@@ -3,8 +3,9 @@ package game
 type GameType string
 
 const (
-	GameTypeRating   GameType = "rating"
-	GameTypeFriendly GameType = "friendly"
+	GameTypeRating GameType = "rating"
+	GameTypeByLink GameType = "by_link"
+	GameTypeBot    GameType = "bot"
 )
 
 func (gt GameType) String() string {
