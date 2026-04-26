@@ -67,8 +67,8 @@ type RepeatGamePayload struct {
 	GameType GameType
 }
 
-func RepeatGameButton(caption string, gameType GameType) (button.Button, error) {
-	btn, err := button.CreateButton(caption, button.OperationRepeatGame, false, RepeatGamePayload{
+func StartGameButton(caption string, gameType GameType) (button.Button, error) {
+	btn, err := button.CreateButton(caption, button.OperationStartGame, false, RepeatGamePayload{
 		GameType: gameType,
 	})
 

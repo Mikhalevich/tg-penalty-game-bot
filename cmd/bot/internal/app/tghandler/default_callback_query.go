@@ -175,7 +175,7 @@ func (t *TGHandler) cbStopFindButton(
 	return nil
 }
 
-func (t *TGHandler) cbRepeatGameButton(
+func (t *TGHandler) cbStartGameButton(
 	ctx context.Context,
 	msg tgbot.BotMessage,
 	btn *button.Button,

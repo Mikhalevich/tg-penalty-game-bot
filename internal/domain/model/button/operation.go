@@ -12,7 +12,7 @@ const (
 	OperationStopSearchGame    Operation = "StopSearchGame"
 	OperationLeaderboardPage   Operation = "LeaderboardPage"
 	OperationLeaderboardMyPage Operation = "LeaderboardMyPage"
-	OperationRepeatGame        Operation = "RepeatGame"
+	OperationStartGame         Operation = "StartGame"
 )
 
 func (o Operation) String() string {

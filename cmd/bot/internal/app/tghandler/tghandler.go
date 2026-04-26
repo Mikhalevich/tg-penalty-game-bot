@@ -128,7 +128,7 @@ func (t *TGHandler) registerCBHandlers() {
 		button.OperationLeaveGame:         t.cbLeaveGame,
 		button.OperationShotStats:         t.cbShotStatsOnStartGameMessage,
 		button.OperationStopSearchGame:    t.cbStopFindButton,
-		button.OperationRepeatGame:        t.cbRepeatGameButton,
+		button.OperationStartGame:         t.cbStartGameButton,
 		button.OperationLeaderboardPage:   t.cbLeaderboardPage,
 		button.OperationLeaderboardMyPage: t.cbLeaderboardMyPage,
 	}

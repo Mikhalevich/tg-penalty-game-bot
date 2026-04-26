@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/button"
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/game"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/msginfo"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/player"
 )
@@ -13,14 +14,24 @@ func (n *Notifier) WelcomeNewPlayer(ctx context.Context, plr player.Player) erro
 	welcomeMsg := fmt.Sprintf("Welcome to the penalty shootout game bot\nYour name is *%s*",
 		n.escaper.EscapeMarkdown(plr.DisplayName))
 
+	playBotBtn, err := game.StartGameButton("Play with bot", game.GameTypeBot)
+	if err != nil {
+		return fmt.Errorf("create bot button: %w", err)
+	}
+
+	playRatingBtn, err := game.StartGameButton("Play rating game", game.GameTypeRating)
+	if err != nil {
+		return fmt.Errorf("create rating button: %w", err)
+	}
+
 	if err := n.sender.SendMessage(ctx, msginfo.Message{
 		ChatID: plr.ChatID,
 		Text:   welcomeMsg,
 		Type:   msginfo.MessageTypeMarkdown,
 		Buttons: []button.ButtonRow{
-			{
-				button.ChangeNameTrigger("Change name"),
-			},
+			button.Row(playBotBtn),
+			button.Row(playRatingBtn),
+			button.Row(button.ChangeNameTrigger("Change name")),
 		},
 	}); err != nil {
 		return fmt.Errorf("send message: %w", err)
