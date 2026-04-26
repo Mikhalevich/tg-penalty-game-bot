@@ -23,7 +23,9 @@ func (n *Notifier) ShowLeaderboard(
 	pagesCount int,
 	positions []player.Position,
 ) error {
-	buttons, err := makeLeaderboardButtons(pageNumber, pagesCount)
+	msg, isContaintsCurrentPlayer := n.makeLeaderboardMsg(playerID, positions)
+
+	buttons, err := makeLeaderboardButtons(pageNumber, pagesCount, isContaintsCurrentPlayer)
 	if err != nil {
 		return fmt.Errorf("make leaderboard buttons: %w", err)
 	}
@@ -31,7 +33,7 @@ func (n *Notifier) ShowLeaderboard(
 	if err := n.sender.SendMessage(ctx, msginfo.Message{
 		ChatID:     chatID,
 		ReplyMsgID: messageID,
-		Text:       n.makeLeaderboardMsg(playerID, positions),
+		Text:       msg,
 		Type:       sendOrEditTextMarkdownType(messageID),
 		Buttons:    buttons,
 	}); err != nil {
@@ -41,7 +43,44 @@ func (n *Notifier) ShowLeaderboard(
 	return nil
 }
 
-func makeLeaderboardButtons(pageNumber, pagesCount int) ([]button.ButtonRow, error) {
+func makeLeaderboardButtons(
+	pageNumber int,
+	pagesCount int,
+	isContainsCurrentPlayer bool,
+) ([]button.ButtonRow, error) {
+	navigationRow, err := makeLeaderboardNavigationButtonRow(pageNumber, pagesCount)
+	if err != nil {
+		return nil, fmt.Errorf("make navigation buttons: %w", err)
+	}
+
+	if !isContainsCurrentPlayer {
+		return []button.ButtonRow{
+			navigationRow,
+			button.Row(button.LeaderboardMyPage("My position")),
+		}, nil
+	}
+
+	if pageNumber == 1 {
+		return []button.ButtonRow{
+			navigationRow,
+		}, nil
+	}
+
+	topBtn, err := button.LeaderboardPage("Top", 1)
+	if err != nil {
+		return nil, fmt.Errorf("create top button: %w", err)
+	}
+
+	return []button.ButtonRow{
+		navigationRow,
+		button.Row(topBtn),
+	}, nil
+}
+
+func makeLeaderboardNavigationButtonRow(
+	pageNumber int,
+	pagesCount int,
+) (button.ButtonRow, error) {
 	row := make(button.ButtonRow, 0, leaderboardMaxButtonsCount)
 
 	if pageNumber > 1 {
@@ -66,7 +105,7 @@ func makeLeaderboardButtons(pageNumber, pagesCount int) ([]button.ButtonRow, err
 		return nil, nil
 	}
 
-	return []button.ButtonRow{row}, nil
+	return row, nil
 }
 
 func sendOrEditTextMarkdownType(messageID msginfo.MessageID) msginfo.MessageType {
@@ -77,8 +116,16 @@ func sendOrEditTextMarkdownType(messageID msginfo.MessageID) msginfo.MessageType
 	return msginfo.MessageTypeEditMarkdown
 }
 
-func (n *Notifier) makeLeaderboardMsg(playerID player.ID, positions []player.Position) string {
-	lines := make([]string, 0, len(positions))
+// makeLeaderboardMsg construct leaderboard message
+// returns constructed message and flag that shows current player in positions.
+func (n *Notifier) makeLeaderboardMsg(
+	playerID player.ID,
+	positions []player.Position,
+) (string, bool) {
+	var (
+		lines                   = make([]string, 0, len(positions))
+		isContainsCurrentPlayer = false
+	)
 
 	for _, pos := range positions {
 		if playerID == pos.ID {
@@ -87,6 +134,8 @@ func (n *Notifier) makeLeaderboardMsg(playerID player.ID, positions []player.Pos
 				n.escaper.EscapeMarkdown(pos.DisplayName),
 				pos.Score,
 			))
+
+			isContainsCurrentPlayer = true
 
 			continue
 		}
@@ -98,5 +147,5 @@ func (n *Notifier) makeLeaderboardMsg(playerID player.ID, positions []player.Pos
 		))
 	}
 
-	return strings.Join(lines, "\n")
+	return strings.Join(lines, "\n"), isContainsCurrentPlayer
 }

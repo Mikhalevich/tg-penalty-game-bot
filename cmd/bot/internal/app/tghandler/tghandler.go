@@ -45,6 +45,7 @@ type LeaveGame interface {
 
 type Leaderboard interface {
 	Page(ctx context.Context, chatID msginfo.ChatID, messageID msginfo.MessageID, pageNumber int) error
+	MyPage(ctx context.Context, chatID msginfo.ChatID, messageID msginfo.MessageID) error
 }
 
 type ShotStats interface {
@@ -129,5 +130,6 @@ func (t *TGHandler) registerCBHandlers() {
 		button.OperationStopSearchGame:    t.cbStopFindButton,
 		button.OperationRepeatGame:        t.cbRepeatGameButton,
 		button.OperationLeaderboardPage:   t.cbLeaderboardPage,
+		button.OperationLeaderboardMyPage: t.cbLeaderboardMyPage,
 	}
 }

@@ -90,3 +90,7 @@ func calculatePageCount(maxPosition, pageSize int) int {
 func calculatePositionFrom(pageNumber, pageSize int) int {
 	return (pageNumber-1)*pageSize + 1
 }
+
+func calculatePageByPosition(position, pageSize int) int {
+	return position/pageSize + 1
+}

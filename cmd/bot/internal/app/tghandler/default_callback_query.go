@@ -212,7 +212,23 @@ func (t *TGHandler) cbLeaderboardPage(
 		msginfo.MessageIDFromInt(msg.MessageID),
 		payload.PageNumber,
 	); err != nil {
-		return fmt.Errorf("leaderboard player: %w", err)
+		return fmt.Errorf("leaderboard page: %w", err)
+	}
+
+	return nil
+}
+
+func (t *TGHandler) cbLeaderboardMyPage(
+	ctx context.Context,
+	msg tgbot.BotMessage,
+	btn *button.Button,
+) error {
+	if err := t.leaderboard.MyPage(
+		ctx,
+		msginfo.ChatIDFromInt64(msg.ChatID),
+		msginfo.MessageIDFromInt(msg.MessageID),
+	); err != nil {
+		return fmt.Errorf("leaderboard my page: %w", err)
 	}
 
 	return nil
