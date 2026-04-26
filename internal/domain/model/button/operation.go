@@ -11,6 +11,7 @@ const (
 	OperationShotStats         Operation = "ShotStats"
 	OperationStopSearchGame    Operation = "StopSearchGame"
 	OperationLeaderboardPage   Operation = "LeaderboardPage"
+	OperationLeaderboardMyPage Operation = "LeaderboardMyPage"
 	OperationRepeatGame        Operation = "RepeatGame"
 )
 

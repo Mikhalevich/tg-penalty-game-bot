@@ -11,3 +11,7 @@ func LeaderboardPage(caption string, pageNumber int) (Button, error) {
 		},
 	)
 }
+
+func LeaderboardMyPage(caption string) Button {
+	return CreateButtonWithoutPayload(caption, OperationLeaderboardMyPage, false)
+}

@@ -14,6 +14,10 @@ type Repository interface {
 		limit int,
 	) ([]player.Position, error)
 	PlayerScoreMaxPosition(ctx context.Context) (int, error)
+	PlayerScoreMyPosition(
+		ctx context.Context,
+		playerID player.ID,
+	) (player.Position, error)
 }
 
 type PlayerProvider interface {
