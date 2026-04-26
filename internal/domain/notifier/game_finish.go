@@ -123,7 +123,7 @@ func makeFinishGameButtons(gameType game.GameType) ([]button.ButtonRow, error) {
 		return nil, fmt.Errorf("invalid game type: %s", gameType)
 	}
 
-	btn, err := game.RepeatGameButton(caption, gameType)
+	btn, err := game.StartGameButton(caption, gameType)
 	if err != nil {
 		return nil, fmt.Errorf("create repeat button: %w", err)
 	}
