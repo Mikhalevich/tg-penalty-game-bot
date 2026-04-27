@@ -19,7 +19,9 @@ func (t *TGBot) Start(ctx context.Context) error {
 
 	go t.bot.StartWebhook(ctx)
 
-	http.ListenAndServe(":2000", t.bot.WebhookHandler())
+	if err := http.ListenAndServe(":2000", t.bot.WebhookHandler()); err != nil {
+		return fmt.Errorf("listen and serve: %w", err)
+	}
 
 	return nil
 }
