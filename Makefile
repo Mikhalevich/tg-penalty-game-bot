@@ -13,7 +13,7 @@ LINTER_VERSION := v2.11.4
 
 APP_TAG := 0.1.0
 
-.PHONY: all build test compose-up compose-down load-test-data vendor install-linter lint fmt tools-update generate minikube-load-images minikube-apply minikube-delete do-load-images
+.PHONY: all build test compose-up compose-down load-test-data vendor install-linter lint fmt tools-update generate minikube-load-images minikube-apply minikube-delete do-load-images do-apply do-delete
 
 all: build
 
@@ -71,3 +71,9 @@ minikube-delete:
 
 do-load-images:
 	./script/k8s/do/load_images.sh ${APP_TAG}
+
+do-apply:
+	kubectl apply -f ./script/k8s/do
+
+do-delete:
+	kubectl delete -f ./script/k8s/do
