@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bot-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bot
+  template:
+    metadata:
+      labels:
+        app: bot
+    spec:
+      initContainers:
+      - name: bot-db-migrations
+        image: registry.digitalocean.com/penalty-bot-registry/sqlmigrate:0.1.0
+        volumeMounts:
+        - name: db-migrate-config-volume
+          mountPath: /app/config
+      containers:
+      - name: bot
+        image: registry.digitalocean.com/penalty-bot-registry/bot:0.1.0
+        command: ["/app/bot"]
+        args: ["-config", "/app/config/config-bot.yaml"]
+        volumeMounts:
+        - name: config-volume
+          mountPath: /app/config
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "200m"
+          limits:
+            memory: "256Mi"
+            cpu: "700m"
+      volumes:
+      - name: config-volume
+        configMap:
+          name: bot-cm
+      - name: db-migrate-config-volume
+        configMap:
+          name: sqlmigrate-cm
+
+
+
+

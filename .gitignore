@@ -37,3 +37,8 @@ go.work.sum
 /script/k8s/minikube/sqlmigrate-cm.yaml
 /script/k8s/minikube/outboxpoller-cm.yaml
 /script/k8s/minikube/gamepoller-cm.yaml
+
+/script/k8s/do/bot-cm.yaml
+/script/k8s/do/sqlmigrate-cm.yaml
+/script/k8s/do/outboxpoller-cm.yaml
+/script/k8s/do/gamepoller-cm.yaml
