@@ -32,7 +32,8 @@ type Tracing struct {
 }
 
 type Bot struct {
-	Token string `yaml:"token" required:"true"`
+	Token        string `yaml:"token" required:"true"`
+	WebHookToken string `yaml:"webhook_token"`
 }
 
 type Postgres struct {

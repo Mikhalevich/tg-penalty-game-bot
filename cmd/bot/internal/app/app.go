@@ -6,12 +6,13 @@ import (
 
 	"github.com/Mikhalevich/tg-penalty-game-bot/cmd/bot/internal/app/tgbot"
 	"github.com/Mikhalevich/tg-penalty-game-bot/cmd/bot/internal/app/tghandler"
+	"github.com/Mikhalevich/tg-penalty-game-bot/cmd/bot/internal/config"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/infra/logger"
 )
 
 func Start(
 	ctx context.Context,
-	token string,
+	botCfg config.Bot,
 	buttonProvider tghandler.ButtonProvider,
 	playerProvider tghandler.PlayerProvider,
 	welcome tghandler.Welcome,
@@ -38,7 +39,7 @@ func Start(
 		)
 	)
 
-	tbot, err := tgbot.New(token, logger.FromContext(ctx))
+	tbot, err := tgbot.New(botCfg.Token, botCfg.WebHookToken, logger.FromContext(ctx))
 	if err != nil {
 		return fmt.Errorf("creating bot: %w", err)
 	}
