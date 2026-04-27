@@ -4,6 +4,7 @@ tracing:
   service_name: "penalty-game-bot"
 bot:
   token: "bot_token"
+  webhook_token: "webhook_token or empty if running in polling mode"
 postgres:
   connection: "host=postgres port=5432 user=bot password=bot dbname=bot sslmode=disable"
 button_redis:
