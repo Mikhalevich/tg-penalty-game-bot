@@ -14,6 +14,7 @@ const (
 
 	percent100 = 100
 	percent10  = 10
+	percent1   = 1
 )
 
 type ID string
@@ -123,7 +124,7 @@ func (g *Game) PlayerShot(shot Shot) error {
 	}
 
 	inGameShot.ExpectedSide = shot.ExpectedSide
-	inGameShot.ActualSide = calculateActualSide(shot.ExpectedSide)
+	inGameShot.ActualSide = calculateActualShotSide(shot.Type, shot.ExpectedSide)
 	inGameShot.CompletedAt = shot.CompletedAt
 
 	g.StateUpdatedAt = shot.CompletedAt
@@ -136,8 +137,17 @@ func isPercentMatch(percent int) bool {
 	return rand.Int()%percent100 <= percent
 }
 
-func calculateActualSide(side ShotSide) ShotSide {
-	if isPercentMatch(percent10) {
+func calculateActualShotSide(shotType ShotType, side ShotSide) ShotSide {
+	missPercent := 0
+	switch shotType {
+	case ShotTypeAttack:
+		missPercent = percent10
+
+	case ShotTypeDefend:
+		missPercent = percent1
+	}
+
+	if isPercentMatch(missPercent) {
 		return ShotSideMiss
 	}
 
