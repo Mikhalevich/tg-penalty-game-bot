@@ -46,7 +46,7 @@ func (t *TGBot) Start(ctx context.Context) error {
 func listenHTTP(ctx context.Context, hndlr http.Handler) error {
 	var (
 		srv = &http.Server{
-			Addr:         ":2000",
+			Addr:         ":80",
 			Handler:      hndlr,
 			ReadTimeout:  readTimeout,
 			WriteTimeout: writeTimeout,

@@ -2,11 +2,16 @@ apiVersion: v1
 kind: Service
 metadata:
   name: bot-service
+  annotations:
+    service.beta.kubernetes.io/do-loadbalancer-type: "REGIONAL"
+    service.beta.kubernetes.io/do-loadbalancer-protocol: "https"
+    service.beta.kubernetes.io/do-loadbalancer-certificate-id: "4977af3c-3253-4f23-b3af-17045e42d655"
+    service.beta.kubernetes.io/do-loadbalancer-disable-lets-encrypt-dns-records: "true"
 spec:
   type: LoadBalancer
   ports:
     - name: http
-      port: 2000
-      targetPort: 2000
+      port: 443
+      targetPort: 80
   selector:
     app: bot
