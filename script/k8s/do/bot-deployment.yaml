@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: bot-deployment
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: bot
@@ -29,10 +29,10 @@ spec:
         resources:
           requests:
             memory: "64Mi"
-            cpu: "200m"
+            cpu: "100m"
           limits:
-            memory: "256Mi"
-            cpu: "700m"
+            memory: "128Mi"
+            cpu: "500m"
       volumes:
       - name: config-volume
         configMap:
