@@ -20,16 +20,7 @@ func (t *TGBot) Start(ctx context.Context) error {
 	}
 
 	if !t.isWebHook {
-		go t.bot.Start(ctx)
-
-		if err := listenHTTP(
-			ctx,
-			http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				fmt.Fprintf(w, "It works...")
-			}),
-		); err != nil {
-			return fmt.Errorf("listen http: %w", err)
-		}
+		t.bot.Start(ctx)
 
 		return nil
 	}
