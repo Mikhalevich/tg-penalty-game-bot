@@ -13,7 +13,10 @@ LINTER_VERSION := v2.11.4
 
 APP_TAG := 0.1.2
 
-.PHONY: all build test compose-up compose-down load-test-data vendor install-linter lint fmt tools-update generate minikube-load-images minikube-apply minikube-delete do-load-images do-apply do-delete
+.PHONY: all build test compose-up compose-down load-test-data vendor install-linter \
+lint fmt tools-update generate minikube-load-images minikube-apply minikube-delete \
+do-load-images do-apply do-delete minikube-helm-install minikube-helm-uninstall \
+install-helm-secrets generate-helm-secrets
 
 all: build
 
@@ -78,3 +81,16 @@ do-apply:
 
 do-delete:
 	kubectl delete -f ./script/k8s/do
+
+minikube-helm-install:
+	./script/k8s/minikube-helm/install.sh
+
+minikube-helm-uninstall:
+	./script/k8s/minikube-helm/uninstall.sh
+
+install-helm-secrets:
+	helm plugin install https://github.com/jkroepke/helm-secrets/releases/download/v4.7.4/secrets-4.7.4.tgz --verify=false
+
+generate-helm-secrets:
+	mkdir -p ~/.config/sops/age/
+	age-keygen -o ~/.config/sops/age/keys.txt

@@ -1,0 +1,44 @@
+# Default values for bot.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: "jaegertracing/all-in-one"
+  tag: "1.57"
+
+ports:
+- name: http
+  containerPort: 14268
+  protocol: TCP
+- name: trace
+  containerPort: 4318
+  protocol: TCP
+- name: view
+  containerPort: 16686
+  protocol: TCP
+
+service:
+  type: ClusterIP
+  ports:
+  - name: http
+    port: 14268
+    targetPort: 14268
+    protocol: TCP
+  - name: trace
+    port: 4318
+    targetPort: 4318
+    protocol: TCP
+  - name: view
+    port: 16686
+    targetPort: 16686
+    protocol: TCP
+
+resources:
+  requests:
+    memory: "64Mi"
+    cpu: "10m"
+  limits:
+    memory: "128Mi"
+    cpu: "100m"
