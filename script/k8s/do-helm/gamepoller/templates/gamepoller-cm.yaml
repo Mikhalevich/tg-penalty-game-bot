@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Chart.Name }}-cm
+data:
+  config-gamepoller.yaml: |
+    log_level: "info"
+    tracing:
+      endpoint: "jaeger-service:4318"
+      service_name: "penalty-game-poller"
+    postgres:
+      connection: {{ .Values.postgres.connStr }}
+    matchmaking_worker:
+      count: 1
+      interval: 1s
+      batch_size: 10
+    expired_shots_worker:
+      count: 1
+      interval: 5s
+      batch_size: 100
+      shot_expire_duration: 5m
+    leaderboard_recalculator_worker:
+      count: 1
+      interval: 1m
+      batch_size: 1
+    expired_search_game_worker:
+      count: 1
+      interval: 10s
+      search_expire_duration: 2m
+
+

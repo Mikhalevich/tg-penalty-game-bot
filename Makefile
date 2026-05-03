@@ -14,9 +14,12 @@ LINTER_VERSION := v2.11.4
 APP_TAG := 0.1.2
 
 .PHONY: all build test compose-up compose-down load-test-data vendor install-linter \
-lint fmt tools-update generate minikube-load-images minikube-apply minikube-delete \
-do-load-images do-apply do-delete minikube-helm-install minikube-helm-uninstall \
-install-helm-secrets generate-helm-secrets
+lint fmt tools-update generate \
+minikube-load-images minikube-apply minikube-delete \
+minikube-helm-install minikube-helm-uninstall \
+do-load-images do-apply do-delete \
+do-helm-load-images do-helm-encrypt-secrets do-helm-install do-helm-uninstall \
+install-helm-secrets generate-helm-secrets \
 
 all: build
 
@@ -87,6 +90,18 @@ minikube-helm-install:
 
 minikube-helm-uninstall:
 	./script/k8s/minikube-helm/uninstall.sh
+
+do-helm-load-images:
+	./script/k8s/do-helm/load_images.sh ${APP_TAG}
+
+do-helm-encrypt-secrets:
+	./script/k8s/do-helm/encrypt_secrets.sh
+
+do-helm-install:
+	./script/k8s/do-helm/install.sh
+
+do-helm-uninstall:
+	./script/k8s/do-helm/uninstall.sh
 
 install-helm-secrets:
 	helm plugin install https://github.com/jkroepke/helm-secrets/releases/download/v4.7.4/secrets-4.7.4.tgz --verify=false

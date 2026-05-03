@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Chart.Name }}-cm
+data:
+  config-bot.yaml: |
+    log_level: "info"
+    tracing:
+      endpoint: "jaeger-service:4318"
+      service_name: "penalty-game-bot"
+    bot:
+      token: {{ .Values.bot.token }}
+      webhook_token: {{ .Values.bot.webhook_token }}
+    postgres:
+      connection: {{ .Values.postgres.connStr }}
+    random_name_generator:
+      prefix: "player_"
+      length: 5
+    change_name:
+      max_len: 255
+      retry_interval: 24h
+
