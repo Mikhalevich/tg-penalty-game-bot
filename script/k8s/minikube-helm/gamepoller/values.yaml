@@ -8,11 +8,11 @@ dbmigration:
   name: "sqlmigrate"
   image:
     repository: "sqlmigrate"
-    tag: "0.1.2"
+    tag: "0.1.3"
 
 image:
   repository: "gamepoller"
-  tag: "0.1.2"
+  tag: "0.1.3"
 
 resources:
   requests:
