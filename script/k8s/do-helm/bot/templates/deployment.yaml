@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Chart.Name }}-deployment
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Chart.Name }}
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/bot-cm.yaml") . | sha256sum }}
+      labels:
+        app: {{ .Chart.Name }}
+    spec:
+      initContainers:
+      - name: {{ .Chart.Name }}-db-migrations
+        image: "{{ .Values.dbmigration.image.repository }}:{{ .Values.dbmigration.image.tag }}"
+        volumeMounts:
+        - name: db-migrate-config-volume
+          mountPath: /app/config
+      containers:
+      - name: {{ .Chart.Name }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        command: ["/app/bot"]
+        args: ["-config", "/app/config/config-bot.yaml"]
+        volumeMounts:
+        - name: config-volume
+          mountPath: /app/config
+        {{- with .Values.ports }}
+        ports:
+          {{- toYaml . | nindent 12 }}
+        {{- end }}
+        {{- with .Values.resources }}
+        resources:
+          {{- toYaml . | nindent 12 }}
+        {{- end }}
+      volumes:
+      - name: config-volume
+        configMap:
+          name: {{ .Chart.Name }}-cm
+      - name: db-migrate-config-volume
+        configMap:
+          name: {{ .Chart.Name }}-{{ .Values.dbmigration.name }}-cm

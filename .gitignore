@@ -30,7 +30,7 @@ go.work.sum
 
 /cmd/botwebhook/botwebhook
 /cmd/botwebhook/config/config.yaml
-/cmd/botwebhook/config/penalty_public.pem
+/cmd/botwebhook/config/penalty_bot.pem
 
 /config/config-bot.yaml
 /config/config-gamepoller.yaml
