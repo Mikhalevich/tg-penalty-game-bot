@@ -19,7 +19,7 @@ func (p *Postgres) UpdateGame(ctx context.Context, game game.Game) error {
 				payload_version = payload_version + 1,
 				payload_updated_at = :payload_updated_at
 			WHERE
-				game_id = :id AND
+				id = :id AND
 				payload_version = :payload_version
 		`
 	)
