@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"encoding/json"
+	"flag"
 	"fmt"
 	"os"
 
@@ -20,24 +22,47 @@ type Config struct {
 }
 
 func main() {
+	var (
+		isGet = flag.Bool("get", false, "receive info about webhook")
+		isSet = flag.Bool("set", false, "set webhook")
+	)
+
 	var cfg Config
 	if err := application.LoadConfig(&cfg); err != nil {
 		logger.StdLogger().WithError(err).Error("failed to load config")
 		os.Exit(1)
 	}
 
-	if err := setWebHook(context.Background(), cfg); err != nil {
-		logger.StdLogger().WithError(err).Error("failed to set webhook")
-		os.Exit(1)
-	}
-}
-
-func setWebHook(ctx context.Context, cfg Config) error {
 	botAPI, err := bot.New(cfg.Token, bot.WithSkipGetMe())
 	if err != nil {
-		return fmt.Errorf("creating bot api: %w", err)
+		logger.StdLogger().WithError(err).Error("initialization bot api")
+		os.Exit(1)
 	}
 
+	if *isGet {
+		if err := getWebHookInfo(context.Background(), botAPI); err != nil {
+			logger.StdLogger().WithError(err).Error("failed to get webhook info")
+			os.Exit(1)
+		}
+
+		return
+	}
+
+	if *isSet {
+		if err := setWebHook(context.Background(), botAPI, cfg); err != nil {
+			logger.StdLogger().WithError(err).Error("failed to set webhook")
+			os.Exit(1)
+		}
+
+		return
+	}
+
+	logger.StdLogger().Info("you need to specify --get or --set flag")
+
+	os.Exit(1)
+}
+
+func setWebHook(ctx context.Context, botAPI *bot.Bot, cfg Config) error {
 	file, err := os.Open(cfg.CertificatePath)
 	if err != nil {
 		return fmt.Errorf("open certificate file: %w", err)
@@ -56,6 +81,23 @@ func setWebHook(ctx context.Context, cfg Config) error {
 	); err != nil {
 		return fmt.Errorf("set webhook: %w", err)
 	}
+
+	return nil
+}
+
+func getWebHookInfo(ctx context.Context, botAPI *bot.Bot) error {
+	info, err := botAPI.GetWebhookInfo(ctx)
+	if err != nil {
+		return fmt.Errorf("get webhook info: %w", err)
+	}
+
+	buf, err := json.MarshalIndent(info, "", "    ")
+	if err != nil {
+		return fmt.Errorf("marshal json: %w", err)
+	}
+
+	//nolint:forbidigo
+	fmt.Println(string(buf))
 
 	return nil
 }
