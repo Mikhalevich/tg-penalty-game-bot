@@ -2,6 +2,8 @@ name: build/push images and deploy to kubernetes cluster
 
 on:
   push:
+    tags:
+      - 'v*'
 
 jobs:
   build:
