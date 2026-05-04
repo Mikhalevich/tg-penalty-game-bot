@@ -1,17 +1,22 @@
 #! /usr/bin/env bash
 
-docker build -t bot:$1 -f ./script/docker/bot.Dockerfile .
-docker tag bot:$1 registry.digitalocean.com/penalty-bot-registry/bot:$1
-docker push registry.digitalocean.com/penalty-bot-registry/bot:$1
+TAG=$1
+VERSION="${TAG#v}"
 
-docker build -t sqlmigrate:$1 -f ./script/docker/sqlmigrate.Dockerfile .
-docker tag sqlmigrate:$1 registry.digitalocean.com/penalty-bot-registry/sqlmigrate:$1
-docker push registry.digitalocean.com/penalty-bot-registry/sqlmigrate:$1
+echo $VERSION
 
-docker build -t outboxpoller:$1 -f ./script/docker/outboxpoller.Dockerfile .
-docker tag outboxpoller:$1 registry.digitalocean.com/penalty-bot-registry/outboxpoller:$1
-docker push registry.digitalocean.com/penalty-bot-registry/outboxpoller:$1
+# docker build -t bot:${VERSION} -f ./script/docker/bot.Dockerfile .
+# docker tag bot:${VERSION} registry.digitalocean.com/penalty-bot-registry/bot:${VERSION}
+# docker push registry.digitalocean.com/penalty-bot-registry/bot:${VERSION}
 
-docker build -t gamepoller:$1 -f ./script/docker/gamepoller.Dockerfile .
-docker tag gamepoller:$1 registry.digitalocean.com/penalty-bot-registry/gamepoller:$1
-docker push registry.digitalocean.com/penalty-bot-registry/gamepoller:$1
+# docker build -t sqlmigrate:${VERSION} -f ./script/docker/sqlmigrate.Dockerfile .
+# docker tag sqlmigrate:${VERSION} registry.digitalocean.com/penalty-bot-registry/sqlmigrate:${VERSION}
+# docker push registry.digitalocean.com/penalty-bot-registry/sqlmigrate:${VERSION}
+
+# docker build -t outboxpoller:${VERSION} -f ./script/docker/outboxpoller.Dockerfile .
+# docker tag outboxpoller:${VERSION} registry.digitalocean.com/penalty-bot-registry/outboxpoller:${VERSION}
+# docker push registry.digitalocean.com/penalty-bot-registry/outboxpoller:${VERSION}
+
+# docker build -t gamepoller:${VERSION} -f ./script/docker/gamepoller.Dockerfile .
+# docker tag gamepoller:${VERSION} registry.digitalocean.com/penalty-bot-registry/gamepoller:${VERSION}
+# docker push registry.digitalocean.com/penalty-bot-registry/gamepoller:${VERSION}
