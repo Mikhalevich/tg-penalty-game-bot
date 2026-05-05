@@ -86,7 +86,7 @@ do-delete:
 	kubectl delete -f ./script/k8s/do
 
 minikube-helm-install:
-	./script/k8s/minikube-helm/install.sh
+	./script/k8s/minikube-helm/install.sh ${APP_TAG}
 
 minikube-helm-uninstall:
 	./script/k8s/minikube-helm/uninstall.sh
@@ -98,7 +98,7 @@ do-helm-encrypt-secrets:
 	./script/k8s/do-helm/encrypt_secrets.sh
 
 do-helm-install:
-	./script/k8s/do-helm/install.sh
+	./script/k8s/do-helm/install.sh ${APP_TAG}
 
 do-helm-uninstall:
 	./script/k8s/do-helm/uninstall.sh
