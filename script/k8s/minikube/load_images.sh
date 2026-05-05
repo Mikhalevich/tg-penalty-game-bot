@@ -1,6 +1,11 @@
 #! /usr/bin/env bash
 
-minikube image build -t bot:$1 -f ./script/docker/bot.Dockerfile .
-minikube image build -t sqlmigrate:$1 -f ./script/docker/sqlmigrate.Dockerfile .
-minikube image build -t outboxpoller:$1 -f ./script/docker/outboxpoller.Dockerfile .
-minikube image build -t gamepoller:$1 -f ./script/docker/gamepoller.Dockerfile .
+TAG=$1
+VERSION="${TAG#v}"
+
+echo "load image with version ${VERSION}"
+
+minikube image build -t bot:${VERSION} -f ./script/docker/bot.Dockerfile .
+minikube image build -t sqlmigrate:${VERSION} -f ./script/docker/sqlmigrate.Dockerfile .
+minikube image build -t outboxpoller:${VERSION} -f ./script/docker/outboxpoller.Dockerfile .
+minikube image build -t gamepoller:${VERSION} -f ./script/docker/gamepoller.Dockerfile .
