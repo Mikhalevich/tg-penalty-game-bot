@@ -1,7 +1,7 @@
 #! /usr/bin/env bash
 
-helm uninstall outboxpoller
-helm uninstall gamepoller
-helm uninstall bot
-helm uninstall jaeger
-helm uninstall postgres
+helm uninstall --kube-context minikube outboxpoller
+helm uninstall --kube-context minikube gamepoller
+helm uninstall --kube-context minikube bot
+helm uninstall --kube-context minikube jaeger
+helm uninstall --kube-context minikube postgres
