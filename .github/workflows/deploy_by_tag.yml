@@ -23,12 +23,12 @@ jobs:
     - name: Build and push images
       run: make do-helm-load-images APP_TAG=$GITHUB_REF_NAME
 
-    - name: Setup SOPS
+    - name: Install SOPS
       uses: nhedger/setup-sops@v2
       with:
         version: "3.12.1"
 
-    - name: Set up SOPS
+    - name: Set up SOPS key.txt
       run: |
         mkdir -p ~/.config/sops/age/
         echo "${{ secrets.SOPS_AGE_KEY }}" > ~/.config/sops/age/keys.txt
