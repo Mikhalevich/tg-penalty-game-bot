@@ -78,3 +78,15 @@ func StartGameButton(caption string, gameType GameType) (button.Button, error) {
 
 	return btn, nil
 }
+
+func StartGameWithDeleteAfterPressButton(caption string, gameType GameType) (button.Button, error) {
+	btn, err := button.CreateButton(caption, button.OperationStartGame, true, RepeatGamePayload{
+		GameType: gameType,
+	})
+
+	if err != nil {
+		return button.Button{}, fmt.Errorf("create button: %w", err)
+	}
+
+	return btn, nil
+}
