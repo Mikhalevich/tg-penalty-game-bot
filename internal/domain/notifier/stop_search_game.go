@@ -10,7 +10,7 @@ import (
 )
 
 func (n *Notifier) StopSearchGame(ctx context.Context, chatID msginfo.ChatID) error {
-	playRatingBtn, err := game.StartGameButton("Play rating game", game.GameTypeRating)
+	playRatingBtn, err := game.StartGameWithDeleteAfterPressButton("Play rating game", game.GameTypeRating)
 	if err != nil {
 		return fmt.Errorf("create rating button: %w", err)
 	}
