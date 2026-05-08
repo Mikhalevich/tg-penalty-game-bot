@@ -13,7 +13,7 @@ const (
 )
 
 type leaderboardMonthPayload struct {
-	Month time.Month
+	Month time.Month `json:"month"`
 }
 
 func (s *Settings) GetLeaderboardMonth(ctx context.Context) (time.Month, error) {

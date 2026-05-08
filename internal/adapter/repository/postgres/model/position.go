@@ -3,6 +3,7 @@ package model
 import (
 	"time"
 
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/lbrefresher"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/player"
 )
 
@@ -32,4 +33,32 @@ func ToDomPositions(dbPos []Position) []player.Position {
 	}
 
 	return domPos
+}
+
+type HistoryPosition struct {
+	PlayerID    int       `db:"player_id"`
+	Year        int       `db:"year"`
+	Month       int       `db:"month"`
+	DisplayName string    `db:"display_name"`
+	Score       int       `db:"score"`
+	UpdatedAt   time.Time `db:"updated_at"`
+	Position    int       `db:"position"`
+}
+
+func ToDBHisotoryPositions(history lbrefresher.HistoryPositions) []HistoryPosition {
+	dbPositions := make([]HistoryPosition, 0, len(history.Positions))
+
+	for _, pos := range history.Positions {
+		dbPositions = append(dbPositions, HistoryPosition{
+			PlayerID:    pos.ID.Int(),
+			Year:        history.Year,
+			Month:       history.Month,
+			DisplayName: pos.DisplayName,
+			Score:       pos.Score,
+			UpdatedAt:   pos.UpdatedAt,
+			Position:    pos.Position,
+		})
+	}
+
+	return dbPositions
 }

@@ -13,7 +13,7 @@ import (
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/settings"
 )
 
-func (p *Postgres) GetSetting(ctx context.Context, id string) (settings.SettingItem, error) {
+func (p *Postgres) GetSetting(ctx context.Context, settingID string) (settings.SettingItem, error) {
 	var (
 		query = `
 			SELECT
@@ -36,11 +36,12 @@ func (p *Postgres) GetSetting(ctx context.Context, id string) (settings.SettingI
 		p.transactor.ExtContext(ctx),
 		&item,
 		query,
-		id,
+		settingID,
 	); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return settings.SettingItem{}, perror.NotFound("setting not found")
 		}
+
 		return settings.SettingItem{}, fmt.Errorf("insert or update setting: %w", err)
 	}
 

@@ -18,7 +18,7 @@ type ExpiredShotsProcessor interface {
 }
 
 type LeaderboradRefresher interface {
-	RefreshScoreLeaderboard(ctx context.Context) error
+	Refresh(ctx context.Context) error
 }
 
 type ExpiredSearchGamer interface {
@@ -76,7 +76,7 @@ func (a *App) Run(
 
 	runWorkers(ctx, "leaderboard refresher", leaderboardCfg.Count, leaderboardCfg.Interval, &wgr,
 		func(ctx context.Context) error {
-			return a.leaderboradRefresher.RefreshScoreLeaderboard(ctx)
+			return a.leaderboradRefresher.Refresh(ctx)
 		},
 	)
 
