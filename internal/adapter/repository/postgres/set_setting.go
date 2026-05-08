@@ -27,11 +27,10 @@ func (p *Postgres) SetSetting(ctx context.Context, item settings.SettingItem) er
 				:payload,
 				:payload_updated_at
 			) ON CONFLICT(id) DO
-				UPDATE settings SET
+				UPDATE SET
 					is_enabled = EXCLUDED.is_enabled,
 					payload = EXCLUDED.payload,
 					payload_updated_at = EXCLUDED.payload_updated_at
-			)
 		`
 	)
 

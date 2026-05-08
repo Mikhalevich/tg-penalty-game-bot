@@ -10,7 +10,7 @@ CREATE TABLE leaderboard_score_history(
     updated_at TIMESTAMPTZ NOT NULL,
     position INTEGER NOT NULL,
 
-    CONSTRAINT pk_leaderboard_score_history PRIMARY KEY (player_id, year, month),
+    CONSTRAINT pk_leaderboard_score_history PRIMARY KEY (player_id, year, month)
 );
 
 CREATE INDEX idx_leaderboard_score_history_year_month_position ON leaderboard_score_history(year, month, position);
