@@ -9,7 +9,7 @@ BIN_PATH ?= $(ROOT)/bin
 GOPRIVATE = GOPRIVATE=github.com/Mikhalevich/
 
 LINTER_NAME := golangci-lint
-LINTER_VERSION := v2.11.4
+LINTER_VERSION := v2.12.2
 
 APP_TAG := 0.2.0
 
@@ -51,7 +51,7 @@ vendor:
 install-linter:
 	if [ ! -f $(GOBIN)/$(LINTER_VERSION)/$(LINTER_NAME) ]; then \
 		echo INSTALLING $(GOBIN)/$(LINTER_VERSION)/$(LINTER_NAME) $(LINTER_VERSION) ; \
-		curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(GOBIN)/$(LINTER_VERSION) $(LINTER_VERSION) ; \
+		curl -sSfL https://golangci-lint.run/install.sh  | sh -s -- -b $(GOBIN)/$(LINTER_VERSION) $(LINTER_VERSION) ; \
 		echo DONE ; \
 	fi
 

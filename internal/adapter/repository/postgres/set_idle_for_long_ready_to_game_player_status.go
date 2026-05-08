@@ -43,8 +43,10 @@ func (p *Postgres) SetIdleForLongReadyToGamePlayerStatus(
 	)
 
 	query, args, err := sqlx.Named(query, map[string]any{
-		"game_status_idle":           player.GameStatusIdle,
-		"game_status_changed_at":     updatedAt,
+		"game_status_idle": player.GameStatusIdle,
+		//nolint:goconst
+		"game_status_changed_at": updatedAt,
+		//nolint:goconst
 		"current_game_id":            "",
 		"game_status_ready_for_game": player.GameStatusReadyForGame,
 		"start_search_before":        startSearchBefore,

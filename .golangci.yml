@@ -24,6 +24,7 @@ linters:
     - wsl
     - wsl_v5
     - noinlineerr
+    - gomodguard
 
   settings:
     misspell:

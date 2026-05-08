@@ -104,9 +104,11 @@ func bindChangeGameStatusQuery(
 	return sqlx.Named(
 		query,
 		map[string]any{
-			"game_status":            status,
+			"game_status": status,
+			//nolint:goconst
 			"game_status_changed_at": changedTime,
 			"id":                     playerID.Int(),
-			"current_game_id":        gameID.String(),
+			//nolint:goconst
+			"current_game_id": gameID.String(),
 		})
 }
