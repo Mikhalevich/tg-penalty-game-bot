@@ -102,3 +102,7 @@ func NotInGame() Error {
 func InSearchGameState() Error {
 	return New(TypeInSearchGameState, "searching for game")
 }
+
+func NoRowsUpdated() Error {
+	return New(TypeNoRowsUpdated, "no rows updated")
+}
