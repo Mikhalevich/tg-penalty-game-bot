@@ -34,12 +34,14 @@ func (p *Postgres) SetPlayerIdleStatusWithScore(
 
 	res, err := sqlx.NamedExecContext(ctx, p.transactor.ExtContext(ctx), query,
 		map[string]any{
-			"game_status_idle":       player.GameStatusIdle,
+			"game_status_idle": player.GameStatusIdle,
+			//nolint:goconst
 			"game_status_changed_at": changedAt,
-			"current_game_id":        "",
-			"score_delta":            scoreDelta,
-			"id":                     playerID,
-			"previous_game_status":   player.GameStatusInGame,
+			//nolint:goconst
+			"current_game_id":      "",
+			"score_delta":          scoreDelta,
+			"id":                   playerID,
+			"previous_game_status": player.GameStatusInGame,
 		})
 	if err != nil {
 		return fmt.Errorf("named exec: %w", err)
