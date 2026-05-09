@@ -5,7 +5,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"time"
 )
 
 const (
@@ -13,24 +12,24 @@ const (
 )
 
 type leaderboardMonthPayload struct {
-	Month time.Month `json:"month"`
+	Month int `json:"month"`
 }
 
-func (s *Settings) GetLeaderboardMonth(ctx context.Context) (time.Month, error) {
+func (s *Settings) GetLeaderboardMonth(ctx context.Context) (int, error) {
 	item, err := s.repo.GetSetting(ctx, leaderboardMonth)
 	if err != nil {
-		return time.January, fmt.Errorf("get setting: %w", err)
+		return 0, fmt.Errorf("get setting: %w", err)
 	}
 
 	var payload leaderboardMonthPayload
 	if err := json.NewDecoder(bytes.NewReader(item.Payload)).Decode(&payload); err != nil {
-		return time.January, fmt.Errorf("decode setting payload: %w", err)
+		return 0, fmt.Errorf("decode setting payload: %w", err)
 	}
 
 	return payload.Month, nil
 }
 
-func (s *Settings) SetLeaderboardMonth(ctx context.Context, month time.Month) error {
+func (s *Settings) SetLeaderboardMonth(ctx context.Context, month int) error {
 	payload, err := json.Marshal(leaderboardMonthPayload{
 		Month: month,
 	})

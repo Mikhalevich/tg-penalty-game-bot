@@ -54,7 +54,7 @@ func (s *LeaderboardRefresherSuite) TestGetMonthFromSettingsError() {
 
 		s.settingsProvider.EXPECT().
 			GetLeaderboardMonth(ctx).
-			Return(time.January, errors.New("some error")),
+			Return(0, errors.New("some error")),
 	)
 
 	err := refresher.Refresh(ctx)
@@ -75,10 +75,10 @@ func (s *LeaderboardRefresherSuite) TestSetMonthSettingsError() {
 
 		s.settingsProvider.EXPECT().
 			GetLeaderboardMonth(ctx).
-			Return(time.January, perror.NotFound("month not found")),
+			Return(0, perror.NotFound("month not found")),
 
 		s.settingsProvider.EXPECT().
-			SetLeaderboardMonth(ctx, time.May).
+			SetLeaderboardMonth(ctx, 5).
 			Return(errors.New("some set error")),
 	)
 
@@ -100,7 +100,7 @@ func (s *LeaderboardRefresherSuite) TestMonthNotChangedFromSettings() {
 
 		s.settingsProvider.EXPECT().
 			GetLeaderboardMonth(ctx).
-			Return(time.May, nil),
+			Return(5, nil),
 
 		s.repo.EXPECT().RefreshScoreLeaderboard(ctx),
 	)
@@ -123,10 +123,10 @@ func (s *LeaderboardRefresherSuite) TestMonthNotFoundInSettings() {
 
 		s.settingsProvider.EXPECT().
 			GetLeaderboardMonth(ctx).
-			Return(time.January, perror.NotFound("month not found")),
+			Return(0, perror.NotFound("month not found")),
 
 		s.settingsProvider.EXPECT().
-			SetLeaderboardMonth(ctx, time.May).
+			SetLeaderboardMonth(ctx, 5).
 			Return(nil),
 
 		s.repo.EXPECT().
@@ -152,7 +152,7 @@ func (s *LeaderboardRefresherSuite) TestMonthIsChanged() {
 
 		s.settingsProvider.EXPECT().
 			GetLeaderboardMonth(ctx).
-			Return(time.April, nil),
+			Return(4, nil),
 
 		s.transactor.EXPECT().
 			Transaction(ctx, gomock.Any()).
@@ -175,7 +175,7 @@ func (s *LeaderboardRefresherSuite) TestMonthIsChanged() {
 			).Return(nil),
 
 		s.settingsProvider.EXPECT().
-			SetLeaderboardMonth(ctx, time.May).
+			SetLeaderboardMonth(ctx, 5).
 			Return(nil),
 
 		s.repo.EXPECT().
@@ -201,7 +201,7 @@ func (s *LeaderboardRefresherSuite) TestMonthIsChangedTrxError() {
 
 		s.settingsProvider.EXPECT().
 			GetLeaderboardMonth(ctx).
-			Return(time.April, nil),
+			Return(4, nil),
 
 		s.transactor.EXPECT().
 			Transaction(ctx, gomock.Any()).
@@ -227,7 +227,7 @@ func (s *LeaderboardRefresherSuite) TestMonthIsChangedTrxError() {
 			).Return(nil),
 
 		s.settingsProvider.EXPECT().
-			SetLeaderboardMonth(ctx, time.May).
+			SetLeaderboardMonth(ctx, 5).
 			Return(nil),
 	)
 
@@ -249,7 +249,7 @@ func (s *LeaderboardRefresherSuite) TestMonthIsChangedTrxSetLeaderboardError() {
 
 		s.settingsProvider.EXPECT().
 			GetLeaderboardMonth(ctx).
-			Return(time.April, nil),
+			Return(4, nil),
 
 		s.transactor.EXPECT().
 			Transaction(ctx, gomock.Any()).
@@ -272,7 +272,7 @@ func (s *LeaderboardRefresherSuite) TestMonthIsChangedTrxSetLeaderboardError() {
 			).Return(nil),
 
 		s.settingsProvider.EXPECT().
-			SetLeaderboardMonth(ctx, time.May).
+			SetLeaderboardMonth(ctx, 5).
 			Return(errors.New("some set error")),
 	)
 
@@ -294,7 +294,7 @@ func (s *LeaderboardRefresherSuite) TestMonthIsChangedTrxInsertHistoryError() {
 
 		s.settingsProvider.EXPECT().
 			GetLeaderboardMonth(ctx).
-			Return(time.April, nil),
+			Return(4, nil),
 
 		s.transactor.EXPECT().
 			Transaction(ctx, gomock.Any()).
@@ -336,7 +336,7 @@ func (s *LeaderboardRefresherSuite) TestMonthIsChangedTrxPlayerPositionsError() 
 
 		s.settingsProvider.EXPECT().
 			GetLeaderboardMonth(ctx).
-			Return(time.April, nil),
+			Return(4, nil),
 
 		s.transactor.EXPECT().
 			Transaction(ctx, gomock.Any()).

@@ -148,10 +148,10 @@ func (m *MockSettingsProvider) EXPECT() *MockSettingsProviderMockRecorder {
 }
 
 // GetLeaderboardMonth mocks base method.
-func (m *MockSettingsProvider) GetLeaderboardMonth(ctx context.Context) (time.Month, error) {
+func (m *MockSettingsProvider) GetLeaderboardMonth(ctx context.Context) (int, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetLeaderboardMonth", ctx)
-	ret0, _ := ret[0].(time.Month)
+	ret0, _ := ret[0].(int)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -163,7 +163,7 @@ func (mr *MockSettingsProviderMockRecorder) GetLeaderboardMonth(ctx any) *gomock
 }
 
 // SetLeaderboardMonth mocks base method.
-func (m *MockSettingsProvider) SetLeaderboardMonth(ctx context.Context, month time.Month) error {
+func (m *MockSettingsProvider) SetLeaderboardMonth(ctx context.Context, month int) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SetLeaderboardMonth", ctx, month)
 	ret0, _ := ret[0].(error)

@@ -28,8 +28,8 @@ type Transactor interface {
 }
 
 type SettingsProvider interface {
-	GetLeaderboardMonth(ctx context.Context) (time.Month, error)
-	SetLeaderboardMonth(ctx context.Context, month time.Month) error
+	GetLeaderboardMonth(ctx context.Context) (int, error)
+	SetLeaderboardMonth(ctx context.Context, month int) error
 }
 
 type TimeProvider interface {
