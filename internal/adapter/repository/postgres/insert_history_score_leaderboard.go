@@ -17,7 +17,7 @@ func (p *Postgres) InsertHistoryScoreLeaderboard(
 ) error {
 	var (
 		query = `
-			INSERT INTO leaderboard_history(
+			INSERT INTO leaderboard_score_history(
 				player_id,
 				year,
 				month,
