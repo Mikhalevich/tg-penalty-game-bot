@@ -4,9 +4,10 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/jmoiron/sqlx"
+
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/adapter/repository/postgres/model"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/player"
-	"github.com/jmoiron/sqlx"
 )
 
 func (p *Postgres) HistoryScoreLeaderboard(
