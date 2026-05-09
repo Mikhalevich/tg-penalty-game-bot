@@ -20,6 +20,10 @@ func (c *ChangeName) SetChangeDisplayNameTrigger(
 	}
 
 	if plr.IsChangeNameTriggered {
+		if err := c.notifier.ChangeName(ctx, plr, fullName, userName); err != nil {
+			return fmt.Errorf("change name notificatoin: %w", err)
+		}
+
 		return nil
 	}
 
