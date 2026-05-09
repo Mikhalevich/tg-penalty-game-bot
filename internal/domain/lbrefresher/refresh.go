@@ -57,11 +57,8 @@ func (lr *LeaderboardRefresher) updateHistoryLeaderboard(
 			return fmt.Errorf("set leaderboard month setting: %w", err)
 		}
 
-		lr.storedMonth = now.Month()
-
 		return nil
-	},
-	); err != nil {
+	}); err != nil {
 		return fmt.Errorf("transaction: %w", err)
 	}
 
@@ -69,16 +66,11 @@ func (lr *LeaderboardRefresher) updateHistoryLeaderboard(
 }
 
 // isMonthChangedSinceLastHistoryUpdate check is month changed since last time store history positions
-// returns true is month was changed and false otherwise
-// if month is not stored in settings then store current one and return false.
+// returns true is month was changed and false otherwise.
 func (lr *LeaderboardRefresher) isMonthChangedSinceLastHistoryUpdate(
 	ctx context.Context,
 	currentMonth time.Month,
 ) (bool, error) {
-	if lr.storedMonth != 0 {
-		return lr.storedMonth != currentMonth, nil
-	}
-
 	settingsMonth, err := lr.settingsProvider.GetLeaderboardMonth(ctx)
 	if err != nil {
 		if !perror.IsType(err, perror.TypeNotFound) {
@@ -89,12 +81,8 @@ func (lr *LeaderboardRefresher) isMonthChangedSinceLastHistoryUpdate(
 			return false, fmt.Errorf("set leaderboard month setting: %w", err)
 		}
 
-		lr.storedMonth = currentMonth
-
 		return false, nil
 	}
 
-	lr.storedMonth = settingsMonth
-
-	return lr.storedMonth != currentMonth, nil
+	return settingsMonth != currentMonth, nil
 }

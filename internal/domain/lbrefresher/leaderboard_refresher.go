@@ -41,7 +41,6 @@ type LeaderboardRefresher struct {
 	transactor       Transactor
 	settingsProvider SettingsProvider
 	timeProvider     TimeProvider
-	storedMonth      time.Month
 }
 
 func New(

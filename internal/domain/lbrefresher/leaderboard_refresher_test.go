@@ -18,8 +18,6 @@ type LeaderboardRefresherSuite struct {
 	transactor       *lbrefresher.MockTransactor
 	settingsProvider *lbrefresher.MockSettingsProvider
 	timeProvider     *lbrefresher.MockTimeProvider
-
-	refresher *lbrefresher.LeaderboardRefresher
 }
 
 func TestLeaderboardRefresherSuit(t *testing.T) {
@@ -36,8 +34,6 @@ func (s *LeaderboardRefresherSuite) SetupSuite() {
 	s.transactor = lbrefresher.NewMockTransactor(s.ctrl)
 	s.settingsProvider = lbrefresher.NewMockSettingsProvider(s.ctrl)
 	s.timeProvider = lbrefresher.NewMockTimeProvider(s.ctrl)
-
-	s.refresher = lbrefresher.New(s.repo, s.transactor, s.settingsProvider, s.timeProvider)
 }
 
 func (s *LeaderboardRefresherSuite) TearDownSuite() {
