@@ -29,7 +29,12 @@ func (p *Postgres) SetButtonRows(
 				:operation,
 				:is_delete_message,
 				:payload
-			)
+			) ON CONFLICT(id)
+				DO UPDATE SET
+					caption = EXCLUDED.caption,
+					operation = EXCLUDED.operation,
+					is_delete_message = EXCLUDED.is_delete_message,
+					payload = EXCLUDED.payload
 		`
 
 		dbRows = model.ToDBButtons(rows)

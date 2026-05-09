@@ -63,7 +63,7 @@ func (o *OutboxProcessor) ProcessMessage(
 	return nil
 }
 
-type sendResuts struct {
+type sendResults struct {
 	DispatchedIDs          []int
 	CanceledIDs            []int
 	IncrementRetryCountIDs []int
@@ -73,31 +73,14 @@ func (o *OutboxProcessor) sendMessages(
 	ctx context.Context,
 	msgs []outboxmsg.Message,
 	maxRetryCount int,
-) sendResuts {
-	results := sendResuts{
+) sendResults {
+	results := sendResults{
 		DispatchedIDs: make([]int, 0, len(msgs)),
 	}
 
 	for _, msg := range msgs {
 		if err := o.sender.SendMessage(ctx, msg.Message); err != nil {
-			if msg.RetryCount < maxRetryCount {
-				results.IncrementRetryCountIDs = append(results.IncrementRetryCountIDs, msg.ID)
-
-				continue
-			}
-
-			logger.FromContext(ctx).
-				WithFields(
-					logger.Fields{
-						"chat_id":  msg.ChatID,
-						"text":     msg.Text,
-						"msg_type": msg.Type,
-					},
-				).
-				WithError(err).
-				Error("send message")
-
-			results.CanceledIDs = append(results.CanceledIDs, msg.ID)
+			processAndLogSendError(ctx, err, msg, maxRetryCount, &results)
 
 			continue
 		}
@@ -106,4 +89,34 @@ func (o *OutboxProcessor) sendMessages(
 	}
 
 	return results
+}
+
+func processAndLogSendError(
+	ctx context.Context,
+	err error,
+	msg outboxmsg.Message,
+	maxRetryCount int,
+	results *sendResults,
+) {
+	loggerFromCtx := logger.FromContext(ctx).
+		WithFields(
+			logger.Fields{
+				"chat_id":  msg.ChatID,
+				"text":     msg.Text,
+				"msg_type": msg.Type,
+			},
+		).
+		WithError(err)
+
+	loggerFromCtx.Error("send message")
+
+	if msg.RetryCount < maxRetryCount {
+		results.IncrementRetryCountIDs = append(results.IncrementRetryCountIDs, msg.ID)
+
+		return
+	}
+
+	loggerFromCtx.Error("riched max retry count, skip message")
+
+	results.CanceledIDs = append(results.CanceledIDs, msg.ID)
 }
