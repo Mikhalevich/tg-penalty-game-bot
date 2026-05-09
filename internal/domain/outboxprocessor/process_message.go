@@ -15,8 +15,8 @@ func (o *OutboxProcessor) ProcessMessage(
 ) error {
 	now := o.timeProvider.Now()
 
-	if err := o.transactor.Transaction(ctx, func(trxCtx context.Context) error {
-		msgs, err := o.repository.OutboxSelectForDispatchMessages(trxCtx, now, batchSize)
+	if err := o.transactor.Transaction(ctx, func(ctx context.Context) error {
+		msgs, err := o.repository.OutboxSelectForDispatchMessages(ctx, now, batchSize)
 		if err != nil {
 			return fmt.Errorf("select outbox messages: %w", err)
 		}
@@ -25,7 +25,7 @@ func (o *OutboxProcessor) ProcessMessage(
 
 		if len(results.DispatchedIDs) > 0 {
 			if err := o.repository.OutboxUpdateStatus(
-				trxCtx,
+				ctx,
 				results.DispatchedIDs,
 				outboxmsg.StatusDispatched,
 				now,
@@ -36,7 +36,7 @@ func (o *OutboxProcessor) ProcessMessage(
 
 		if len(results.CanceledIDs) > 0 {
 			if err := o.repository.OutboxUpdateStatus(
-				trxCtx,
+				ctx,
 				results.CanceledIDs,
 				outboxmsg.StatusCanceled,
 				now,
@@ -47,7 +47,7 @@ func (o *OutboxProcessor) ProcessMessage(
 
 		if len(results.IncrementRetryCountIDs) > 0 {
 			if err := o.repository.OutboxIncrementRetryCount(
-				trxCtx,
+				ctx,
 				results.IncrementRetryCountIDs,
 				now,
 			); err != nil {
