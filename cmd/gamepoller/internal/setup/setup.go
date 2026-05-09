@@ -16,9 +16,11 @@ import (
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/adapter/timeprovider"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/gameusecase/forceshot"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/gameusecase/startgame"
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/lbrefresher"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/matchmaking"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/notifier"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/playerusecase/changestatus"
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/settings"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/stopsearchgame"
 )
 
@@ -42,13 +44,15 @@ func StartWorker(ctx context.Context, cfg config.Config) error {
 			timeProvider,
 		)
 		expiredShotsProcessor      = forceshot.New(pgDB, timeProvider, changeStatusService, notificationService)
+		settingsProvider           = settings.New(pgDB, timeProvider)
+		lbRefresher                = lbrefresher.New(pgDB, pgDB.Transactor(), settingsProvider, timeProvider)
 		expiredSearchGameProcessor = stopsearchgame.New(pgDB, timeProvider, notificationService)
 	)
 
 	app.New(
 		matchmakingProcessor,
 		expiredShotsProcessor,
-		pgDB,
+		lbRefresher,
 		expiredSearchGameProcessor,
 	).Run(
 		ctx,

@@ -18,6 +18,10 @@ func NewString(s string) JSONB {
 }
 
 func NewFromMarshaler(s any) (JSONB, error) {
+	if s == nil {
+		return JSONB("{}"), nil
+	}
+
 	b, err := json.Marshal(s)
 	if err != nil {
 		return "", fmt.Errorf("json marshal: %w", err)

@@ -16,4 +16,5 @@ const (
 	TypeAlreadyInGame
 	TypeNotInGame
 	TypeInSearchGameState
+	TypeNoRowsUpdated
 )
