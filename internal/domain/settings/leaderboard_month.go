@@ -12,6 +12,7 @@ const (
 )
 
 type leaderboardMonthPayload struct {
+	Year  int `json:"year"`
 	Month int `json:"month"`
 }
 
@@ -29,8 +30,9 @@ func (s *Settings) GetLeaderboardMonth(ctx context.Context) (int, error) {
 	return payload.Month, nil
 }
 
-func (s *Settings) SetLeaderboardMonth(ctx context.Context, month int) error {
+func (s *Settings) SetLeaderboardMonth(ctx context.Context, year, month int) error {
 	payload, err := json.Marshal(leaderboardMonthPayload{
+		Year:  year,
 		Month: month,
 	})
 

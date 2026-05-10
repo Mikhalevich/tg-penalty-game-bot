@@ -17,7 +17,7 @@ func (lr *LeaderboardRefresher) Refresh(ctx context.Context) error {
 		now = lr.timeProvider.Now()
 	)
 
-	isChanged, err := lr.isMonthChangedSinceLastHistoryUpdate(ctx, int(now.Month()))
+	isChanged, err := lr.isMonthChangedSinceLastHistoryUpdate(ctx, now.Year(), int(now.Month()))
 	if err != nil {
 		return fmt.Errorf("check is month changed: %w", err)
 	}
@@ -53,7 +53,7 @@ func (lr *LeaderboardRefresher) updateHistoryLeaderboard(
 			return fmt.Errorf("insert history leaderboard: %w", err)
 		}
 
-		if err := lr.settingsProvider.SetLeaderboardMonth(ctx, int(now.Month())); err != nil {
+		if err := lr.settingsProvider.SetLeaderboardMonth(ctx, now.Year(), int(now.Month())); err != nil {
 			return fmt.Errorf("set leaderboard month setting: %w", err)
 		}
 
@@ -69,6 +69,7 @@ func (lr *LeaderboardRefresher) updateHistoryLeaderboard(
 // returns true is month was changed and false otherwise.
 func (lr *LeaderboardRefresher) isMonthChangedSinceLastHistoryUpdate(
 	ctx context.Context,
+	currentYear int,
 	currentMonth int,
 ) (bool, error) {
 	settingsMonth, err := lr.settingsProvider.GetLeaderboardMonth(ctx)
@@ -77,7 +78,7 @@ func (lr *LeaderboardRefresher) isMonthChangedSinceLastHistoryUpdate(
 			return false, fmt.Errorf("get leaderboard month from settings: %w", err)
 		}
 
-		if err := lr.settingsProvider.SetLeaderboardMonth(ctx, currentMonth); err != nil {
+		if err := lr.settingsProvider.SetLeaderboardMonth(ctx, currentYear, currentMonth); err != nil {
 			return false, fmt.Errorf("set leaderboard month setting: %w", err)
 		}
 
