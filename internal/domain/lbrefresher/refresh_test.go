@@ -78,7 +78,7 @@ func (s *LeaderboardRefresherSuite) TestSetMonthSettingsError() {
 			Return(0, perror.NotFound("month not found")),
 
 		s.settingsProvider.EXPECT().
-			SetLeaderboardMonth(ctx, 5).
+			SetLeaderboardMonth(ctx, 2026, 5).
 			Return(errors.New("some set error")),
 	)
 
@@ -126,7 +126,7 @@ func (s *LeaderboardRefresherSuite) TestMonthNotFoundInSettings() {
 			Return(0, perror.NotFound("month not found")),
 
 		s.settingsProvider.EXPECT().
-			SetLeaderboardMonth(ctx, 5).
+			SetLeaderboardMonth(ctx, 2026, 5).
 			Return(nil),
 
 		s.repo.EXPECT().
@@ -175,7 +175,7 @@ func (s *LeaderboardRefresherSuite) TestMonthIsChanged() {
 			).Return(nil),
 
 		s.settingsProvider.EXPECT().
-			SetLeaderboardMonth(ctx, 5).
+			SetLeaderboardMonth(ctx, 2026, 5).
 			Return(nil),
 
 		s.repo.EXPECT().
@@ -227,7 +227,7 @@ func (s *LeaderboardRefresherSuite) TestMonthIsChangedTrxError() {
 			).Return(nil),
 
 		s.settingsProvider.EXPECT().
-			SetLeaderboardMonth(ctx, 5).
+			SetLeaderboardMonth(ctx, 2026, 5).
 			Return(nil),
 	)
 
@@ -272,7 +272,7 @@ func (s *LeaderboardRefresherSuite) TestMonthIsChangedTrxSetLeaderboardError() {
 			).Return(nil),
 
 		s.settingsProvider.EXPECT().
-			SetLeaderboardMonth(ctx, 5).
+			SetLeaderboardMonth(ctx, 2026, 5).
 			Return(errors.New("some set error")),
 	)
 

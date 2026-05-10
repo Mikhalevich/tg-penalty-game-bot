@@ -163,17 +163,17 @@ func (mr *MockSettingsProviderMockRecorder) GetLeaderboardMonth(ctx any) *gomock
 }
 
 // SetLeaderboardMonth mocks base method.
-func (m *MockSettingsProvider) SetLeaderboardMonth(ctx context.Context, month int) error {
+func (m *MockSettingsProvider) SetLeaderboardMonth(ctx context.Context, year, month int) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SetLeaderboardMonth", ctx, month)
+	ret := m.ctrl.Call(m, "SetLeaderboardMonth", ctx, year, month)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // SetLeaderboardMonth indicates an expected call of SetLeaderboardMonth.
-func (mr *MockSettingsProviderMockRecorder) SetLeaderboardMonth(ctx, month any) *gomock.Call {
+func (mr *MockSettingsProviderMockRecorder) SetLeaderboardMonth(ctx, year, month any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetLeaderboardMonth", reflect.TypeOf((*MockSettingsProvider)(nil).SetLeaderboardMonth), ctx, month)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetLeaderboardMonth", reflect.TypeOf((*MockSettingsProvider)(nil).SetLeaderboardMonth), ctx, year, month)
 }
 
 // MockTimeProvider is a mock of TimeProvider interface.
