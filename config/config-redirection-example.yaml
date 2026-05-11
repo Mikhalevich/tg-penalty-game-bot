@@ -1,0 +1,7 @@
+log_level: "info"
+tracing:
+  endpoint: "jaeger:4318"
+  service_name: "redirection-bot"
+bot:
+  token: "bot_token"
+redirection_link: "https://t.me/SoccerPenaltyBot"

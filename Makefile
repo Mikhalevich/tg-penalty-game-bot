@@ -28,6 +28,7 @@ build:
 	go build -mod=vendor -o $(BIN_PATH)/gamepoller ./cmd/gamepoller/main.go
 	go build -mod=vendor -o $(BIN_PATH)/outboxpoller ./cmd/outboxpoller/main.go
 	go build -mod=vendor -o $(BIN_PATH)/botwebhook ./cmd/botwebhook/main.go
+	go build -mod=vendor -o $(BIN_PATH)/redirectionbot ./cmd/redirectionbot/main.go
 
 test:
 	go test ./...
