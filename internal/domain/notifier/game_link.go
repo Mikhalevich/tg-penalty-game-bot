@@ -21,5 +21,5 @@ func (n *Notifier) GameLink(ctx context.Context, chatID msginfo.ChatID, gameID g
 }
 
 func makeStartGameLink(gameID game.ID) string {
-	return fmt.Sprintf("https://t.me/football_penalty_shootout_bot?start=join_%s", gameID.String())
+	return fmt.Sprintf("https://t.me/SoccerPenaltyBot?start=join_%s", gameID.String())
 }
