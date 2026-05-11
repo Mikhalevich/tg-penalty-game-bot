@@ -8,10 +8,10 @@ import (
 	"path/filepath"
 	"runtime"
 	"testing"
+	"time"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/ory/dockertest/v3"
-	"github.com/ory/dockertest/v3/docker"
+	"github.com/ory/dockertest/v4"
 	migrate "github.com/rubenv/sql-migrate"
 	"github.com/stretchr/testify/suite"
 
@@ -38,7 +38,7 @@ func TestPostgresSuit(t *testing.T) {
 func (s *PostgresSuit) SetupSuite() {
 	dbDriver := driver.NewPgx()
 
-	dbConn, cleanup, err := connectToDatabase(s.T().Context(), dbDriver.Name())
+	dbConn, cleanup, err := connectToDatabase(s.T().Context(), s.T(), dbDriver.Name())
 	if err != nil {
 		s.FailNow("could not connect to database", err)
 	}
@@ -80,48 +80,40 @@ func (s *PostgresSuit) cleanup() {
 	sqlx.MustExecContext(ctx, trx.ExtContext(ctx), "DELETE FROM outbox_messages")
 }
 
-func connectToDatabase(ctx context.Context, driverName string) (*sql.DB, func() error, error) {
-	pool, err := dockertest.NewPool("")
-	if err != nil {
-		return nil, nil, fmt.Errorf("construct pool: %w", err)
-	}
+func connectToDatabase(ctx context.Context, t *testing.T, driverName string) (*sql.DB, func() error, error) {
+	t.Helper()
 
-	if err := pool.Client.Ping(); err != nil {
-		return nil, nil, fmt.Errorf("connect to docker: %w", err)
-	}
+	var (
+		pool     = dockertest.NewPoolT(t, "")
+		resource = pool.RunT(
+			t,
+			"postgres",
+			dockertest.WithTag("16.3-alpine3.20"),
+			dockertest.WithEnv([]string{
+				"POSTGRES_DB=bot",
+				"POSTGRES_USER=bot",
+				"POSTGRES_PASSWORD=bot",
+			}),
+		)
 
-	resource, err := pool.RunWithOptions(&dockertest.RunOptions{
-		Repository: "postgres",
-		Tag:        "16.3-alpine3.20",
-		Env: []string{
-			"POSTGRES_DB=bot",
-			"POSTGRES_USER=bot",
-			"POSTGRES_PASSWORD=bot",
-			"listen_addresses = '*'",
-		},
-	}, func(config *docker.HostConfig) {
-		config.AutoRemove = true
-		config.RestartPolicy = docker.RestartPolicy{
-			Name: "no",
-		}
-	})
+		dbConn *sql.DB
+	)
 
-	if err != nil {
-		return nil, nil, fmt.Errorf("run docker: %w", err)
-	}
-
-	var dbConn *sql.DB
-
-	if err := pool.Retry(func() error {
-		dbConn, err = sql.Open(driverName,
-			fmt.Sprintf("host=localhost port=%s user=bot password=bot dbname=bot sslmode=disable", resource.GetPort("5432/tcp")))
+	if err := pool.Retry(ctx, 30*time.Second, func() error {
+		dbConnLocal, err := sql.Open(driverName,
+			fmt.Sprintf("host=localhost port=%s user=bot password=bot dbname=bot sslmode=disable",
+				resource.GetPort("5432/tcp"),
+			),
+		)
 		if err != nil {
 			return fmt.Errorf("sql open: %w", err)
 		}
 
-		if err := dbConn.PingContext(ctx); err != nil {
+		if err := dbConnLocal.PingContext(ctx); err != nil {
 			return fmt.Errorf("ping: %w", err)
 		}
+
+		dbConn = dbConnLocal
 
 		return nil
 	}); err != nil {
@@ -131,10 +123,6 @@ func connectToDatabase(ctx context.Context, driverName string) (*sql.DB, func() 
 	return dbConn, func() error {
 		if err := dbConn.Close(); err != nil {
 			return fmt.Errorf("close database connection: %w", err)
-		}
-
-		if err := pool.Purge(resource); err != nil {
-			return fmt.Errorf("purge resource: %w", err)
 		}
 
 		return nil
