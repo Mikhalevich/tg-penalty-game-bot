@@ -3,7 +3,7 @@ kind: ConfigMap
 metadata:
   name: {{ .Chart.Name }}-cm
 data:
-  config-bot.yaml: |
+  config-redirectionbot.yaml: |
     log_level: "info"
     tracing:
       endpoint: "jaeger-service:4318"
