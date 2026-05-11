@@ -23,8 +23,9 @@ type Config struct {
 
 func main() {
 	var (
-		isGet = flag.Bool("get", false, "receive info about webhook")
-		isSet = flag.Bool("set", false, "set webhook")
+		isGet    = flag.Bool("get", false, "receive info about webhook")
+		isSet    = flag.Bool("set", false, "set webhook")
+		isRemove = flag.Bool("remove", false, "remove webhook by bot token")
 	)
 
 	var cfg Config
@@ -57,7 +58,16 @@ func main() {
 		return
 	}
 
-	logger.StdLogger().Info("you need to specify --get or --set flag")
+	if *isRemove {
+		if err := removeWebHook(context.Background(), botAPI); err != nil {
+			logger.StdLogger().WithError(err).Error("failed to remove webhook")
+			os.Exit(1)
+		}
+
+		return
+	}
+
+	logger.StdLogger().Info("you need to specify --get or --set or --remove flag")
 
 	os.Exit(1)
 }
@@ -80,6 +90,19 @@ func setWebHook(ctx context.Context, botAPI *bot.Bot, cfg Config) error {
 		},
 	); err != nil {
 		return fmt.Errorf("set webhook: %w", err)
+	}
+
+	return nil
+}
+
+func removeWebHook(ctx context.Context, botAPI *bot.Bot) error {
+	if _, err := botAPI.SetWebhook(
+		ctx,
+		&bot.SetWebhookParams{
+			URL: "",
+		},
+	); err != nil {
+		return fmt.Errorf("remove webhook: %w", err)
 	}
 
 	return nil
