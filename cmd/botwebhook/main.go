@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"os"
@@ -40,36 +41,24 @@ func main() {
 		os.Exit(1)
 	}
 
-	if *isGet {
-		if err := getWebHookInfo(context.Background(), botAPI); err != nil {
-			logger.StdLogger().WithError(err).Error("failed to get webhook info")
-			os.Exit(1)
-		}
+	switch {
+	case *isGet:
+		err = getWebHookInfo(context.Background(), botAPI)
 
-		return
+	case *isSet:
+		err = setWebHook(context.Background(), botAPI, cfg)
+
+	case *isRemove:
+		err = removeWebHook(context.Background(), botAPI)
+
+	default:
+		err = errors.New("missing flag operation: --get or --set or --remove")
 	}
 
-	if *isSet {
-		if err := setWebHook(context.Background(), botAPI, cfg); err != nil {
-			logger.StdLogger().WithError(err).Error("failed to set webhook")
-			os.Exit(1)
-		}
-
-		return
+	if err != nil {
+		logger.StdLogger().WithError(err).Error("operation failed")
+		os.Exit(1)
 	}
-
-	if *isRemove {
-		if err := removeWebHook(context.Background(), botAPI); err != nil {
-			logger.StdLogger().WithError(err).Error("failed to remove webhook")
-			os.Exit(1)
-		}
-
-		return
-	}
-
-	logger.StdLogger().Info("you need to specify --get or --set or --remove flag")
-
-	os.Exit(1)
 }
 
 func setWebHook(ctx context.Context, botAPI *bot.Bot, cfg Config) error {
