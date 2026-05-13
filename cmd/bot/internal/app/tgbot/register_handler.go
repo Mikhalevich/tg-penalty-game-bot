@@ -74,12 +74,39 @@ func (t *TGBot) addCommand(command string, description string, handler Handler) 
 		})
 	}
 
-	t.bot.RegisterHandler(
-		bot.HandlerTypeMessageText,
-		command,
-		bot.MatchTypeCommandStartOnly,
+	t.bot.RegisterHandlerMatchFunc(
+		commandMatchFn(command),
 		t.wrapHandler(command, handler),
 	)
+}
+
+func commandMatchFn(command string) bot.MatchFunc {
+	return func(update *models.Update) bool {
+		if update.Message == nil {
+			return false
+		}
+
+		var (
+			data     = update.Message.Text
+			entities = update.Message.Entities
+		)
+
+		for _, entity := range entities {
+			if entity.Type == models.MessageEntityTypeBotCommand {
+				if entity.Offset != 0 {
+					continue
+				}
+
+				entityData := data[entity.Offset+1 : entity.Offset+entity.Length]
+
+				if strings.HasPrefix(entityData, command) {
+					return true
+				}
+			}
+		}
+
+		return false
+	}
 }
 
 func (t *TGBot) AddDefaultHandler(h Handler) {
