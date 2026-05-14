@@ -14,6 +14,7 @@ import (
 func (s *StartGame) StartGameWithBot(
 	ctx context.Context,
 	chatID msginfo.ChatID,
+	difficulty game.BotDifficulty,
 ) error {
 	currentPlayer, err := s.playerProvider.GetPlayerByChatID(ctx, chatID)
 	if err != nil {
@@ -34,7 +35,7 @@ func (s *StartGame) StartGameWithBot(
 	case player.GameStatusIdle:
 	}
 
-	if err := s.startGameWithBot(ctx, currentPlayer, s.timeProvider.Now()); err != nil {
+	if err := s.startGameWithBot(ctx, currentPlayer, difficulty, s.timeProvider.Now()); err != nil {
 		return fmt.Errorf("start game with bot: %w", err)
 	}
 
@@ -44,16 +45,14 @@ func (s *StartGame) StartGameWithBot(
 func (s *StartGame) startGameWithBot(
 	ctx context.Context,
 	currentPlayer player.Player,
+	difficulty game.BotDifficulty,
 	createdAt time.Time,
 ) error {
-	currentGame := game.CreateGame(
+	currentGame := game.CreateGameWithBot(
 		ctx,
 		game.GameTypeBot,
 		currentPlayer,
-		player.Player{
-			ID:          0,
-			DisplayName: "bot",
-		},
+		difficulty,
 		createdAt,
 	)
 

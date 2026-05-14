@@ -3,16 +3,17 @@ package button
 type Operation string
 
 const (
-	OperationChangeName        Operation = "ChangeName"
-	OperationChangeNameTrigger Operation = "ChangeNameTrigger"
-	OperationChangeNameCancel  Operation = "ChangeNameCancel"
-	OperationShotSide          Operation = "ShotSide"
-	OperationLeaveGame         Operation = "LeaveGame"
-	OperationShotStats         Operation = "ShotStats"
-	OperationStopSearchGame    Operation = "StopSearchGame"
-	OperationLeaderboardPage   Operation = "LeaderboardPage"
-	OperationLeaderboardMyPage Operation = "LeaderboardMyPage"
-	OperationStartGame         Operation = "StartGame"
+	OperationChangeName          Operation = "ChangeName"
+	OperationChangeNameTrigger   Operation = "ChangeNameTrigger"
+	OperationChangeNameCancel    Operation = "ChangeNameCancel"
+	OperationShotSide            Operation = "ShotSide"
+	OperationLeaveGame           Operation = "LeaveGame"
+	OperationShotStats           Operation = "ShotStats"
+	OperationStopSearchGame      Operation = "StopSearchGame"
+	OperationLeaderboardPage     Operation = "LeaderboardPage"
+	OperationLeaderboardMyPage   Operation = "LeaderboardMyPage"
+	OperationStartGame           Operation = "StartGame"
+	OperatoinSelectBotDifficulty Operation = "SelectBotDifficulty"
 )
 
 func (o Operation) String() string {

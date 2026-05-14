@@ -9,8 +9,8 @@ import (
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/player"
 )
 
-// CreateGame create a new game(in progress status), start first round and return created game.
-func CreateGame(
+// CreateGameWithPlayer create a new game(in progress status), start first round and return created game.
+func CreateGameWithPlayer(
 	ctx context.Context,
 	gameType GameType,
 	player1 player.Player,
@@ -27,6 +27,37 @@ func CreateGame(
 			Player1: CreateGamePlayerFromPlayer(player1),
 			Player2: CreateGamePlayerFromPlayer(player2),
 			Rounds:  makeRounds(gameID, ShotsInitial, player1.ID, player2.ID),
+		},
+		StateUpdatedAt: createdAt,
+	}
+
+	createdGame.StartFirstRound(createdAt)
+
+	return createdGame
+}
+
+// CreateGameWithBot create a new game(in progress status), with bot and return created game.
+func CreateGameWithBot(
+	ctx context.Context,
+	gameType GameType,
+	player1 player.Player,
+	difficulty BotDifficulty,
+	createdAt time.Time,
+) Game {
+	var (
+		gameID    = IDFromString(uuid.NewString())
+		botPlayer = createBot(difficulty)
+	)
+
+	createdGame := Game{
+		ID:        gameID,
+		CreatedAt: createdAt,
+		Type:      gameType,
+		Status:    GameStatusInProgress,
+		State: State{
+			Player1: CreateGamePlayerFromPlayer(player1),
+			Player2: botPlayer,
+			Rounds:  makeRounds(gameID, ShotsInitial, player1.ID, botPlayer.ID),
 		},
 		StateUpdatedAt: createdAt,
 	}
@@ -59,6 +90,7 @@ func CreateGamePlayerFromPlayer(plr player.Player) Player {
 		ID:          plr.ID,
 		ChatID:      plr.ChatID,
 		DisplayName: plr.DisplayName,
+		Info:        createPlayerInfo(),
 	}
 }
 

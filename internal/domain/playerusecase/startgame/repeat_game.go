@@ -18,7 +18,7 @@ func (s *StartGame) RepeatGame(
 		return s.FindGame(ctx, chatID)
 
 	case game.GameTypeBot:
-		return s.StartGameWithBot(ctx, chatID)
+		return s.PlayWithBot(ctx, chatID)
 
 	case game.GameTypeByLink:
 		return perror.InvalidParam("unable to repeat game by link")

@@ -90,3 +90,19 @@ func StartGameWithDeleteAfterPressButton(caption string, gameType GameType) (but
 
 	return btn, nil
 }
+
+type SelectBotDifficultyPayload struct {
+	Difficulty BotDifficulty
+}
+
+func SelectBotDifficultyButton(caption string, difficulty BotDifficulty) (button.Button, error) {
+	btn, err := button.CreateButton(caption, button.OperatoinSelectBotDifficulty, true, SelectBotDifficultyPayload{
+		Difficulty: difficulty,
+	})
+
+	if err != nil {
+		return button.Button{}, fmt.Errorf("create button: %w", err)
+	}
+
+	return btn, nil
+}

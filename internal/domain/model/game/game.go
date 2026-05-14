@@ -4,17 +4,12 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/msginfo"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/perror"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/player"
 )
 
 const (
 	ShotsInitial = 5
-
-	percent100 = 100
-	percent10  = 10
-	percent1   = 1
 )
 
 type ID string
@@ -35,17 +30,6 @@ type Game struct {
 	State          State
 	StateVersion   int
 	StateUpdatedAt time.Time
-}
-
-type Player struct {
-	ID          player.ID
-	ChatID      msginfo.ChatID
-	DisplayName string
-	GoalsScored int
-}
-
-func (p Player) IsBot() bool {
-	return p.ID == 0
 }
 
 func (g *Game) IsGameWithBot() bool {
@@ -124,7 +108,11 @@ func (g *Game) PlayerShot(shot Shot) error {
 	}
 
 	inGameShot.ExpectedSide = shot.ExpectedSide
-	inGameShot.ActualSide = calculateActualShotSide(shot.Type, shot.ExpectedSide)
+	inGameShot.ActualSide = calculateActualShotSide(
+		g.State.PlayerByID(shot.PlayerID).Info,
+		shot.Type,
+		shot.ExpectedSide,
+	)
 	inGameShot.CompletedAt = shot.CompletedAt
 
 	g.StateUpdatedAt = shot.CompletedAt
@@ -133,18 +121,22 @@ func (g *Game) PlayerShot(shot Shot) error {
 }
 
 func isPercentMatch(percent int) bool {
+	if percent == 0 {
+		return false
+	}
+
 	//nolint:gosec
 	return rand.Int()%percent100 <= percent
 }
 
-func calculateActualShotSide(shotType ShotType, side ShotSide) ShotSide {
+func calculateActualShotSide(info PlayerInfo, shotType ShotType, side ShotSide) ShotSide {
 	missPercent := 0
 	switch shotType {
 	case ShotTypeAttack:
-		missPercent = percent10
+		missPercent = info.AttackMissPercent
 
 	case ShotTypeDefend:
-		missPercent = percent1
+		missPercent = info.DefendMissPercent
 	}
 
 	if isPercentMatch(missPercent) {

@@ -56,6 +56,7 @@ type Notifier interface {
 	LinkCanceled(ctx context.Context, chatID msginfo.ChatID) error
 	SearchGame(ctx context.Context, chatID msginfo.ChatID) error
 	StopSearchGame(ctx context.Context, chatID msginfo.ChatID) error
+	SelectBotDifficulty(ctx context.Context, chatID msginfo.ChatID) error
 }
 
 type StartGame struct {
