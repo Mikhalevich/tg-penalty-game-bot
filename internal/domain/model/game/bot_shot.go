@@ -121,19 +121,6 @@ func firstNotEqualSide(side ShotSide) ShotSide {
 	return side
 }
 
-func isMissPercentMatch(info PlayerInfo, shotType ShotType) bool {
-	missPercent := 0
-	switch shotType {
-	case ShotTypeAttack:
-		missPercent = info.AttackMissPercent
-
-	case ShotTypeDefend:
-		missPercent = info.DefendMissPercent
-	}
-
-	return isPercentMatch(missPercent)
-}
-
 func generateBotSide() ShotSide {
 	//nolint:gosec
 	return possibleBotShotSides[rand.Int()%len(possibleBotShotSides)]

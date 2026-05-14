@@ -1,7 +1,6 @@
 package game
 
 import (
-	"math/rand"
 	"time"
 
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/perror"
@@ -90,60 +89,6 @@ func (g *Game) JoinPlayerAndStartGame(plr Player, joinedAt time.Time) error {
 	g.StateUpdatedAt = joinedAt
 
 	return nil
-}
-
-func (g *Game) PlayerShot(shot Shot) error {
-	inGameShot := g.shotByPlayerID(shot.PlayerID)
-
-	if inGameShot.ExpectedSide != ShotSideNoShot {
-		return perror.AlreadyExists("shot already exist")
-	}
-
-	if inGameShot.PlayerID != shot.PlayerID {
-		return perror.InvalidPlayer()
-	}
-
-	if inGameShot.Round != shot.Round {
-		return perror.InvalidRound()
-	}
-
-	inGameShot.ExpectedSide = shot.ExpectedSide
-	inGameShot.ActualSide = calculateActualShotSide(
-		g.State.PlayerByID(shot.PlayerID).Info,
-		shot.Type,
-		shot.ExpectedSide,
-	)
-	inGameShot.CompletedAt = shot.CompletedAt
-
-	g.StateUpdatedAt = shot.CompletedAt
-
-	return nil
-}
-
-func isPercentMatch(percent int) bool {
-	if percent == 0 {
-		return false
-	}
-
-	//nolint:gosec
-	return rand.Int()%percent100 <= percent
-}
-
-func calculateActualShotSide(info PlayerInfo, shotType ShotType, side ShotSide) ShotSide {
-	missPercent := 0
-	switch shotType {
-	case ShotTypeAttack:
-		missPercent = info.AttackMissPercent
-
-	case ShotTypeDefend:
-		missPercent = info.DefendMissPercent
-	}
-
-	if isPercentMatch(missPercent) {
-		return ShotSideMiss
-	}
-
-	return side
 }
 
 // TryToCompleteRound complete round if both players make shots

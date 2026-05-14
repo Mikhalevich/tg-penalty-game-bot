@@ -8,11 +8,12 @@ import (
 const (
 	percent100 = 100
 	percent60  = 60
-	percent25  = 25
+	percent40  = 40
 	percent30  = 30
+	percent25  = 25
 	percent20  = 20
 	percent10  = 10
-	percent1   = 1
+	percent2   = 2
 )
 
 type BotDifficulty int
@@ -47,7 +48,7 @@ func (p Player) IsBot() bool {
 func createPlayerInfo() PlayerInfo {
 	return PlayerInfo{
 		AttackMissPercent: percent10,
-		DefendMissPercent: percent1,
+		DefendMissPercent: percent2,
 	}
 }
 
@@ -56,29 +57,29 @@ func createPlayerInfoAgainstBot(difficulty BotDifficulty) PlayerInfo {
 	case BotDifficultyEasy:
 		return PlayerInfo{
 			AttackMissPercent: percent10,
-			DefendMissPercent: percent1,
+			DefendMissPercent: percent2,
 			ForceGoalPercent:  percent30,
-			ForceSavePercent:  percent30,
+			ForceSavePercent:  percent40,
 		}
 
 	case BotDifficultyNormal:
 		return PlayerInfo{
 			AttackMissPercent: percent10,
-			DefendMissPercent: percent1,
-			ForceGoalPercent:  percent10,
-			ForceSavePercent:  percent10,
+			DefendMissPercent: percent2,
+			ForceGoalPercent:  0,
+			ForceSavePercent:  percent20,
 		}
 
 	case BotDifficultyHard, BotDifficultyInsane:
 		return PlayerInfo{
 			AttackMissPercent: percent10,
-			DefendMissPercent: percent1,
+			DefendMissPercent: percent2,
 		}
 	}
 
 	return PlayerInfo{
 		AttackMissPercent: percent10,
-		DefendMissPercent: percent1,
+		DefendMissPercent: percent2,
 	}
 }
 
@@ -92,7 +93,7 @@ func createBot(difficulty BotDifficulty) Player {
 			Info: PlayerInfo{
 				IsBot:             true,
 				AttackMissPercent: percent20,
-				DefendMissPercent: percent20,
+				DefendMissPercent: percent10,
 				ForceGoalPercent:  0,
 				ForceSavePercent:  0,
 			},
@@ -105,7 +106,7 @@ func createBot(difficulty BotDifficulty) Player {
 			Info: PlayerInfo{
 				IsBot:             true,
 				AttackMissPercent: percent20,
-				DefendMissPercent: percent1,
+				DefendMissPercent: percent2,
 				ForceGoalPercent:  0,
 				ForceSavePercent:  0,
 			},
@@ -117,8 +118,8 @@ func createBot(difficulty BotDifficulty) Player {
 			DisplayName: "bot hard",
 			Info: PlayerInfo{
 				IsBot:             true,
-				AttackMissPercent: percent1,
-				DefendMissPercent: percent1,
+				AttackMissPercent: percent2,
+				DefendMissPercent: percent2,
 				ForceGoalPercent:  percent30,
 				ForceSavePercent:  percent25,
 			},
@@ -130,8 +131,8 @@ func createBot(difficulty BotDifficulty) Player {
 			DisplayName: "bot insane",
 			Info: PlayerInfo{
 				IsBot:             true,
-				AttackMissPercent: percent1,
-				DefendMissPercent: percent1,
+				AttackMissPercent: percent2,
+				DefendMissPercent: percent2,
 				ForceGoalPercent:  percent60,
 				ForceSavePercent:  percent60,
 			},
@@ -144,7 +145,7 @@ func createBot(difficulty BotDifficulty) Player {
 		Info: PlayerInfo{
 			IsBot:             true,
 			AttackMissPercent: percent10,
-			DefendMissPercent: percent1,
+			DefendMissPercent: percent2,
 			ForceGoalPercent:  0,
 			ForceSavePercent:  0,
 		},
