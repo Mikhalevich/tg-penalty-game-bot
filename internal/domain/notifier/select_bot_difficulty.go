@@ -46,7 +46,7 @@ func (n *Notifier) SelectBotDifficulty(
 
 	if err := n.sender.SendMessage(ctx, msginfo.Message{
 		ChatID:  chatID,
-		Text:    "Select bot difficulty",
+		Text:    "Bot difficulty",
 		Type:    msginfo.MessageTypePlain,
 		Buttons: buttons,
 	}); err != nil {
