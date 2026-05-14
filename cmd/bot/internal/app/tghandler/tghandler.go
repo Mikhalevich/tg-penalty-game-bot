@@ -29,7 +29,8 @@ type ChangeName interface {
 }
 
 type StartGame interface {
-	StartGameWithBot(ctx context.Context, chatID msginfo.ChatID) error
+	PlayWithBot(ctx context.Context, chatID msginfo.ChatID) error
+	StartGameWithBot(ctx context.Context, chatID msginfo.ChatID, difficulty game.BotDifficulty) error
 	StartGameByLink(ctx context.Context, chatID msginfo.ChatID) error
 	JoinGameByLink(ctx context.Context, chatID msginfo.ChatID, gameID game.ID) error
 
@@ -121,15 +122,16 @@ func New(
 
 func (t *TGHandler) registerCBHandlers() {
 	t.cbHanlers = map[button.Operation]cbHandler{
-		button.OperationChangeName:        t.cbChangeName,
-		button.OperationChangeNameTrigger: t.cbChangeNameTrigger,
-		button.OperationChangeNameCancel:  t.cbChangeNameCancel,
-		button.OperationShotSide:          t.cbShotSide,
-		button.OperationLeaveGame:         t.cbLeaveGame,
-		button.OperationShotStats:         t.cbShotStatsOnStartGameMessage,
-		button.OperationStopSearchGame:    t.cbStopFindButton,
-		button.OperationStartGame:         t.cbStartGameButton,
-		button.OperationLeaderboardPage:   t.cbLeaderboardPage,
-		button.OperationLeaderboardMyPage: t.cbLeaderboardMyPage,
+		button.OperationChangeName:          t.cbChangeName,
+		button.OperationChangeNameTrigger:   t.cbChangeNameTrigger,
+		button.OperationChangeNameCancel:    t.cbChangeNameCancel,
+		button.OperationShotSide:            t.cbShotSide,
+		button.OperationLeaveGame:           t.cbLeaveGame,
+		button.OperationShotStats:           t.cbShotStatsOnStartGameMessage,
+		button.OperationStopSearchGame:      t.cbStopFindButton,
+		button.OperationStartGame:           t.cbStartGameButton,
+		button.OperationLeaderboardPage:     t.cbLeaderboardPage,
+		button.OperationLeaderboardMyPage:   t.cbLeaderboardMyPage,
+		button.OperatoinSelectBotDifficulty: t.cbSelectBotDifficulty,
 	}
 }

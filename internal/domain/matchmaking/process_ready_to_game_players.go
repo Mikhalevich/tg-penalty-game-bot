@@ -52,7 +52,7 @@ func (m *MatchMaking) transactionReadyToGamePlayers(
 			player2 = players[i]
 		)
 
-		newGame := game.CreateGame(ctx, game.GameTypeRating, player1, player2, now)
+		newGame := game.CreateGameWithPlayer(ctx, game.GameTypeRating, player1, player2, now)
 
 		games = append(games, newGame)
 

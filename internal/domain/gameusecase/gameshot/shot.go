@@ -3,20 +3,10 @@ package gameshot
 import (
 	"context"
 	"fmt"
-	"math/rand"
 	"time"
 
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/game"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/perror"
-)
-
-var (
-	//nolint:gochecknoglobals
-	possibleBotShotSides = []game.ShotSide{
-		game.ShotSideLeft,
-		game.ShotSideMiddle,
-		game.ShotSideRight,
-	}
 )
 
 func (g *GameShot) Shot(
@@ -63,7 +53,7 @@ func (g *GameShot) processGameShot(
 	}
 
 	if currentGame.IsGameWithBot() {
-		if err := g.processBotShot(currentGame, shot.Round, shot.CompletedAt); err != nil {
+		if err := currentGame.BotShot(shot.Round, shot.CompletedAt); err != nil {
 			return fmt.Errorf("bot shot: %w", err)
 		}
 	}
@@ -135,27 +125,4 @@ func (g *GameShot) finishGame(
 	}
 
 	return nil
-}
-
-func (g *GameShot) processBotShot(
-	currentGame *game.Game,
-	round int,
-	completedAt time.Time,
-) error {
-	if err := currentGame.PlayerShot(game.Shot{
-		GameID:       currentGame.ID,
-		PlayerID:     0,
-		Round:        round,
-		ExpectedSide: generateBotSide(),
-		CompletedAt:  completedAt,
-	}); err != nil {
-		return fmt.Errorf("player shot: %w", err)
-	}
-
-	return nil
-}
-
-func generateBotSide() game.ShotSide {
-	//nolint:gosec
-	return possibleBotShotSides[rand.Int()%len(possibleBotShotSides)]
 }

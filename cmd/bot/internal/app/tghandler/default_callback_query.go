@@ -233,3 +233,24 @@ func (t *TGHandler) cbLeaderboardMyPage(
 
 	return nil
 }
+
+func (t *TGHandler) cbSelectBotDifficulty(
+	ctx context.Context,
+	msg tgbot.BotMessage,
+	btn *button.Button,
+) error {
+	payload, err := button.GetPayload[game.SelectBotDifficultyPayload](*btn)
+	if err != nil {
+		return fmt.Errorf("get payload: %w", err)
+	}
+
+	if err := t.startGame.StartGameWithBot(
+		ctx,
+		msginfo.ChatIDFromInt64(msg.ChatID),
+		payload.Difficulty,
+	); err != nil {
+		return fmt.Errorf("start game with bot: %w", err)
+	}
+
+	return nil
+}
