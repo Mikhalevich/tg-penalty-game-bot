@@ -55,7 +55,7 @@ func CreateGameWithBot(
 		Type:      gameType,
 		Status:    GameStatusInProgress,
 		State: State{
-			Player1: CreateGamePlayerFromPlayer(player1),
+			Player1: CreateGamePlayerFromPlayerAgainstBot(player1, difficulty),
 			Player2: botPlayer,
 			Rounds:  makeRounds(gameID, ShotsInitial, player1.ID, botPlayer.ID),
 		},
@@ -91,6 +91,15 @@ func CreateGamePlayerFromPlayer(plr player.Player) Player {
 		ChatID:      plr.ChatID,
 		DisplayName: plr.DisplayName,
 		Info:        createPlayerInfo(),
+	}
+}
+
+func CreateGamePlayerFromPlayerAgainstBot(plr player.Player, difficulty BotDifficulty) Player {
+	return Player{
+		ID:          plr.ID,
+		ChatID:      plr.ChatID,
+		DisplayName: plr.DisplayName,
+		Info:        createPlayerInfoAgainstBot(difficulty),
 	}
 }
 
