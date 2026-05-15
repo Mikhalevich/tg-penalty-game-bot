@@ -10,7 +10,7 @@ import (
 
 var (
 	//nolint:gochecknoglobals
-	possibleBotShotSides = []ShotSide{
+	possibleExpectedShotSides = []ShotSide{
 		ShotSideLeft,
 		ShotSideMiddle,
 		ShotSideRight,
@@ -25,7 +25,7 @@ func (g *Game) BotShot(
 		return perror.InvalidParam("game is not with bot")
 	}
 
-	botShot, playerShot := g.playersShots(0)
+	botShot, playerShot := g.currentRoundShots(0)
 
 	if playerShot.ActualSide == ShotSideNoShot {
 		return perror.InvalidParam("player is not shot yet")
@@ -39,10 +39,10 @@ func (g *Game) BotShot(
 		return perror.InvalidRound()
 	}
 
-	botShot.ExpectedSide = generateBotSide()
+	botShot.ExpectedSide = generateExpectedShotSide()
 	botShot.ActualSide = calculateActualBotShotSide(
-		g.State.PlayerByID(0).Info,
 		botShot.Type,
+		g.State.PlayerByID(0).Info,
 		botShot.ExpectedSide,
 		g.State.PlayerByID(playerShot.PlayerID).Info,
 		playerShot.ActualSide,
@@ -56,8 +56,8 @@ func (g *Game) BotShot(
 }
 
 func calculateActualBotShotSide(
-	botInfo PlayerInfo,
 	shotType ShotType,
+	botInfo PlayerInfo,
 	botShotSide ShotSide,
 	playerInfo PlayerInfo,
 	playerShotSide ShotSide,
@@ -72,16 +72,16 @@ func calculateActualBotShotSide(
 
 	switch shotType {
 	case ShotTypeAttack:
-		return botCalculateActualAttackShotSide(botInfo, botShotSide, playerInfo, playerShotSide)
+		return calculateActualAttackBotShotSide(botInfo, botShotSide, playerInfo, playerShotSide)
 
 	case ShotTypeDefend:
-		return botCalculateActualDefendShotSide(botInfo, botShotSide, playerInfo, playerShotSide)
+		return calculateActualDefendBotShotSide(botInfo, botShotSide, playerInfo, playerShotSide)
 	}
 
 	return botShotSide
 }
 
-func botCalculateActualAttackShotSide(
+func calculateActualAttackBotShotSide(
 	botInfo PlayerInfo, botShotSide ShotSide,
 	playerInfo PlayerInfo, playerShotSide ShotSide,
 ) ShotSide {
@@ -96,7 +96,7 @@ func botCalculateActualAttackShotSide(
 	return botShotSide
 }
 
-func botCalculateActualDefendShotSide(
+func calculateActualDefendBotShotSide(
 	botInfo PlayerInfo, botShotSide ShotSide,
 	playerInfo PlayerInfo, playerShotSide ShotSide,
 ) ShotSide {
@@ -112,7 +112,7 @@ func botCalculateActualDefendShotSide(
 }
 
 func firstNotEqualSide(side ShotSide) ShotSide {
-	for _, s := range possibleBotShotSides {
+	for _, s := range possibleExpectedShotSides {
 		if s != side {
 			return s
 		}
@@ -121,13 +121,13 @@ func firstNotEqualSide(side ShotSide) ShotSide {
 	return side
 }
 
-func generateBotSide() ShotSide {
+func generateExpectedShotSide() ShotSide {
 	//nolint:gosec
-	return possibleBotShotSides[rand.Int()%len(possibleBotShotSides)]
+	return possibleExpectedShotSides[rand.Int()%len(possibleExpectedShotSides)]
 }
 
-// playersShots returns in shot by player id for modification, shot another player for ready only.
-func (g *Game) playersShots(id player.ID) (*Shot, Shot) {
+// currentRoundShots returns shot by player id for modification and shot another player for ready only access.
+func (g *Game) currentRoundShots(id player.ID) (*Shot, Shot) {
 	cRound := g.currentRoundPtr()
 
 	if cRound.Attack.PlayerID == id {
