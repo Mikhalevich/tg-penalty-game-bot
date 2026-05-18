@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	imagePathTemplate = "assets/%s/%s.png"
+	imagePathTemplate = "assets/%s/%s.jpg"
 
 	prepareFolder = "prepare"
 	attackFolder  = "attack"
