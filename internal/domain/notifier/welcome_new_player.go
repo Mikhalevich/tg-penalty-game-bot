@@ -19,6 +19,11 @@ func (n *Notifier) WelcomeNewPlayer(ctx context.Context, plr player.Player) erro
 		return fmt.Errorf("create bot button: %w", err)
 	}
 
+	playByLinkBtn, err := game.StartGameButton("Play by share link", game.GameTypeByLink)
+	if err != nil {
+		return fmt.Errorf("create play by link button: %w", err)
+	}
+
 	playRatingBtn, err := game.StartGameButton("Play rating game", game.GameTypeRating)
 	if err != nil {
 		return fmt.Errorf("create rating button: %w", err)
@@ -30,6 +35,7 @@ func (n *Notifier) WelcomeNewPlayer(ctx context.Context, plr player.Player) erro
 		Type:   msginfo.MessageTypeMarkdown,
 		Buttons: []button.ButtonRow{
 			button.Row(playBotBtn),
+			button.Row(playByLinkBtn),
 			button.Row(playRatingBtn),
 			button.Row(button.ChangeNameTrigger("Change name")),
 		},
