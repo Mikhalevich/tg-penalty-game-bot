@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/button"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/game"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/msginfo"
 )
@@ -13,6 +14,11 @@ func (n *Notifier) GameLink(ctx context.Context, chatID msginfo.ChatID, gameID g
 		ChatID: chatID,
 		Text:   makeStartGameLink(gameID),
 		Type:   msginfo.MessageTypePlain,
+		Buttons: []button.ButtonRow{
+			{
+				game.LeaveGameButton("Cancel"),
+			},
+		},
 	}); err != nil {
 		return fmt.Errorf("send message: %w", err)
 	}
