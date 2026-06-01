@@ -9,6 +9,14 @@ import (
 )
 
 func (t *TGHandler) ChangeName(ctx context.Context, msg tgbot.BotMessage, sender tgbot.MessageSender) error {
+	if msg.Args != "" {
+		if err := t.changeName.ChangeDisplayName(ctx, msginfo.ChatID(msg.ChatID), msg.Args); err != nil {
+			return fmt.Errorf("change name to %q: %w", msg.Args, err)
+		}
+
+		return nil
+	}
+
 	if err := t.changeName.SetChangeDisplayNameTrigger(
 		ctx,
 		msginfo.ChatIDFromInt64(msg.ChatID),
