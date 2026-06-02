@@ -42,6 +42,7 @@ func (u User) FullName() string {
 type BotMessage struct {
 	MessageID int
 	ChatID    int64
+	IsGroup   bool
 	User      User
 	// for text message
 	Text string
@@ -216,6 +217,7 @@ func fillBaseMessage(msg *models.Message, user *models.User) BotMessage {
 	botMsg := BotMessage{
 		MessageID: msg.ID,
 		ChatID:    msg.Chat.ID,
+		IsGroup:   msg.Chat.Type != models.ChatTypePrivate,
 		Text:      msg.Text,
 	}
 

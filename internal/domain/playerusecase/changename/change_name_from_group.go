@@ -8,7 +8,7 @@ import (
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/msginfo"
 )
 
-func (c *ChangeName) SetChangeDisplayNameTrigger(
+func (c *ChangeName) ChangeNameFromGroup(
 	ctx context.Context,
 	chatID msginfo.ChatID,
 	fullName string,
@@ -17,14 +17,6 @@ func (c *ChangeName) SetChangeDisplayNameTrigger(
 	plr, err := c.playerProvider.GetPlayerByChatID(ctx, chatID)
 	if err != nil {
 		return fmt.Errorf("get player by chat id: %w", err)
-	}
-
-	if plr.IsChangeNameTriggered {
-		if err := c.notifier.ChangeName(ctx, plr, false, fullName, userName); err != nil {
-			return fmt.Errorf("change name notificatoin: %w", err)
-		}
-
-		return nil
 	}
 
 	var (
@@ -39,17 +31,9 @@ func (c *ChangeName) SetChangeDisplayNameTrigger(
 		return nil
 	}
 
-	if err := c.repo.SetChangeDisplayNameTrigger(ctx, plr.ChatID, true); err != nil {
-		return fmt.Errorf("repo up change display name trigger: %w", err)
-	}
-
-	if err := c.notifier.ChangeName(ctx, plr, false, fullName, userName); err != nil {
+	if err := c.notifier.ChangeName(ctx, plr, true, fullName, userName); err != nil {
 		return fmt.Errorf("change name notificatoin: %w", err)
 	}
 
 	return nil
-}
-
-func formatDelta(delta time.Duration) time.Duration {
-	return delta.Truncate(time.Second)
 }

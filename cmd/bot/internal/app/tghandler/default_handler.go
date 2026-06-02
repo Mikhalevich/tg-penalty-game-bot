@@ -35,7 +35,7 @@ func (t *TGHandler) changeDisplayName(
 	chatID msginfo.ChatID,
 	displayName string,
 ) error {
-	if err := t.changeName.ChangeDisplayName(ctx, chatID, displayName); err != nil {
+	if err := t.changeName.ChangeDisplayName(ctx, chatID, displayName, false); err != nil {
 		if !perror.IsType(err, perror.TypeAlreadyExists) {
 			return fmt.Errorf("change display name: %w", err)
 		}

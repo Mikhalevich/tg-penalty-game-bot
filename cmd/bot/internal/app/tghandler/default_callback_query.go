@@ -69,13 +69,8 @@ func (t *TGHandler) cbChangeNameTrigger(
 	msg tgbot.BotMessage,
 	btn *button.Button,
 ) error {
-	if err := t.changeName.SetChangeDisplayNameTrigger(
-		ctx,
-		msginfo.ChatIDFromInt64(msg.ChatID),
-		msg.User.FullName(),
-		msg.User.Username,
-	); err != nil {
-		return fmt.Errorf("set change name trigger: %w", err)
+	if err := t.processChangeName(ctx, msg); err != nil {
+		return fmt.Errorf("change name triggered: %w", err)
 	}
 
 	return nil

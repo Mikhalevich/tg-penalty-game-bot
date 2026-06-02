@@ -16,6 +16,7 @@ const (
 func (n *Notifier) ChangeName(
 	ctx context.Context,
 	plr player.Player,
+	isGroup bool,
 	fullName,
 	userName string,
 ) error {
@@ -26,14 +27,23 @@ func (n *Notifier) ChangeName(
 
 	if err := n.sender.SendMessage(ctx, msginfo.Message{
 		ChatID:  plr.ChatID,
-		Text:    "Send message to change your name or use buttons for one of the your account name",
-		Type:    msginfo.MessageTypePlain,
+		Text:    changeNameText(isGroup),
+		Type:    msginfo.MessageTypeMarkdown,
 		Buttons: buttons,
 	}); err != nil {
 		return fmt.Errorf("send message: %w", err)
 	}
 
 	return nil
+}
+
+func changeNameText(isGroup bool) string {
+	if isGroup {
+		return `To change name in a group chat use commad *\/change\_name \<new\_name\>* 
+or use buttons for one of the your account name`
+	}
+
+	return "Send message to change your name or use buttons for one of the your account name"
 }
 
 func makeChanageNameButton(
