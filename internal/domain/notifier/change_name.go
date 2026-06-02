@@ -39,7 +39,7 @@ func (n *Notifier) ChangeName(
 
 func changeNameText(isGroup bool) string {
 	if isGroup {
-		return `To change name in a group chat use commad */change_name <new_name>* 
+		return `To change name in a group chat use commad *\\/change_name \\<new_name\\>* 
 or use buttons for one of the your account name`
 	}
 
