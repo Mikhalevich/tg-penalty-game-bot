@@ -17,6 +17,14 @@ func (t *TGHandler) ChangeName(ctx context.Context, msg tgbot.BotMessage, sender
 		return nil
 	}
 
+	if err := t.processChangeName(ctx, msg); err != nil {
+		return fmt.Errorf("change name triggered: %w", err)
+	}
+
+	return nil
+}
+
+func (t *TGHandler) processChangeName(ctx context.Context, msg tgbot.BotMessage) error {
 	if msg.IsGroup {
 		if err := t.changeName.ChangeNameFromGroup(
 			ctx,
