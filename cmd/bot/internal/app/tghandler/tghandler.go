@@ -24,7 +24,8 @@ type Welcome interface {
 
 type ChangeName interface {
 	SetChangeDisplayNameTrigger(ctx context.Context, chatID msginfo.ChatID, fullName, userName string) error
-	ChangeDisplayName(ctx context.Context, chatID msginfo.ChatID, displayName string) error
+	ChangeNameFromGroup(ctx context.Context, chatID msginfo.ChatID, fullName string, userName string) error
+	ChangeDisplayName(ctx context.Context, chatID msginfo.ChatID, displayName string, force bool) error
 	Cancel(ctx context.Context, chatID msginfo.ChatID) error
 }
 

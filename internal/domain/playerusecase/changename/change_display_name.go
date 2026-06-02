@@ -13,6 +13,7 @@ func (c *ChangeName) ChangeDisplayName(
 	ctx context.Context,
 	chatID msginfo.ChatID,
 	displayName string,
+	force bool,
 ) error {
 	if utf8.RuneCountInString(displayName) > c.maxNameLen {
 		if err := c.notifier.NameIsTooLong(ctx, chatID, c.maxNameLen); err != nil {
@@ -27,7 +28,7 @@ func (c *ChangeName) ChangeDisplayName(
 		return fmt.Errorf("get player info: %w", err)
 	}
 
-	if !currentPlayer.IsChangeNameTriggered {
+	if !force && !currentPlayer.IsChangeNameTriggered {
 		return errors.New("change name not triggered")
 	}
 

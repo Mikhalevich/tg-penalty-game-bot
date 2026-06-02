@@ -29,8 +29,7 @@ func (p *Postgres) ChangeDisplayName(
 				is_change_name_triggered = FALSE,
 				name_changed_at = :name_changed_at
 			WHERE
-				chat_id = :chat_id AND
-				is_change_name_triggered = TRUE
+				chat_id = :chat_id
 		`
 	)
 

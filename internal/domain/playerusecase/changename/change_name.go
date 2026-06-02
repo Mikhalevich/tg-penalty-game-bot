@@ -25,7 +25,7 @@ type TimeProvider interface {
 
 type Notifier interface {
 	ChangeNameDelay(ctx context.Context, plr player.Player, waitPeriod time.Duration) error
-	ChangeName(ctx context.Context, plr player.Player, fullName, userName string) error
+	ChangeName(ctx context.Context, plr player.Player, isGroup bool, fullName, userName string) error
 	NameChanged(ctx context.Context, plr player.Player) error
 	NameAlreadyRegistered(ctx context.Context, chatID msginfo.ChatID, displayName string) error
 	NameIsTooLong(ctx context.Context, chatID msginfo.ChatID, maxNameLen int) error
