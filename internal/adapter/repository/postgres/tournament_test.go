@@ -11,49 +11,57 @@ import (
 
 func (s *PostgresSuit) TestCRUTournament() {
 	var (
-		ctx = context.Background()
-		id  = tournament.IDFromString(uuid.NewString())
+		ctx          = context.Background()
+		tournamentID = tournament.IDFromString(uuid.NewString())
 	)
 
 	err := s.pgDB.InsertTournament(ctx, tournament.Tournament{
-		ID:             id,
-		CreatedAt:      time.Date(2026, 06, 14, 14, 49, 7, 0, time.Local),
-		Status:         tournament.TournamentStatusPending,
-		State:          tournament.State{},
-		StateVersion:   1,
+		ID: tournamentID,
+		//nolint:gosmopolitan
+		CreatedAt:    time.Date(2026, 06, 14, 14, 49, 7, 0, time.Local),
+		Status:       tournament.TournamentStatusPending,
+		State:        tournament.State{},
+		StateVersion: 1,
+		//nolint:gosmopolitan
 		StateUpdatedAt: time.Date(2026, 06, 14, 14, 49, 7, 0, time.Local),
 	})
 	s.Require().NoError(err)
 
-	actualCreatedTournament, err := s.pgDB.GetTournament(ctx, id)
+	actualCreatedTournament, err := s.pgDB.GetTournament(ctx, tournamentID)
 	s.Require().NoError(err)
 	s.Require().Equal(tournament.Tournament{
-		ID:             id,
-		CreatedAt:      time.Date(2026, 06, 14, 14, 49, 7, 0, time.Local),
-		Status:         tournament.TournamentStatusPending,
-		State:          tournament.State{},
-		StateVersion:   1,
+		ID: tournamentID,
+		//nolint:gosmopolitan
+		CreatedAt:    time.Date(2026, 06, 14, 14, 49, 7, 0, time.Local),
+		Status:       tournament.TournamentStatusPending,
+		State:        tournament.State{},
+		StateVersion: 1,
+		//nolint:gosmopolitan
 		StateUpdatedAt: time.Date(2026, 06, 14, 14, 49, 7, 0, time.Local),
 	}, actualCreatedTournament)
 
 	err = s.pgDB.UpdateTournament(ctx, tournament.Tournament{
-		ID:             id,
-		CreatedAt:      time.Date(2027, 07, 16, 16, 49, 7, 0, time.Local),
-		Status:         tournament.TournamentStatusInProgress,
-		State:          tournament.State{},
-		StateVersion:   1,
+		ID: tournamentID,
+		//nolint:gosmopolitan
+		CreatedAt:    time.Date(2027, 07, 16, 16, 49, 7, 0, time.Local),
+		Status:       tournament.TournamentStatusInProgress,
+		State:        tournament.State{},
+		StateVersion: 1,
+		//nolint:gosmopolitan
 		StateUpdatedAt: time.Date(2026, 06, 15, 15, 49, 7, 0, time.Local),
 	})
 	s.Require().NoError(err)
 
-	actualUpdatedTournament, err := s.pgDB.GetTournament(ctx, id)
+	actualUpdatedTournament, err := s.pgDB.GetTournament(ctx, tournamentID)
 	s.Require().NoError(err)
 	s.Require().Equal(tournament.Tournament{
-		ID:             id,
-		CreatedAt:      time.Date(2026, 06, 14, 14, 49, 7, 0, time.Local),
-		Status:         tournament.TournamentStatusInProgress,
-		State:          tournament.State{},
-		StateVersion:   2,
+		ID: tournamentID,
+		//nolint:gosmopolitan
+		CreatedAt:    time.Date(2026, 06, 14, 14, 49, 7, 0, time.Local),
+		Status:       tournament.TournamentStatusInProgress,
+		State:        tournament.State{},
+		StateVersion: 2,
+		//nolint:gosmopolitan
 		StateUpdatedAt: time.Date(2026, 06, 15, 15, 49, 7, 0, time.Local),
 	}, actualUpdatedTournament)
 }
@@ -70,26 +78,30 @@ func (s *PostgresSuit) TestGetTournamentNotFoundError() {
 
 func (s *PostgresSuit) TestUpdateTournamentInvalidVersionPayloadError() {
 	var (
-		ctx = context.Background()
-		id  = tournament.IDFromString(uuid.NewString())
+		ctx          = context.Background()
+		tournamentID = tournament.IDFromString(uuid.NewString())
 	)
 
 	err := s.pgDB.InsertTournament(ctx, tournament.Tournament{
-		ID:             id,
-		CreatedAt:      time.Date(2026, 06, 14, 14, 49, 7, 0, time.Local),
-		Status:         tournament.TournamentStatusPending,
-		State:          tournament.State{},
-		StateVersion:   2,
+		ID: tournamentID,
+		//nolint:gosmopolitan
+		CreatedAt:    time.Date(2026, 06, 14, 14, 49, 7, 0, time.Local),
+		Status:       tournament.TournamentStatusPending,
+		State:        tournament.State{},
+		StateVersion: 2,
+		//nolint:gosmopolitan
 		StateUpdatedAt: time.Date(2026, 06, 14, 14, 49, 7, 0, time.Local),
 	})
 	s.Require().NoError(err)
 
 	err = s.pgDB.UpdateTournament(ctx, tournament.Tournament{
-		ID:             id,
-		CreatedAt:      time.Date(2026, 06, 14, 14, 49, 7, 0, time.Local),
-		Status:         tournament.TournamentStatusInProgress,
-		State:          tournament.State{},
-		StateVersion:   3,
+		ID: tournamentID,
+		//nolint:gosmopolitan
+		CreatedAt:    time.Date(2026, 06, 14, 14, 49, 7, 0, time.Local),
+		Status:       tournament.TournamentStatusInProgress,
+		State:        tournament.State{},
+		StateVersion: 3,
+		//nolint:gosmopolitan
 		StateUpdatedAt: time.Date(2026, 06, 15, 15, 49, 7, 0, time.Local),
 	})
 	s.Require().EqualError(err, "no rows updated")
