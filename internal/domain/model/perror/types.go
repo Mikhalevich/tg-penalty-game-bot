@@ -10,6 +10,7 @@ const (
 	TypeInvalidParam
 	TypeTooManyRequests
 	TypeInvalidPlayer
+	TypeInvalidState
 	TypeInvalidGameState
 	TypeInvalidRound
 	TypeRoundNotCompleted
