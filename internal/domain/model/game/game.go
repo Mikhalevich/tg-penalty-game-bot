@@ -3,6 +3,8 @@ package game
 import (
 	"time"
 
+	"github.com/google/uuid"
+
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/perror"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/player"
 )
@@ -19,6 +21,10 @@ func (id ID) String() string {
 
 func IDFromString(id string) ID {
 	return ID(id)
+}
+
+func GenerateID() ID {
+	return ID(uuid.NewString())
 }
 
 type Game struct {
