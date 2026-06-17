@@ -1,7 +1,15 @@
 package tournament
 
 import (
+	"fmt"
 	"time"
+
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/perror"
+)
+
+const (
+	MinPlayers = 3
+	MaxPlayers = 20
 )
 
 type ID string
@@ -34,4 +42,54 @@ type Tournament struct {
 	State          State
 	StateVersion   int
 	StateUpdatedAt time.Time
+}
+
+func (t *Tournament) Join(plr Player) error {
+	if err := t.ensureStatus(TournamentStatusPending); err != nil {
+		return fmt.Errorf("ensure status: %w", err)
+	}
+
+	if len(t.State.Teams) >= MaxPlayers {
+		return perror.InvalidState("max players reached")
+	}
+
+	t.State.Teams = append(t.State.Teams, Team{
+		Player: plr,
+	})
+
+	return nil
+}
+
+func (t *Tournament) Start() error {
+	if err := t.ensureStatus(TournamentStatusPending); err != nil {
+		return fmt.Errorf("ensure status: %w", err)
+	}
+
+	if len(t.State.Teams) < MinPlayers {
+		return perror.InvalidState("not enough players")
+	}
+
+	return nil
+}
+
+func (t *Tournament) ensureStatus(s TournamentStatus) error {
+	if t.Status == s {
+		return nil
+	}
+
+	switch t.Status {
+	case TournamentStatusPending:
+		return perror.InvalidState("tournament is in pending state")
+
+	case TournamentStatusInProgress:
+		return perror.InvalidState("tournament already in progress")
+
+	case TournamentStatusCompleted:
+		return perror.InvalidState("tournament is completed")
+
+	case TournamentStatusCanceled:
+		return perror.InvalidState("tournament is canceled")
+	}
+
+	return nil
 }

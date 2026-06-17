@@ -79,6 +79,10 @@ func InvalidPlayer() Error {
 	return New(TypeInvalidPlayer, "invalid player")
 }
 
+func InvalidState(msg string) Error {
+	return New(TypeInvalidState, msg)
+}
+
 func InvalidGameState() Error {
 	return New(TypeInvalidGameState, "invalid game state")
 }
