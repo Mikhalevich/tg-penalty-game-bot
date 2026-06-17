@@ -5,6 +5,7 @@ import (
 
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/perror"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/player"
+	"github.com/google/uuid"
 )
 
 const (
@@ -19,6 +20,10 @@ func (id ID) String() string {
 
 func IDFromString(id string) ID {
 	return ID(id)
+}
+
+func GenerateID() ID {
+	return ID(uuid.NewString())
 }
 
 type Game struct {

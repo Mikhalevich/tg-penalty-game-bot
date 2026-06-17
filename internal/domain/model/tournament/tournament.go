@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/game"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/perror"
 )
 
@@ -60,7 +61,7 @@ func (t *Tournament) Join(plr Player) error {
 	return nil
 }
 
-func (t *Tournament) Start() error {
+func (t *Tournament) Start(startedAt time.Time) error {
 	if err := t.ensureStatus(TournamentStatusPending); err != nil {
 		return fmt.Errorf("ensure status: %w", err)
 	}
@@ -68,6 +69,10 @@ func (t *Tournament) Start() error {
 	if len(t.State.Teams) < MinPlayers {
 		return perror.InvalidState("not enough players")
 	}
+
+	t.State.Rounds = RoundRobinSchedule(len(t.State.Teams), game.GenerateID)
+	t.Status = TournamentStatusInProgress
+	t.StateUpdatedAt = startedAt
 
 	return nil
 }

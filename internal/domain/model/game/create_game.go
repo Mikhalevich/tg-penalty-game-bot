@@ -4,8 +4,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/google/uuid"
-
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/player"
 )
 
@@ -17,7 +15,7 @@ func CreateGameWithPlayer(
 	player2 player.Player,
 	createdAt time.Time,
 ) Game {
-	gameID := IDFromString(uuid.NewString())
+	gameID := GenerateID()
 	createdGame := Game{
 		ID:        gameID,
 		CreatedAt: createdAt,
@@ -45,7 +43,7 @@ func CreateGameWithBot(
 	createdAt time.Time,
 ) Game {
 	var (
-		gameID    = IDFromString(uuid.NewString())
+		gameID    = GenerateID()
 		botPlayer = createBot(difficulty)
 	)
 
@@ -74,7 +72,7 @@ func CreatePendingGame(
 	createdAt time.Time,
 ) Game {
 	return Game{
-		ID:        IDFromString(uuid.NewString()),
+		ID:        GenerateID(),
 		CreatedAt: createdAt,
 		Type:      GameTypeByLink,
 		Status:    GameStatusPending,
