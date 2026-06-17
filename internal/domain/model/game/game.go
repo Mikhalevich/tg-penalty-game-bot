@@ -3,9 +3,10 @@ package game
 import (
 	"time"
 
+	"github.com/google/uuid"
+
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/perror"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/player"
-	"github.com/google/uuid"
 )
 
 const (
