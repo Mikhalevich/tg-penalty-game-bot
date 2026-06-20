@@ -77,6 +77,26 @@ func (t *Tournament) Start(startedAt time.Time) error {
 	return nil
 }
 
+func (t *Tournament) NextRound() ([]game.Game, bool, error) {
+	if !t.State.isCurrentRoundFinished() {
+		return nil, false, perror.InvalidState("current round is not finished")
+	}
+
+	t.State.CurrentRound++
+
+	if t.State.isRoundsCompleted() {
+		t.Status = TournamentStatusCompleted
+
+		return nil, true, nil
+	}
+
+	for range t.State.Rounds[t.State.CurrentRound] {
+		// make games
+	}
+
+	return nil, false, nil
+}
+
 func (t *Tournament) ensureStatus(s TournamentStatus) error {
 	if t.Status == s {
 		return nil

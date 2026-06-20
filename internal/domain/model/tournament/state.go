@@ -35,3 +35,21 @@ type State struct {
 	Rounds       []Round
 	CurrentRound int
 }
+
+func (s State) isRoundsCompleted() bool {
+	return s.CurrentRound >= len(s.Rounds)
+}
+
+func (s State) isCurrentRoundFinished() bool {
+	if s.isRoundsCompleted() {
+		return true
+	}
+
+	for _, match := range s.Rounds[s.CurrentRound] {
+		if !match.IsCompleted {
+			return false
+		}
+	}
+
+	return true
+}
