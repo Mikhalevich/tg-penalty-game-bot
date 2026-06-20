@@ -26,7 +26,6 @@ func (s *StartGame) StartGameByLink(
 	now := s.timeProvider.Now()
 
 	pendingGame := game.CreatePendingGame(
-		ctx,
 		currentPlayer,
 		now,
 	)

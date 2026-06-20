@@ -1,7 +1,6 @@
 package game
 
 import (
-	"context"
 	"time"
 
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/player"
@@ -9,7 +8,6 @@ import (
 
 // CreateGameWithPlayer create a new game(in progress status), start first round and return created game.
 func CreateGameWithPlayer(
-	ctx context.Context,
 	gameType GameType,
 	player1 player.Player,
 	player2 player.Player,
@@ -36,7 +34,6 @@ func CreateGameWithPlayer(
 
 // CreateGameWithBot create a new game(in progress status), with bot and return created game.
 func CreateGameWithBot(
-	ctx context.Context,
 	gameType GameType,
 	player1 player.Player,
 	difficulty BotDifficulty,
@@ -67,7 +64,6 @@ func CreateGameWithBot(
 
 // CreatePendingGame create a new game in pending status, no round is starting and return created game.
 func CreatePendingGame(
-	ctx context.Context,
 	plr player.Player,
 	createdAt time.Time,
 ) Game {
