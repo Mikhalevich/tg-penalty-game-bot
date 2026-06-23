@@ -77,7 +77,9 @@ func (t *Tournament) Start(startedAt time.Time) error {
 	return nil
 }
 
-func (t *Tournament) NextRound() ([]game.Game, bool, error) {
+// NextRound try to start next round
+// returns new round games, completion flag and error.
+func (t *Tournament) NextRound(startedAt time.Time) ([]game.Game, bool, error) {
 	if !t.State.isCurrentRoundFinished() {
 		return nil, false, perror.InvalidState("current round is not finished")
 	}
@@ -86,15 +88,70 @@ func (t *Tournament) NextRound() ([]game.Game, bool, error) {
 
 	if t.State.isRoundsCompleted() {
 		t.Status = TournamentStatusCompleted
+		t.StateUpdatedAt = startedAt
 
 		return nil, true, nil
 	}
 
-	for range t.State.Rounds[t.State.CurrentRound] {
-		// make games
+	games := t.makeRoundGames(startedAt)
+
+	return games, false, nil
+}
+
+func (t *Tournament) makeRoundGames(startedAt time.Time) []game.Game {
+	var (
+		games               = make([]game.Game, 0, len(t.State.Rounds[t.State.CurrentRound]))
+		currentRoundMatches = t.State.Rounds[t.State.CurrentRound]
+	)
+
+	for matchIdx, match := range currentRoundMatches {
+		var (
+			homePlayer = t.State.Teams[match.Home.Idx]
+			awayPlayer = t.State.Teams[match.Away.Idx]
+		)
+
+		newGame := makeGame(homePlayer.Player, awayPlayer.Player, startedAt)
+		currentRoundMatches[matchIdx].ID = newGame.ID
+		games = append(games, newGame)
 	}
 
-	return nil, false, nil
+	return games
+}
+
+func makeGame(homePlayer, awayPlayer Player, startedAt time.Time) game.Game {
+	switch {
+	case homePlayer.IsBot && awayPlayer.IsBot:
+		return game.CreateGameBotToBot(
+			game.GameTypeTournament,
+			homePlayer.BotDifficulty,
+			awayPlayer.BotDifficulty,
+			startedAt,
+		)
+
+	case homePlayer.IsBot:
+		return game.CreateGameWithBot(
+			game.GameTypeTournament,
+			awayPlayer.toDomPlayer(),
+			homePlayer.BotDifficulty,
+			startedAt,
+		)
+
+	case awayPlayer.IsBot:
+		return game.CreateGameWithBot(
+			game.GameTypeTournament,
+			homePlayer.toDomPlayer(),
+			awayPlayer.BotDifficulty,
+			startedAt,
+		)
+
+	default:
+		return game.CreateGameWithPlayer(
+			game.GameTypeTournament,
+			homePlayer.toDomPlayer(),
+			awayPlayer.toDomPlayer(),
+			startedAt,
+		)
+	}
 }
 
 func (t *Tournament) ensureStatus(s TournamentStatus) error {
