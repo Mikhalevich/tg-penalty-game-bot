@@ -116,7 +116,7 @@ func makeFinishGameButtons(gameType game.GameType) ([]button.ButtonRow, error) {
 	case game.GameTypeBot:
 		caption = "Play with bot"
 
-	case game.GameTypeByLink:
+	case game.GameTypeByLink, game.GameTypeTournament:
 		return nil, nil
 
 	default:

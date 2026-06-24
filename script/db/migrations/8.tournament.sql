@@ -17,6 +17,7 @@ CREATE TABLE tournament(
     payload_updated_at TIMESTAMPTZ NOT NULL
 );
 
+ALTER TYPE game_type ADD VALUE 'tournament';
 
 -- +migrate Down
 -- SQL section 'Down' is executed when this migration is rolled back

@@ -22,6 +22,9 @@ func (s *StartGame) RepeatGame(
 
 	case game.GameTypeByLink:
 		return s.StartGameByLink(ctx, chatID)
+
+	case game.GameTypeTournament:
+		return nil
 	}
 
 	return perror.InvalidParam("invalid game type")

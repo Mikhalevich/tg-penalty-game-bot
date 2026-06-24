@@ -1,7 +1,6 @@
 package game
 
 import (
-	"context"
 	"time"
 
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/player"
@@ -9,7 +8,6 @@ import (
 
 // CreateGameWithPlayer create a new game(in progress status), start first round and return created game.
 func CreateGameWithPlayer(
-	ctx context.Context,
 	gameType GameType,
 	player1 player.Player,
 	player2 player.Player,
@@ -36,7 +34,6 @@ func CreateGameWithPlayer(
 
 // CreateGameWithBot create a new game(in progress status), with bot and return created game.
 func CreateGameWithBot(
-	ctx context.Context,
 	gameType GameType,
 	player1 player.Player,
 	difficulty BotDifficulty,
@@ -65,9 +62,39 @@ func CreateGameWithBot(
 	return createdGame
 }
 
+// CreateGameBotToBot create a bot to bot game(in progress status).
+func CreateGameBotToBot(
+	gameType GameType,
+	homeDiff BotDifficulty,
+	awayDiff BotDifficulty,
+	createdAt time.Time,
+) Game {
+	var (
+		gameID  = GenerateID()
+		homeBot = createBot(homeDiff)
+		awayBot = createBot(awayDiff)
+	)
+
+	createdGame := Game{
+		ID:        gameID,
+		CreatedAt: createdAt,
+		Type:      gameType,
+		Status:    GameStatusInProgress,
+		State: State{
+			Player1: homeBot,
+			Player2: awayBot,
+			Rounds:  makeRounds(gameID, ShotsInitial, homeBot.ID, awayBot.ID),
+		},
+		StateUpdatedAt: createdAt,
+	}
+
+	createdGame.StartFirstRound(createdAt)
+
+	return createdGame
+}
+
 // CreatePendingGame create a new game in pending status, no round is starting and return created game.
 func CreatePendingGame(
-	ctx context.Context,
 	plr player.Player,
 	createdAt time.Time,
 ) Game {
@@ -103,6 +130,7 @@ func CreateGamePlayerFromPlayerAgainstBot(plr player.Player, difficulty BotDiffi
 
 func makeRounds(
 	gameID ID,
+	//nolint:unparam
 	shotsCount int,
 	playerID1 player.ID,
 	playerID2 player.ID,
