@@ -62,37 +62,6 @@ func CreateGameWithBot(
 	return createdGame
 }
 
-// CreateGameBotToBot create a bot to bot game(in progress status).
-func CreateGameBotToBot(
-	gameType GameType,
-	homeDiff BotDifficulty,
-	awayDiff BotDifficulty,
-	createdAt time.Time,
-) Game {
-	var (
-		gameID  = GenerateID()
-		homeBot = createBot(homeDiff)
-		awayBot = createBot(awayDiff)
-	)
-
-	createdGame := Game{
-		ID:        gameID,
-		CreatedAt: createdAt,
-		Type:      gameType,
-		Status:    GameStatusInProgress,
-		State: State{
-			Player1: homeBot,
-			Player2: awayBot,
-			Rounds:  makeRounds(gameID, ShotsInitial, homeBot.ID, awayBot.ID),
-		},
-		StateUpdatedAt: createdAt,
-	}
-
-	createdGame.StartFirstRound(createdAt)
-
-	return createdGame
-}
-
 // CreatePendingGame create a new game in pending status, no round is starting and return created game.
 func CreatePendingGame(
 	plr player.Player,

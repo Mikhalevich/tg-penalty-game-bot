@@ -16,6 +16,13 @@ const (
 	percent2   = 2
 )
 
+const (
+	botEasy   = "bot easy"
+	botNormal = "bot normal"
+	botHard   = "bot hard"
+	botInsane = "bot insane"
+)
+
 type BotDifficulty int
 
 const (
@@ -89,7 +96,7 @@ func createBot(difficulty BotDifficulty) Player {
 	case BotDifficultyEasy:
 		return Player{
 			ID:          0,
-			DisplayName: "bot easy",
+			DisplayName: botEasy,
 			Info: PlayerInfo{
 				IsBot:             true,
 				AttackMissPercent: percent20,
@@ -102,7 +109,7 @@ func createBot(difficulty BotDifficulty) Player {
 	case BotDifficultyNormal:
 		return Player{
 			ID:          0,
-			DisplayName: "bot normal",
+			DisplayName: botNormal,
 			Info: PlayerInfo{
 				IsBot:             true,
 				AttackMissPercent: percent20,
@@ -115,7 +122,7 @@ func createBot(difficulty BotDifficulty) Player {
 	case BotDifficultyHard:
 		return Player{
 			ID:          0,
-			DisplayName: "bot hard",
+			DisplayName: botHard,
 			Info: PlayerInfo{
 				IsBot:             true,
 				AttackMissPercent: percent2,
@@ -128,7 +135,7 @@ func createBot(difficulty BotDifficulty) Player {
 	case BotDifficultyInsane:
 		return Player{
 			ID:          0,
-			DisplayName: "bot insane",
+			DisplayName: botInsane,
 			Info: PlayerInfo{
 				IsBot:             true,
 				AttackMissPercent: percent2,
