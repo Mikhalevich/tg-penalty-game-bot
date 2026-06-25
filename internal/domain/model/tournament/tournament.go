@@ -70,7 +70,7 @@ func (t *Tournament) Start(startedAt time.Time) error {
 		return perror.InvalidState("not enough players")
 	}
 
-	t.State.Rounds = RoundRobinSchedule(len(t.State.Teams), game.GenerateID)
+	t.State.Rounds = RoundRobinSchedule(len(t.State.Teams))
 	t.Status = TournamentStatusInProgress
 	t.StateUpdatedAt = startedAt
 

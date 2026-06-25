@@ -1,9 +1,5 @@
 package tournament
 
-import (
-	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/game"
-)
-
 type teamMarker struct {
 	TeamIdx int
 	IsGhost bool
@@ -50,7 +46,6 @@ func rotateTeamMarkers(markers []teamMarker) {
 func makeRoundMatches(
 	markers []teamMarker,
 	roundNumber int,
-	gameIDGeneratorFn func() game.ID,
 ) Round {
 	var (
 		teamCount     = len(markers)
@@ -75,7 +70,6 @@ func makeRoundMatches(
 		}
 
 		roundMatches = append(roundMatches, Match{
-			ID: gameIDGeneratorFn(),
 			Home: MatchTeamInfo{
 				Idx: homeIdx,
 			},
@@ -90,7 +84,6 @@ func makeRoundMatches(
 
 func RoundRobinSchedule(
 	teamCount int,
-	gameIDGeneratorFn func() game.ID,
 ) []Round {
 	if teamCount == 0 {
 		return nil
@@ -103,7 +96,7 @@ func RoundRobinSchedule(
 	)
 
 	for round := range roundsCount {
-		roundMatches := makeRoundMatches(teamMarkers, round, gameIDGeneratorFn)
+		roundMatches := makeRoundMatches(teamMarkers, round)
 
 		schedule = append(schedule, roundMatches)
 

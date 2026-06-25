@@ -5,7 +5,6 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/game"
 	"github.com/Mikhalevich/tg-penalty-game-bot/internal/domain/model/tournament"
 )
 
@@ -135,9 +134,7 @@ func TestRoundRobinSchedule(t *testing.T) {
 		t.Run(test.Name, func(t *testing.T) {
 			t.Parallel()
 
-			rounds := tournament.RoundRobinSchedule(test.TeamCount, func() game.ID {
-				return game.IDFromString("")
-			})
+			rounds := tournament.RoundRobinSchedule(test.TeamCount)
 
 			require.Equal(t, test.ExpectedSchedule, rounds)
 		})
